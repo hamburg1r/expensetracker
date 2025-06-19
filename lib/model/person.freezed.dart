@@ -15,9 +15,10 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$PersonModel {
+  dynamic get id;
   String get firstName;
   String? get middleName;
-  String get lastName;
+  String? get lastName; // required int countryCode,
   int get number;
 
   /// Create a copy of PersonModel
@@ -35,6 +36,7 @@ mixin _$PersonModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is PersonModel &&
+            const DeepCollectionEquality().equals(other.id, id) &&
             (identical(other.firstName, firstName) ||
                 other.firstName == firstName) &&
             (identical(other.middleName, middleName) ||
@@ -46,12 +48,17 @@ mixin _$PersonModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, firstName, middleName, lastName, number);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(id),
+      firstName,
+      middleName,
+      lastName,
+      number);
 
   @override
   String toString() {
-    return 'PersonModel(firstName: $firstName, middleName: $middleName, lastName: $lastName, number: $number)';
+    return 'PersonModel(id: $id, firstName: $firstName, middleName: $middleName, lastName: $lastName, number: $number)';
   }
 }
 
@@ -62,7 +69,11 @@ abstract mixin class $PersonModelCopyWith<$Res> {
       _$PersonModelCopyWithImpl;
   @useResult
   $Res call(
-      {String firstName, String? middleName, String lastName, int number});
+      {dynamic id,
+      String firstName,
+      String? middleName,
+      String? lastName,
+      int number});
 }
 
 /// @nodoc
@@ -77,12 +88,17 @@ class _$PersonModelCopyWithImpl<$Res> implements $PersonModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
     Object? firstName = null,
     Object? middleName = freezed,
-    Object? lastName = null,
+    Object? lastName = freezed,
     Object? number = null,
   }) {
     return _then(_self.copyWith(
+      id: freezed == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as dynamic,
       firstName: null == firstName
           ? _self.firstName
           : firstName // ignore: cast_nullable_to_non_nullable
@@ -91,10 +107,10 @@ class _$PersonModelCopyWithImpl<$Res> implements $PersonModelCopyWith<$Res> {
           ? _self.middleName
           : middleName // ignore: cast_nullable_to_non_nullable
               as String?,
-      lastName: null == lastName
+      lastName: freezed == lastName
           ? _self.lastName
           : lastName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       number: null == number
           ? _self.number
           : number // ignore: cast_nullable_to_non_nullable
@@ -107,19 +123,23 @@ class _$PersonModelCopyWithImpl<$Res> implements $PersonModelCopyWith<$Res> {
 @JsonSerializable()
 class _PersonModel implements PersonModel {
   _PersonModel(
-      {required this.firstName,
+      {required this.id,
+      required this.firstName,
       this.middleName,
-      required this.lastName,
+      this.lastName,
       required this.number});
   factory _PersonModel.fromJson(Map<String, dynamic> json) =>
       _$PersonModelFromJson(json);
 
   @override
+  final dynamic id;
+  @override
   final String firstName;
   @override
   final String? middleName;
   @override
-  final String lastName;
+  final String? lastName;
+// required int countryCode,
   @override
   final int number;
 
@@ -143,6 +163,7 @@ class _PersonModel implements PersonModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _PersonModel &&
+            const DeepCollectionEquality().equals(other.id, id) &&
             (identical(other.firstName, firstName) ||
                 other.firstName == firstName) &&
             (identical(other.middleName, middleName) ||
@@ -154,12 +175,17 @@ class _PersonModel implements PersonModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, firstName, middleName, lastName, number);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(id),
+      firstName,
+      middleName,
+      lastName,
+      number);
 
   @override
   String toString() {
-    return 'PersonModel(firstName: $firstName, middleName: $middleName, lastName: $lastName, number: $number)';
+    return 'PersonModel(id: $id, firstName: $firstName, middleName: $middleName, lastName: $lastName, number: $number)';
   }
 }
 
@@ -172,7 +198,11 @@ abstract mixin class _$PersonModelCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String firstName, String? middleName, String lastName, int number});
+      {dynamic id,
+      String firstName,
+      String? middleName,
+      String? lastName,
+      int number});
 }
 
 /// @nodoc
@@ -187,12 +217,17 @@ class __$PersonModelCopyWithImpl<$Res> implements _$PersonModelCopyWith<$Res> {
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? id = freezed,
     Object? firstName = null,
     Object? middleName = freezed,
-    Object? lastName = null,
+    Object? lastName = freezed,
     Object? number = null,
   }) {
     return _then(_PersonModel(
+      id: freezed == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as dynamic,
       firstName: null == firstName
           ? _self.firstName
           : firstName // ignore: cast_nullable_to_non_nullable
@@ -201,10 +236,10 @@ class __$PersonModelCopyWithImpl<$Res> implements _$PersonModelCopyWith<$Res> {
           ? _self.middleName
           : middleName // ignore: cast_nullable_to_non_nullable
               as String?,
-      lastName: null == lastName
+      lastName: freezed == lastName
           ? _self.lastName
           : lastName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       number: null == number
           ? _self.number
           : number // ignore: cast_nullable_to_non_nullable

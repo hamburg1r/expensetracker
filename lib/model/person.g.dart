@@ -7,14 +7,16 @@ part of 'person.dart';
 // **************************************************************************
 
 _PersonModel _$PersonModelFromJson(Map<String, dynamic> json) => _PersonModel(
+      id: json['id'],
       firstName: json['firstName'] as String,
       middleName: json['middleName'] as String?,
-      lastName: json['lastName'] as String,
+      lastName: json['lastName'] as String?,
       number: (json['number'] as num).toInt(),
     );
 
 Map<String, dynamic> _$PersonModelToJson(_PersonModel instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'firstName': instance.firstName,
       'middleName': instance.middleName,
       'lastName': instance.lastName,

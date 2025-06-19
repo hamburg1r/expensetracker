@@ -5,11 +5,13 @@ part 'person.g.dart';
 part 'person.freezed.dart';
 
 @freezed
-sealed class PersonModel with _$PersonModel {
+abstract class PersonModel with _$PersonModel {
   factory PersonModel({
+    required id,
     required String firstName,
     String? middleName,
-    required String lastName,
+    String? lastName,
+    // required int countryCode,
     required int number,
   }) = _PersonModel;
 
