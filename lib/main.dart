@@ -196,7 +196,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 onTap: () {
                   if (currentScreen != 3) {
                     setState(() {
-                      currentScreenNotifier.update(2);
+                      currentScreenNotifier.update(3);
                     });
                   }
                 },
