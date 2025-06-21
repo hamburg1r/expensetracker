@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'expenses.g.dart';
@@ -17,6 +18,9 @@ abstract class TransactionModel with _$TransactionModel {
     required String payerId,
     List<String>? participantIds,
   }) = _TransactionModel;
+
+  factory TransactionModel.fromJson(Map<String, dynamic> json) =>
+      _$TransactionModelFromJson(json);
 }
 
 enum DebtType { owe, borrow }
@@ -32,18 +36,38 @@ abstract class DebtModel with _$DebtModel {
     required DateTime date,
     @Default(false) bool isSettled,
   }) = _DebtModel;
+
+  factory DebtModel.fromJson(Map<String, dynamic> json) =>
+      _$DebtModelFromJson(json);
 }
 
 @riverpod
 class Transactions extends _$Transactions {
+  var transactionsBox = Hive.box<List<TransactionModel>>('transactions');
   @override
-  Future<List<TransactionModel>> build() async {
-    return [];
+  Future<Map<String, List<TransactionModel>>> build() async {
+    return _getTransactions();
+  }
+
+  Future<Map<String, List<TransactionModel>>> updateState() async {
+    state = AsyncValue.data(_getTransactions());
+    return {};
+  }
+
+  Map<String, List<TransactionModel>> _getTransactions() {
+    return transactionsBox.toMap().map((key, value) {
+      return MapEntry(
+        key.toString(),
+        value,
+      );
+    })
+      ..remove('debt');
   }
 }
 
 @riverpod
 class Debts extends _$Debts {
+  var transactionsBox = Hive.box('transactions');
   @override
   Future<List<TransactionModel>> build() async {
     return [];

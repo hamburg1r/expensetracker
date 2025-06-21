@@ -1,12 +1,21 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:expensetracker/screens/overview/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'model/main.dart';
 
 part 'main.g.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var path = await getApplicationDocumentsDirectory();
+  Hive.init(path.path);
+  Hive.initFlutter(path.path);
+  await Hive.openBox<List<TransactionModel>>('transactions');
   runApp(ProviderScope(
     child: const App(),
   ));
@@ -108,6 +117,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           actions: actions,
         );
     var screens = <Widget>[
+      Overview(
+        appBar: appBar,
+      ),
       Scaffold(
         appBar: appBar(Text('1')),
         body: Text('placeholder'),

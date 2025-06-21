@@ -32,6 +32,9 @@ mixin _$TransactionModel {
       _$TransactionModelCopyWithImpl<TransactionModel>(
           this as TransactionModel, _$identity);
 
+  /// Serializes this TransactionModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -49,6 +52,7 @@ mixin _$TransactionModel {
                 .equals(other.participantIds, participantIds));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -137,7 +141,7 @@ class _$TransactionModelCopyWithImpl<$Res>
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _TransactionModel implements TransactionModel {
   _TransactionModel(
       {required this.id,
@@ -148,6 +152,8 @@ class _TransactionModel implements TransactionModel {
       required this.payerId,
       final List<String>? participantIds})
       : _participantIds = participantIds;
+  factory _TransactionModel.fromJson(Map<String, dynamic> json) =>
+      _$TransactionModelFromJson(json);
 
   @override
   final String id;
@@ -182,6 +188,13 @@ class _TransactionModel implements TransactionModel {
       __$TransactionModelCopyWithImpl<_TransactionModel>(this, _$identity);
 
   @override
+  Map<String, dynamic> toJson() {
+    return _$TransactionModelToJson(
+      this,
+    );
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -198,6 +211,7 @@ class _TransactionModel implements TransactionModel {
                 .equals(other._participantIds, _participantIds));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
@@ -304,6 +318,9 @@ mixin _$DebtModel {
   $DebtModelCopyWith<DebtModel> get copyWith =>
       _$DebtModelCopyWithImpl<DebtModel>(this as DebtModel, _$identity);
 
+  /// Serializes this DebtModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -321,6 +338,7 @@ mixin _$DebtModel {
                 other.isSettled == isSettled));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, id, personId, amount, type, description, date, isSettled);
@@ -400,7 +418,7 @@ class _$DebtModelCopyWithImpl<$Res> implements $DebtModelCopyWith<$Res> {
 }
 
 /// @nodoc
-
+@JsonSerializable()
 class _DebtModel implements DebtModel {
   _DebtModel(
       {required this.id,
@@ -410,6 +428,8 @@ class _DebtModel implements DebtModel {
       this.description,
       required this.date,
       this.isSettled = false});
+  factory _DebtModel.fromJson(Map<String, dynamic> json) =>
+      _$DebtModelFromJson(json);
 
   @override
   final String id;
@@ -436,6 +456,13 @@ class _DebtModel implements DebtModel {
       __$DebtModelCopyWithImpl<_DebtModel>(this, _$identity);
 
   @override
+  Map<String, dynamic> toJson() {
+    return _$DebtModelToJson(
+      this,
+    );
+  }
+
+  @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
@@ -452,6 +479,7 @@ class _DebtModel implements DebtModel {
                 other.isSettled == isSettled));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType, id, personId, amount, type, description, date, isSettled);
