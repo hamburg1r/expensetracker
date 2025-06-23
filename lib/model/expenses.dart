@@ -1,73 +1,71 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:isar/isar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'expenses.g.dart';
-part 'expenses.freezed.dart';
 
-@freezed
-abstract class TransactionModel with _$TransactionModel {
-  factory TransactionModel({
-    required String id,
-    required double amount,
-    required String category,
-    required DateTime date,
-    // DateTime? dueDate,
-    // @Default(false) bool due,
-    String? description,
-    required String payerId,
-    List<String>? participantIds,
-  }) = _TransactionModel;
+@collection
+class TransactionModel {
+  Id get id => Isar.autoIncrement;
 
-  factory TransactionModel.fromJson(Map<String, dynamic> json) =>
-      _$TransactionModelFromJson(json);
+  double amount;
+  String category;
+  DateTime date;
+  String? description;
+  String payerId;
+  List<String>? participantIds;
+
+  TransactionModel({
+    required this.amount,
+    required this.category,
+    required this.date,
+    this.description,
+    required this.payerId,
+    this.participantIds,
+  });
 }
 
 enum DebtType { owe, borrow }
 
-@freezed
-abstract class DebtModel with _$DebtModel {
-  factory DebtModel({
-    required String id,
-    required String personId,
-    required double amount,
-    required DebtType type,
-    String? description,
-    required DateTime date,
-    @Default(false) bool isSettled,
-  }) = _DebtModel;
+@collection
+class DebtModel {
+  Id get id => Isar.autoIncrement;
 
-  factory DebtModel.fromJson(Map<String, dynamic> json) =>
-      _$DebtModelFromJson(json);
+  String personId;
+  double amount;
+  @Enumerated(EnumType.name)
+  DebtType type;
+  String? description;
+  DateTime date;
+  bool isSettled;
+
+  DebtModel({
+    required this.personId,
+    required this.amount,
+    required this.type,
+    this.description,
+    required this.date,
+    required this.isSettled,
+  });
 }
 
 @riverpod
 class Transactions extends _$Transactions {
-  var transactionsBox = Hive.box<List<TransactionModel>>('transactions');
   @override
   Future<Map<String, List<TransactionModel>>> build() async {
-    return _getTransactions();
+    return fetch();
   }
 
   Future<Map<String, List<TransactionModel>>> updateState() async {
-    state = AsyncValue.data(_getTransactions());
     return {};
   }
 
-  Map<String, List<TransactionModel>> _getTransactions() {
-    return transactionsBox.toMap().map((key, value) {
-      return MapEntry(
-        key.toString(),
-        value,
-      );
-    })
-      ..remove('debt');
+  fetch() {
+    return;
   }
 }
 
 @riverpod
 class Debts extends _$Debts {
-  var transactionsBox = Hive.box('transactions');
   @override
   Future<List<TransactionModel>> build() async {
     return [];

@@ -1,22 +1,23 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:isar/isar.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'person.g.dart';
-part 'person.freezed.dart';
 
-@freezed
-abstract class PersonModel with _$PersonModel {
-  factory PersonModel({
-    required id,
-    required String firstName,
-    String? middleName,
-    String? lastName,
-    // required int countryCode,
-    required int number,
-  }) = _PersonModel;
+@collection
+class PersonModel {
+  Id id = Isar.autoIncrement;
 
-  factory PersonModel.fromJson(Map<String, dynamic> json) =>
-      _$PersonModelFromJson(json);
+  String firstName;
+  String? middleName;
+  String? lastName;
+  int number;
+
+  PersonModel({
+    required this.firstName,
+    this.middleName,
+    this.lastName,
+    required this.number,
+  });
 }
 
 @riverpod
