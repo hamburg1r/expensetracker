@@ -7,13 +7,12 @@ part 'budget.g.dart';
 class BudgetModel {
   Id id = Isar.autoIncrement;
 
-  String categoryId;
+  final categoryId = IsarLinks<CategoryModel>();
   double limit;
   DateTime startDate;
   DateTime endDate;
 
   BudgetModel({
-    required this.categoryId,
     required this.limit,
     required this.startDate,
     required this.endDate,
@@ -26,25 +25,11 @@ class CategoryModel {
 
   String name;
   String icon;
+  @Backlink(to: 'categoryId')
+  final budget = IsarLink<BudgetModel>();
 
   CategoryModel({
     required this.name,
     required this.icon,
   });
-}
-
-@riverpod
-class Budget extends _$Budget {
-  @override
-  Future<List<Budget>> build() async {
-    return [];
-  }
-}
-
-@riverpod
-class Category extends _$Category {
-  @override
-  Future<List<Category>> build() async {
-    return [];
-  }
 }

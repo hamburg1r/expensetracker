@@ -36,16 +36,6 @@ const TransactionModelSchema = CollectionSchema(
       id: 3,
       name: r'description',
       type: IsarType.string,
-    ),
-    r'participantIds': PropertySchema(
-      id: 4,
-      name: r'participantIds',
-      type: IsarType.stringList,
-    ),
-    r'payerId': PropertySchema(
-      id: 5,
-      name: r'payerId',
-      type: IsarType.string,
     )
   },
   estimateSize: _transactionModelEstimateSize,
@@ -54,7 +44,20 @@ const TransactionModelSchema = CollectionSchema(
   deserializeProp: _transactionModelDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {},
+  links: {
+    r'payerId': LinkSchema(
+      id: -8942577761676346215,
+      name: r'payerId',
+      target: r'PersonModel',
+      single: true,
+    ),
+    r'participantIds': LinkSchema(
+      id: 1853495843416186763,
+      name: r'participantIds',
+      target: r'PersonModel',
+      single: false,
+    )
+  },
   embeddedSchemas: {},
   getId: _transactionModelGetId,
   getLinks: _transactionModelGetLinks,
@@ -75,19 +78,6 @@ int _transactionModelEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
-  {
-    final list = object.participantIds;
-    if (list != null) {
-      bytesCount += 3 + list.length * 3;
-      {
-        for (var i = 0; i < list.length; i++) {
-          final value = list[i];
-          bytesCount += value.length * 3;
-        }
-      }
-    }
-  }
-  bytesCount += 3 + object.payerId.length * 3;
   return bytesCount;
 }
 
@@ -101,8 +91,6 @@ void _transactionModelSerialize(
   writer.writeString(offsets[1], object.category);
   writer.writeDateTime(offsets[2], object.date);
   writer.writeString(offsets[3], object.description);
-  writer.writeStringList(offsets[4], object.participantIds);
-  writer.writeString(offsets[5], object.payerId);
 }
 
 TransactionModel _transactionModelDeserialize(
@@ -116,8 +104,6 @@ TransactionModel _transactionModelDeserialize(
     category: reader.readString(offsets[1]),
     date: reader.readDateTime(offsets[2]),
     description: reader.readStringOrNull(offsets[3]),
-    participantIds: reader.readStringList(offsets[4]),
-    payerId: reader.readString(offsets[5]),
   );
   return object;
 }
@@ -137,10 +123,6 @@ P _transactionModelDeserializeProp<P>(
       return (reader.readDateTime(offset)) as P;
     case 3:
       return (reader.readStringOrNull(offset)) as P;
-    case 4:
-      return (reader.readStringList(offset)) as P;
-    case 5:
-      return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -151,11 +133,16 @@ Id _transactionModelGetId(TransactionModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _transactionModelGetLinks(TransactionModel object) {
-  return [];
+  return [object.payerId, object.participantIds];
 }
 
 void _transactionModelAttach(
-    IsarCollection<dynamic> col, Id id, TransactionModel object) {}
+    IsarCollection<dynamic> col, Id id, TransactionModel object) {
+  object.payerId
+      .attach(col, col.isar.collection<PersonModel>(), r'payerId', id);
+  object.participantIds
+      .attach(col, col.isar.collection<PersonModel>(), r'participantIds', id);
+}
 
 extension TransactionModelQueryWhereSort
     on QueryBuilder<TransactionModel, TransactionModel, QWhere> {
@@ -705,198 +692,52 @@ extension TransactionModelQueryFilter
       ));
     });
   }
+}
 
+extension TransactionModelQueryObject
+    on QueryBuilder<TransactionModel, TransactionModel, QFilterCondition> {}
+
+extension TransactionModelQueryLinks
+    on QueryBuilder<TransactionModel, TransactionModel, QFilterCondition> {
   QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsIsNull() {
+      payerId(FilterQuery<PersonModel> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'participantIds',
-      ));
+      return query.link(q, r'payerId');
     });
   }
 
   QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsIsNotNull() {
+      payerIdIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'participantIds',
-      ));
+      return query.linkLength(r'payerId', 0, true, 0, true);
     });
   }
 
   QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      participantIds(FilterQuery<PersonModel> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'participantIds',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'participantIds',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'participantIds',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'participantIds',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'participantIds',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'participantIds',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'participantIds',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementMatches(String pattern,
-          {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'participantIds',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'participantIds',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      participantIdsElementIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'participantIds',
-        value: '',
-      ));
+      return query.link(q, r'participantIds');
     });
   }
 
   QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
       participantIdsLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'participantIds',
-        length,
-        true,
-        length,
-        true,
-      );
+      return query.linkLength(r'participantIds', length, true, length, true);
     });
   }
 
   QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
       participantIdsIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'participantIds',
-        0,
-        true,
-        0,
-        true,
-      );
+      return query.linkLength(r'participantIds', 0, true, 0, true);
     });
   }
 
   QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
       participantIdsIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'participantIds',
-        0,
-        false,
-        999999,
-        true,
-      );
+      return query.linkLength(r'participantIds', 0, false, 999999, true);
     });
   }
 
@@ -906,13 +747,7 @@ extension TransactionModelQueryFilter
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'participantIds',
-        0,
-        true,
-        length,
-        include,
-      );
+      return query.linkLength(r'participantIds', 0, true, length, include);
     });
   }
 
@@ -922,13 +757,7 @@ extension TransactionModelQueryFilter
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'participantIds',
-        length,
-        include,
-        999999,
-        true,
-      );
+      return query.linkLength(r'participantIds', length, include, 999999, true);
     });
   }
 
@@ -940,158 +769,11 @@ extension TransactionModelQueryFilter
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'participantIds',
-        lower,
-        includeLower,
-        upper,
-        includeUpper,
-      );
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'payerId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'payerId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'payerId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'payerId',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'payerId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'payerId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'payerId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'payerId',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'payerId',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterFilterCondition>
-      payerIdIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'payerId',
-        value: '',
-      ));
+      return query.linkLength(
+          r'participantIds', lower, includeLower, upper, includeUpper);
     });
   }
 }
-
-extension TransactionModelQueryObject
-    on QueryBuilder<TransactionModel, TransactionModel, QFilterCondition> {}
-
-extension TransactionModelQueryLinks
-    on QueryBuilder<TransactionModel, TransactionModel, QFilterCondition> {}
 
 extension TransactionModelQuerySortBy
     on QueryBuilder<TransactionModel, TransactionModel, QSortBy> {
@@ -1147,20 +829,6 @@ extension TransactionModelQuerySortBy
       sortByDescriptionDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'description', Sort.desc);
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
-      sortByPayerId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'payerId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
-      sortByPayerIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'payerId', Sort.desc);
     });
   }
 }
@@ -1234,20 +902,6 @@ extension TransactionModelQuerySortThenBy
       return query.addSortBy(r'id', Sort.desc);
     });
   }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
-      thenByPayerId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'payerId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QAfterSortBy>
-      thenByPayerIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'payerId', Sort.desc);
-    });
-  }
 }
 
 extension TransactionModelQueryWhereDistinct
@@ -1276,20 +930,6 @@ extension TransactionModelQueryWhereDistinct
       distinctByDescription({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'description', caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QDistinct>
-      distinctByParticipantIds() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'participantIds');
-    });
-  }
-
-  QueryBuilder<TransactionModel, TransactionModel, QDistinct> distinctByPayerId(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'payerId', caseSensitive: caseSensitive);
     });
   }
 }
@@ -1326,19 +966,6 @@ extension TransactionModelQueryProperty
       return query.addPropertyName(r'description');
     });
   }
-
-  QueryBuilder<TransactionModel, List<String>?, QQueryOperations>
-      participantIdsProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'participantIds');
-    });
-  }
-
-  QueryBuilder<TransactionModel, String, QQueryOperations> payerIdProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'payerId');
-    });
-  }
 }
 
 // coverage:ignore-file
@@ -1372,13 +999,8 @@ const DebtModelSchema = CollectionSchema(
       name: r'isSettled',
       type: IsarType.bool,
     ),
-    r'personId': PropertySchema(
-      id: 4,
-      name: r'personId',
-      type: IsarType.string,
-    ),
     r'type': PropertySchema(
-      id: 5,
+      id: 4,
       name: r'type',
       type: IsarType.string,
       enumMap: _DebtModeltypeEnumValueMap,
@@ -1390,7 +1012,15 @@ const DebtModelSchema = CollectionSchema(
   deserializeProp: _debtModelDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {},
+  links: {
+    r'personId': LinkSchema(
+      id: -763032821150870703,
+      name: r'personId',
+      target: r'PersonModel',
+      single: true,
+      linkName: r'debts',
+    )
+  },
   embeddedSchemas: {},
   getId: _debtModelGetId,
   getLinks: _debtModelGetLinks,
@@ -1410,7 +1040,6 @@ int _debtModelEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
-  bytesCount += 3 + object.personId.length * 3;
   bytesCount += 3 + object.type.name.length * 3;
   return bytesCount;
 }
@@ -1425,8 +1054,7 @@ void _debtModelSerialize(
   writer.writeDateTime(offsets[1], object.date);
   writer.writeString(offsets[2], object.description);
   writer.writeBool(offsets[3], object.isSettled);
-  writer.writeString(offsets[4], object.personId);
-  writer.writeString(offsets[5], object.type.name);
+  writer.writeString(offsets[4], object.type.name);
 }
 
 DebtModel _debtModelDeserialize(
@@ -1440,8 +1068,7 @@ DebtModel _debtModelDeserialize(
     date: reader.readDateTime(offsets[1]),
     description: reader.readStringOrNull(offsets[2]),
     isSettled: reader.readBool(offsets[3]),
-    personId: reader.readString(offsets[4]),
-    type: _DebtModeltypeValueEnumMap[reader.readStringOrNull(offsets[5])] ??
+    type: _DebtModeltypeValueEnumMap[reader.readStringOrNull(offsets[4])] ??
         DebtType.owe,
   );
   return object;
@@ -1463,8 +1090,6 @@ P _debtModelDeserializeProp<P>(
     case 3:
       return (reader.readBool(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
-    case 5:
       return (_DebtModeltypeValueEnumMap[reader.readStringOrNull(offset)] ??
           DebtType.owe) as P;
     default:
@@ -1486,10 +1111,13 @@ Id _debtModelGetId(DebtModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _debtModelGetLinks(DebtModel object) {
-  return [];
+  return [object.personId];
 }
 
-void _debtModelAttach(IsarCollection<dynamic> col, Id id, DebtModel object) {}
+void _debtModelAttach(IsarCollection<dynamic> col, Id id, DebtModel object) {
+  object.personId
+      .attach(col, col.isar.collection<PersonModel>(), r'personId', id);
+}
 
 extension DebtModelQueryWhereSort
     on QueryBuilder<DebtModel, DebtModel, QWhere> {
@@ -1900,137 +1528,6 @@ extension DebtModelQueryFilter
     });
   }
 
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'personId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'personId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'personId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'personId',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'personId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'personId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdContains(
-      String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'personId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'personId',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'personId',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition>
-      personIdIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'personId',
-        value: '',
-      ));
-    });
-  }
-
   QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> typeEqualTo(
     DebtType value, {
     bool caseSensitive = true,
@@ -2166,7 +1663,20 @@ extension DebtModelQueryObject
     on QueryBuilder<DebtModel, DebtModel, QFilterCondition> {}
 
 extension DebtModelQueryLinks
-    on QueryBuilder<DebtModel, DebtModel, QFilterCondition> {}
+    on QueryBuilder<DebtModel, DebtModel, QFilterCondition> {
+  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personId(
+      FilterQuery<PersonModel> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'personId');
+    });
+  }
+
+  QueryBuilder<DebtModel, DebtModel, QAfterFilterCondition> personIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'personId', 0, true, 0, true);
+    });
+  }
+}
 
 extension DebtModelQuerySortBy on QueryBuilder<DebtModel, DebtModel, QSortBy> {
   QueryBuilder<DebtModel, DebtModel, QAfterSortBy> sortByAmount() {
@@ -2214,18 +1724,6 @@ extension DebtModelQuerySortBy on QueryBuilder<DebtModel, DebtModel, QSortBy> {
   QueryBuilder<DebtModel, DebtModel, QAfterSortBy> sortByIsSettledDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isSettled', Sort.desc);
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterSortBy> sortByPersonId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'personId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterSortBy> sortByPersonIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'personId', Sort.desc);
     });
   }
 
@@ -2304,18 +1802,6 @@ extension DebtModelQuerySortThenBy
     });
   }
 
-  QueryBuilder<DebtModel, DebtModel, QAfterSortBy> thenByPersonId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'personId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QAfterSortBy> thenByPersonIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'personId', Sort.desc);
-    });
-  }
-
   QueryBuilder<DebtModel, DebtModel, QAfterSortBy> thenByType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'type', Sort.asc);
@@ -2353,13 +1839,6 @@ extension DebtModelQueryWhereDistinct
   QueryBuilder<DebtModel, DebtModel, QDistinct> distinctByIsSettled() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isSettled');
-    });
-  }
-
-  QueryBuilder<DebtModel, DebtModel, QDistinct> distinctByPersonId(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'personId', caseSensitive: caseSensitive);
     });
   }
 
@@ -2403,53 +1882,9 @@ extension DebtModelQueryProperty
     });
   }
 
-  QueryBuilder<DebtModel, String, QQueryOperations> personIdProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'personId');
-    });
-  }
-
   QueryBuilder<DebtModel, DebtType, QQueryOperations> typeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'type');
     });
   }
 }
-
-// **************************************************************************
-// RiverpodGenerator
-// **************************************************************************
-
-String _$transactionsHash() => r'46b3b70958a55c9ffd7e73e466f9e7cc735461fa';
-
-/// See also [Transactions].
-@ProviderFor(Transactions)
-final transactionsProvider = AutoDisposeAsyncNotifierProvider<Transactions,
-    Map<String, List<TransactionModel>>>.internal(
-  Transactions.new,
-  name: r'transactionsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$transactionsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$Transactions
-    = AutoDisposeAsyncNotifier<Map<String, List<TransactionModel>>>;
-String _$debtsHash() => r'439cb1983b9de2ff01fd04a2c6baaf758ed10e5c';
-
-/// See also [Debts].
-@ProviderFor(Debts)
-final debtsProvider =
-    AutoDisposeAsyncNotifierProvider<Debts, List<TransactionModel>>.internal(
-  Debts.new,
-  name: r'debtsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$debtsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$Debts = AutoDisposeAsyncNotifier<List<TransactionModel>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

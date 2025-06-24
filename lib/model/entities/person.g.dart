@@ -44,7 +44,28 @@ const PersonModelSchema = CollectionSchema(
   deserializeProp: _personModelDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {},
+  links: {
+    r'paid': LinkSchema(
+      id: -8106839810196404814,
+      name: r'paid',
+      target: r'TransactionModel',
+      single: false,
+      linkName: r'payerId',
+    ),
+    r'participation': LinkSchema(
+      id: -653760379083310186,
+      name: r'participation',
+      target: r'TransactionModel',
+      single: false,
+      linkName: r'participantIds',
+    ),
+    r'debts': LinkSchema(
+      id: 1910730966943643896,
+      name: r'debts',
+      target: r'DebtModel',
+      single: false,
+    )
+  },
   embeddedSchemas: {},
   getId: _personModelGetId,
   getLinks: _personModelGetLinks,
@@ -127,12 +148,16 @@ Id _personModelGetId(PersonModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _personModelGetLinks(PersonModel object) {
-  return [];
+  return [object.paid, object.participation, object.debts];
 }
 
 void _personModelAttach(
     IsarCollection<dynamic> col, Id id, PersonModel object) {
   object.id = id;
+  object.paid.attach(col, col.isar.collection<TransactionModel>(), r'paid', id);
+  object.participation.attach(
+      col, col.isar.collection<TransactionModel>(), r'participation', id);
+  object.debts.attach(col, col.isar.collection<DebtModel>(), r'debts', id);
 }
 
 extension PersonModelQueryWhereSort
@@ -770,7 +795,188 @@ extension PersonModelQueryObject
     on QueryBuilder<PersonModel, PersonModel, QFilterCondition> {}
 
 extension PersonModelQueryLinks
-    on QueryBuilder<PersonModel, PersonModel, QFilterCondition> {}
+    on QueryBuilder<PersonModel, PersonModel, QFilterCondition> {
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> paid(
+      FilterQuery<TransactionModel> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'paid');
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      paidLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'paid', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> paidIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'paid', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      paidIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'paid', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      paidLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'paid', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      paidLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'paid', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      paidLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'paid', lower, includeLower, upper, includeUpper);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> participation(
+      FilterQuery<TransactionModel> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'participation');
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      participationLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'participation', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      participationIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'participation', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      participationIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'participation', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      participationLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'participation', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      participationLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'participation', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      participationLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'participation', lower, includeLower, upper, includeUpper);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> debts(
+      FilterQuery<DebtModel> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'debts');
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      debtsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'debts', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> debtsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'debts', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      debtsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'debts', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      debtsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'debts', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      debtsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'debts', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+      debtsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'debts', lower, includeLower, upper, includeUpper);
+    });
+  }
+}
 
 extension PersonModelQuerySortBy
     on QueryBuilder<PersonModel, PersonModel, QSortBy> {
@@ -948,25 +1154,3 @@ extension PersonModelQueryProperty
     });
   }
 }
-
-// **************************************************************************
-// RiverpodGenerator
-// **************************************************************************
-
-String _$personHash() => r'b1948437ed331854bbed68d8c07b6f2706619840';
-
-/// See also [Person].
-@ProviderFor(Person)
-final personProvider =
-    AutoDisposeAsyncNotifierProvider<Person, List<PersonModel>>.internal(
-  Person.new,
-  name: r'personProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$personHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$Person = AutoDisposeAsyncNotifier<List<PersonModel>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

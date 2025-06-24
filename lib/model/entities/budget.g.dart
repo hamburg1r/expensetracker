@@ -17,23 +17,18 @@ const BudgetModelSchema = CollectionSchema(
   name: r'BudgetModel',
   id: 7247118153370490723,
   properties: {
-    r'categoryId': PropertySchema(
-      id: 0,
-      name: r'categoryId',
-      type: IsarType.string,
-    ),
     r'endDate': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'endDate',
       type: IsarType.dateTime,
     ),
     r'limit': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'limit',
       type: IsarType.double,
     ),
     r'startDate': PropertySchema(
-      id: 3,
+      id: 2,
       name: r'startDate',
       type: IsarType.dateTime,
     )
@@ -44,7 +39,14 @@ const BudgetModelSchema = CollectionSchema(
   deserializeProp: _budgetModelDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {},
+  links: {
+    r'categoryId': LinkSchema(
+      id: 6307075643438266486,
+      name: r'categoryId',
+      target: r'CategoryModel',
+      single: false,
+    )
+  },
   embeddedSchemas: {},
   getId: _budgetModelGetId,
   getLinks: _budgetModelGetLinks,
@@ -58,7 +60,6 @@ int _budgetModelEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.categoryId.length * 3;
   return bytesCount;
 }
 
@@ -68,10 +69,9 @@ void _budgetModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.categoryId);
-  writer.writeDateTime(offsets[1], object.endDate);
-  writer.writeDouble(offsets[2], object.limit);
-  writer.writeDateTime(offsets[3], object.startDate);
+  writer.writeDateTime(offsets[0], object.endDate);
+  writer.writeDouble(offsets[1], object.limit);
+  writer.writeDateTime(offsets[2], object.startDate);
 }
 
 BudgetModel _budgetModelDeserialize(
@@ -81,10 +81,9 @@ BudgetModel _budgetModelDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = BudgetModel(
-    categoryId: reader.readString(offsets[0]),
-    endDate: reader.readDateTime(offsets[1]),
-    limit: reader.readDouble(offsets[2]),
-    startDate: reader.readDateTime(offsets[3]),
+    endDate: reader.readDateTime(offsets[0]),
+    limit: reader.readDouble(offsets[1]),
+    startDate: reader.readDateTime(offsets[2]),
   );
   object.id = id;
   return object;
@@ -98,12 +97,10 @@ P _budgetModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
-    case 1:
       return (reader.readDateTime(offset)) as P;
-    case 2:
+    case 1:
       return (reader.readDouble(offset)) as P;
-    case 3:
+    case 2:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -115,12 +112,14 @@ Id _budgetModelGetId(BudgetModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _budgetModelGetLinks(BudgetModel object) {
-  return [];
+  return [object.categoryId];
 }
 
 void _budgetModelAttach(
     IsarCollection<dynamic> col, Id id, BudgetModel object) {
   object.id = id;
+  object.categoryId
+      .attach(col, col.isar.collection<CategoryModel>(), r'categoryId', id);
 }
 
 extension BudgetModelQueryWhereSort
@@ -203,142 +202,6 @@ extension BudgetModelQueryWhere
 
 extension BudgetModelQueryFilter
     on QueryBuilder<BudgetModel, BudgetModel, QFilterCondition> {
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'categoryId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'categoryId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'categoryId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'categoryId',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'categoryId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'categoryId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'categoryId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'categoryId',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'categoryId',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
-      categoryIdIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'categoryId',
-        value: '',
-      ));
-    });
-  }
-
   QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition> endDateEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -570,22 +433,71 @@ extension BudgetModelQueryObject
     on QueryBuilder<BudgetModel, BudgetModel, QFilterCondition> {}
 
 extension BudgetModelQueryLinks
-    on QueryBuilder<BudgetModel, BudgetModel, QFilterCondition> {}
+    on QueryBuilder<BudgetModel, BudgetModel, QFilterCondition> {
+  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition> categoryId(
+      FilterQuery<CategoryModel> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'categoryId');
+    });
+  }
+
+  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
+      categoryIdLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'categoryId', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
+      categoryIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'categoryId', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
+      categoryIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'categoryId', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
+      categoryIdLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'categoryId', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
+      categoryIdLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'categoryId', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<BudgetModel, BudgetModel, QAfterFilterCondition>
+      categoryIdLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'categoryId', lower, includeLower, upper, includeUpper);
+    });
+  }
+}
 
 extension BudgetModelQuerySortBy
     on QueryBuilder<BudgetModel, BudgetModel, QSortBy> {
-  QueryBuilder<BudgetModel, BudgetModel, QAfterSortBy> sortByCategoryId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'categoryId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterSortBy> sortByCategoryIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'categoryId', Sort.desc);
-    });
-  }
-
   QueryBuilder<BudgetModel, BudgetModel, QAfterSortBy> sortByEndDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'endDate', Sort.asc);
@@ -625,18 +537,6 @@ extension BudgetModelQuerySortBy
 
 extension BudgetModelQuerySortThenBy
     on QueryBuilder<BudgetModel, BudgetModel, QSortThenBy> {
-  QueryBuilder<BudgetModel, BudgetModel, QAfterSortBy> thenByCategoryId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'categoryId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<BudgetModel, BudgetModel, QAfterSortBy> thenByCategoryIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'categoryId', Sort.desc);
-    });
-  }
-
   QueryBuilder<BudgetModel, BudgetModel, QAfterSortBy> thenByEndDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'endDate', Sort.asc);
@@ -688,13 +588,6 @@ extension BudgetModelQuerySortThenBy
 
 extension BudgetModelQueryWhereDistinct
     on QueryBuilder<BudgetModel, BudgetModel, QDistinct> {
-  QueryBuilder<BudgetModel, BudgetModel, QDistinct> distinctByCategoryId(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'categoryId', caseSensitive: caseSensitive);
-    });
-  }
-
   QueryBuilder<BudgetModel, BudgetModel, QDistinct> distinctByEndDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'endDate');
@@ -719,12 +612,6 @@ extension BudgetModelQueryProperty
   QueryBuilder<BudgetModel, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
-    });
-  }
-
-  QueryBuilder<BudgetModel, String, QQueryOperations> categoryIdProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'categoryId');
     });
   }
 
@@ -775,7 +662,15 @@ const CategoryModelSchema = CollectionSchema(
   deserializeProp: _categoryModelDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {},
+  links: {
+    r'budget': LinkSchema(
+      id: -7566554384287918792,
+      name: r'budget',
+      target: r'BudgetModel',
+      single: true,
+      linkName: r'categoryId',
+    )
+  },
   embeddedSchemas: {},
   getId: _categoryModelGetId,
   getLinks: _categoryModelGetLinks,
@@ -839,12 +734,13 @@ Id _categoryModelGetId(CategoryModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _categoryModelGetLinks(CategoryModel object) {
-  return [];
+  return [object.budget];
 }
 
 void _categoryModelAttach(
     IsarCollection<dynamic> col, Id id, CategoryModel object) {
   object.id = id;
+  object.budget.attach(col, col.isar.collection<BudgetModel>(), r'budget', id);
 }
 
 extension CategoryModelQueryWhereSort
@@ -1259,7 +1155,21 @@ extension CategoryModelQueryObject
     on QueryBuilder<CategoryModel, CategoryModel, QFilterCondition> {}
 
 extension CategoryModelQueryLinks
-    on QueryBuilder<CategoryModel, CategoryModel, QFilterCondition> {}
+    on QueryBuilder<CategoryModel, CategoryModel, QFilterCondition> {
+  QueryBuilder<CategoryModel, CategoryModel, QAfterFilterCondition> budget(
+      FilterQuery<BudgetModel> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'budget');
+    });
+  }
+
+  QueryBuilder<CategoryModel, CategoryModel, QAfterFilterCondition>
+      budgetIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'budget', 0, true, 0, true);
+    });
+  }
+}
 
 extension CategoryModelQuerySortBy
     on QueryBuilder<CategoryModel, CategoryModel, QSortBy> {
@@ -1364,40 +1274,3 @@ extension CategoryModelQueryProperty
     });
   }
 }
-
-// **************************************************************************
-// RiverpodGenerator
-// **************************************************************************
-
-String _$budgetHash() => r'190e0191450be621156b8845b278b3a06cdee960';
-
-/// See also [Budget].
-@ProviderFor(Budget)
-final budgetProvider =
-    AutoDisposeAsyncNotifierProvider<Budget, List<Budget>>.internal(
-  Budget.new,
-  name: r'budgetProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$budgetHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$Budget = AutoDisposeAsyncNotifier<List<Budget>>;
-String _$categoryHash() => r'99f91cca4125d0efa005747f8779c4a8da03db1d';
-
-/// See also [Category].
-@ProviderFor(Category)
-final categoryProvider =
-    AutoDisposeAsyncNotifierProvider<Category, List<Category>>.internal(
-  Category.new,
-  name: r'categoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$categoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$Category = AutoDisposeAsyncNotifier<List<Category>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
