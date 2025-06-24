@@ -9,13 +9,13 @@ part of 'person.dart';
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
-extension GetPersonModelCollection on Isar {
-  IsarCollection<PersonModel> get personModels => this.collection();
+extension GetPersonCollection on Isar {
+  IsarCollection<Person> get persons => this.collection();
 }
 
-const PersonModelSchema = CollectionSchema(
-  name: r'PersonModel',
-  id: -4430843621390741319,
+const PersonSchema = CollectionSchema(
+  name: r'Person',
+  id: 7854610480646705599,
   properties: {
     r'firstName': PropertySchema(
       id: 0,
@@ -38,43 +38,44 @@ const PersonModelSchema = CollectionSchema(
       type: IsarType.long,
     )
   },
-  estimateSize: _personModelEstimateSize,
-  serialize: _personModelSerialize,
-  deserialize: _personModelDeserialize,
-  deserializeProp: _personModelDeserializeProp,
+  estimateSize: _personEstimateSize,
+  serialize: _personSerialize,
+  deserialize: _personDeserialize,
+  deserializeProp: _personDeserializeProp,
   idName: r'id',
   indexes: {},
   links: {
     r'paid': LinkSchema(
-      id: -8106839810196404814,
+      id: -4644634735542290458,
       name: r'paid',
-      target: r'TransactionModel',
+      target: r'Expense',
       single: false,
-      linkName: r'payerId',
+      linkName: r'payer',
     ),
     r'participation': LinkSchema(
-      id: -653760379083310186,
+      id: -4720785477284608988,
       name: r'participation',
-      target: r'TransactionModel',
+      target: r'Expense',
       single: false,
-      linkName: r'participantIds',
+      linkName: r'participants',
     ),
     r'debts': LinkSchema(
-      id: 1910730966943643896,
+      id: -4576821842435296144,
       name: r'debts',
-      target: r'DebtModel',
+      target: r'Debt',
       single: false,
+      linkName: r'person',
     )
   },
   embeddedSchemas: {},
-  getId: _personModelGetId,
-  getLinks: _personModelGetLinks,
-  attach: _personModelAttach,
+  getId: _personGetId,
+  getLinks: _personGetLinks,
+  attach: _personAttach,
   version: '3.1.0+1',
 );
 
-int _personModelEstimateSize(
-  PersonModel object,
+int _personEstimateSize(
+  Person object,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -95,8 +96,8 @@ int _personModelEstimateSize(
   return bytesCount;
 }
 
-void _personModelSerialize(
-  PersonModel object,
+void _personSerialize(
+  Person object,
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
@@ -107,13 +108,13 @@ void _personModelSerialize(
   writer.writeLong(offsets[3], object.number);
 }
 
-PersonModel _personModelDeserialize(
+Person _personDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = PersonModel(
+  final object = Person(
     firstName: reader.readString(offsets[0]),
     lastName: reader.readStringOrNull(offsets[1]),
     middleName: reader.readStringOrNull(offsets[2]),
@@ -123,7 +124,7 @@ PersonModel _personModelDeserialize(
   return object;
 }
 
-P _personModelDeserializeProp<P>(
+P _personDeserializeProp<P>(
   IsarReader reader,
   int propertyId,
   int offset,
@@ -143,35 +144,32 @@ P _personModelDeserializeProp<P>(
   }
 }
 
-Id _personModelGetId(PersonModel object) {
+Id _personGetId(Person object) {
   return object.id;
 }
 
-List<IsarLinkBase<dynamic>> _personModelGetLinks(PersonModel object) {
+List<IsarLinkBase<dynamic>> _personGetLinks(Person object) {
   return [object.paid, object.participation, object.debts];
 }
 
-void _personModelAttach(
-    IsarCollection<dynamic> col, Id id, PersonModel object) {
+void _personAttach(IsarCollection<dynamic> col, Id id, Person object) {
   object.id = id;
-  object.paid.attach(col, col.isar.collection<TransactionModel>(), r'paid', id);
-  object.participation.attach(
-      col, col.isar.collection<TransactionModel>(), r'participation', id);
-  object.debts.attach(col, col.isar.collection<DebtModel>(), r'debts', id);
+  object.paid.attach(col, col.isar.collection<Expense>(), r'paid', id);
+  object.participation
+      .attach(col, col.isar.collection<Expense>(), r'participation', id);
+  object.debts.attach(col, col.isar.collection<Debt>(), r'debts', id);
 }
 
-extension PersonModelQueryWhereSort
-    on QueryBuilder<PersonModel, PersonModel, QWhere> {
-  QueryBuilder<PersonModel, PersonModel, QAfterWhere> anyId() {
+extension PersonQueryWhereSort on QueryBuilder<Person, Person, QWhere> {
+  QueryBuilder<Person, Person, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
     });
   }
 }
 
-extension PersonModelQueryWhere
-    on QueryBuilder<PersonModel, PersonModel, QWhereClause> {
-  QueryBuilder<PersonModel, PersonModel, QAfterWhereClause> idEqualTo(Id id) {
+extension PersonQueryWhere on QueryBuilder<Person, Person, QWhereClause> {
+  QueryBuilder<Person, Person, QAfterWhereClause> idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
         lower: id,
@@ -180,8 +178,7 @@ extension PersonModelQueryWhere
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterWhereClause> idNotEqualTo(
-      Id id) {
+  QueryBuilder<Person, Person, QAfterWhereClause> idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -203,7 +200,7 @@ extension PersonModelQueryWhere
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterWhereClause> idGreaterThan(Id id,
+  QueryBuilder<Person, Person, QAfterWhereClause> idGreaterThan(Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -212,7 +209,7 @@ extension PersonModelQueryWhere
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterWhereClause> idLessThan(Id id,
+  QueryBuilder<Person, Person, QAfterWhereClause> idLessThan(Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -221,7 +218,7 @@ extension PersonModelQueryWhere
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterWhereClause> idBetween(
+  QueryBuilder<Person, Person, QAfterWhereClause> idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
@@ -238,10 +235,8 @@ extension PersonModelQueryWhere
   }
 }
 
-extension PersonModelQueryFilter
-    on QueryBuilder<PersonModel, PersonModel, QFilterCondition> {
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameEqualTo(
+extension PersonQueryFilter on QueryBuilder<Person, Person, QFilterCondition> {
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameEqualTo(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -254,8 +249,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameGreaterThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -270,8 +264,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameLessThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameLessThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
@@ -286,8 +279,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameBetween(
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -306,8 +298,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameStartsWith(
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -320,8 +311,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameEndsWith(
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -334,8 +324,9 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameContains(
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'firstName',
@@ -345,8 +336,9 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'firstName',
@@ -356,8 +348,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameIsEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'firstName',
@@ -366,8 +357,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      firstNameIsNotEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> firstNameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'firstName',
@@ -376,8 +366,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> idEqualTo(
-      Id value) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -386,7 +375,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> idGreaterThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> idGreaterThan(
     Id value, {
     bool include = false,
   }) {
@@ -399,7 +388,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> idLessThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> idLessThan(
     Id value, {
     bool include = false,
   }) {
@@ -412,7 +401,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> idBetween(
+  QueryBuilder<Person, Person, QAfterFilterCondition> idBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
@@ -429,8 +418,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameIsNull() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'lastName',
@@ -438,8 +426,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameIsNotNull() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
         property: r'lastName',
@@ -447,7 +434,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> lastNameEqualTo(
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -460,8 +447,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameGreaterThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -476,8 +462,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameLessThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -492,7 +477,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> lastNameBetween(
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -511,8 +496,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameStartsWith(
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -525,8 +509,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameEndsWith(
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -539,8 +522,9 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameContains(
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'lastName',
@@ -550,7 +534,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> lastNameMatches(
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -562,8 +546,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameIsEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'lastName',
@@ -572,8 +555,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      lastNameIsNotEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> lastNameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'lastName',
@@ -582,8 +564,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameIsNull() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'middleName',
@@ -591,8 +572,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameIsNotNull() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
         property: r'middleName',
@@ -600,8 +580,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameEqualTo(
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -614,8 +593,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameGreaterThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -630,8 +608,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameLessThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -646,8 +623,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameBetween(
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -666,8 +642,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameStartsWith(
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -680,8 +655,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameEndsWith(
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -694,8 +668,9 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameContains(String value, {bool caseSensitive = true}) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameContains(
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'middleName',
@@ -705,8 +680,9 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameMatches(String pattern, {bool caseSensitive = true}) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'middleName',
@@ -716,8 +692,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameIsEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'middleName',
@@ -726,8 +701,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      middleNameIsNotEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> middleNameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'middleName',
@@ -736,8 +710,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> numberEqualTo(
-      int value) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> numberEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'number',
@@ -746,8 +719,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      numberGreaterThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> numberGreaterThan(
     int value, {
     bool include = false,
   }) {
@@ -760,7 +732,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> numberLessThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> numberLessThan(
     int value, {
     bool include = false,
   }) {
@@ -773,7 +745,7 @@ extension PersonModelQueryFilter
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> numberBetween(
+  QueryBuilder<Person, Person, QAfterFilterCondition> numberBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -791,40 +763,36 @@ extension PersonModelQueryFilter
   }
 }
 
-extension PersonModelQueryObject
-    on QueryBuilder<PersonModel, PersonModel, QFilterCondition> {}
+extension PersonQueryObject on QueryBuilder<Person, Person, QFilterCondition> {}
 
-extension PersonModelQueryLinks
-    on QueryBuilder<PersonModel, PersonModel, QFilterCondition> {
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> paid(
-      FilterQuery<TransactionModel> q) {
+extension PersonQueryLinks on QueryBuilder<Person, Person, QFilterCondition> {
+  QueryBuilder<Person, Person, QAfterFilterCondition> paid(
+      FilterQuery<Expense> q) {
     return QueryBuilder.apply(this, (query) {
       return query.link(q, r'paid');
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      paidLengthEqualTo(int length) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> paidLengthEqualTo(
+      int length) {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'paid', length, true, length, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> paidIsEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> paidIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'paid', 0, true, 0, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      paidIsNotEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> paidIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'paid', 0, false, 999999, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      paidLengthLessThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> paidLengthLessThan(
     int length, {
     bool include = false,
   }) {
@@ -833,8 +801,7 @@ extension PersonModelQueryLinks
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      paidLengthGreaterThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> paidLengthGreaterThan(
     int length, {
     bool include = false,
   }) {
@@ -843,8 +810,7 @@ extension PersonModelQueryLinks
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      paidLengthBetween(
+  QueryBuilder<Person, Person, QAfterFilterCondition> paidLengthBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -856,35 +822,34 @@ extension PersonModelQueryLinks
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> participation(
-      FilterQuery<TransactionModel> q) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> participation(
+      FilterQuery<Expense> q) {
     return QueryBuilder.apply(this, (query) {
       return query.link(q, r'participation');
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+  QueryBuilder<Person, Person, QAfterFilterCondition>
       participationLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'participation', length, true, length, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      participationIsEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> participationIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'participation', 0, true, 0, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+  QueryBuilder<Person, Person, QAfterFilterCondition>
       participationIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'participation', 0, false, 999999, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+  QueryBuilder<Person, Person, QAfterFilterCondition>
       participationLengthLessThan(
     int length, {
     bool include = false,
@@ -894,7 +859,7 @@ extension PersonModelQueryLinks
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+  QueryBuilder<Person, Person, QAfterFilterCondition>
       participationLengthGreaterThan(
     int length, {
     bool include = false,
@@ -904,7 +869,7 @@ extension PersonModelQueryLinks
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
+  QueryBuilder<Person, Person, QAfterFilterCondition>
       participationLengthBetween(
     int lower,
     int upper, {
@@ -917,35 +882,33 @@ extension PersonModelQueryLinks
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> debts(
-      FilterQuery<DebtModel> q) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> debts(
+      FilterQuery<Debt> q) {
     return QueryBuilder.apply(this, (query) {
       return query.link(q, r'debts');
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      debtsLengthEqualTo(int length) {
+  QueryBuilder<Person, Person, QAfterFilterCondition> debtsLengthEqualTo(
+      int length) {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'debts', length, true, length, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition> debtsIsEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> debtsIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'debts', 0, true, 0, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      debtsIsNotEmpty() {
+  QueryBuilder<Person, Person, QAfterFilterCondition> debtsIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'debts', 0, false, 999999, true);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      debtsLengthLessThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> debtsLengthLessThan(
     int length, {
     bool include = false,
   }) {
@@ -954,8 +917,7 @@ extension PersonModelQueryLinks
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      debtsLengthGreaterThan(
+  QueryBuilder<Person, Person, QAfterFilterCondition> debtsLengthGreaterThan(
     int length, {
     bool include = false,
   }) {
@@ -964,8 +926,7 @@ extension PersonModelQueryLinks
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterFilterCondition>
-      debtsLengthBetween(
+  QueryBuilder<Person, Person, QAfterFilterCondition> debtsLengthBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -978,177 +939,173 @@ extension PersonModelQueryLinks
   }
 }
 
-extension PersonModelQuerySortBy
-    on QueryBuilder<PersonModel, PersonModel, QSortBy> {
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> sortByFirstName() {
+extension PersonQuerySortBy on QueryBuilder<Person, Person, QSortBy> {
+  QueryBuilder<Person, Person, QAfterSortBy> sortByFirstName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'firstName', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> sortByFirstNameDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> sortByFirstNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'firstName', Sort.desc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> sortByLastName() {
+  QueryBuilder<Person, Person, QAfterSortBy> sortByLastName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastName', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> sortByLastNameDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> sortByLastNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastName', Sort.desc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> sortByMiddleName() {
+  QueryBuilder<Person, Person, QAfterSortBy> sortByMiddleName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'middleName', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> sortByMiddleNameDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> sortByMiddleNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'middleName', Sort.desc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> sortByNumber() {
+  QueryBuilder<Person, Person, QAfterSortBy> sortByNumber() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'number', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> sortByNumberDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> sortByNumberDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'number', Sort.desc);
     });
   }
 }
 
-extension PersonModelQuerySortThenBy
-    on QueryBuilder<PersonModel, PersonModel, QSortThenBy> {
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByFirstName() {
+extension PersonQuerySortThenBy on QueryBuilder<Person, Person, QSortThenBy> {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByFirstName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'firstName', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByFirstNameDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByFirstNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'firstName', Sort.desc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenById() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByIdDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByLastName() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByLastName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastName', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByLastNameDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByLastNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastName', Sort.desc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByMiddleName() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByMiddleName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'middleName', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByMiddleNameDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByMiddleNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'middleName', Sort.desc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByNumber() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByNumber() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'number', Sort.asc);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QAfterSortBy> thenByNumberDesc() {
+  QueryBuilder<Person, Person, QAfterSortBy> thenByNumberDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'number', Sort.desc);
     });
   }
 }
 
-extension PersonModelQueryWhereDistinct
-    on QueryBuilder<PersonModel, PersonModel, QDistinct> {
-  QueryBuilder<PersonModel, PersonModel, QDistinct> distinctByFirstName(
+extension PersonQueryWhereDistinct on QueryBuilder<Person, Person, QDistinct> {
+  QueryBuilder<Person, Person, QDistinct> distinctByFirstName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'firstName', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QDistinct> distinctByLastName(
+  QueryBuilder<Person, Person, QDistinct> distinctByLastName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastName', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QDistinct> distinctByMiddleName(
+  QueryBuilder<Person, Person, QDistinct> distinctByMiddleName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'middleName', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<PersonModel, PersonModel, QDistinct> distinctByNumber() {
+  QueryBuilder<Person, Person, QDistinct> distinctByNumber() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'number');
     });
   }
 }
 
-extension PersonModelQueryProperty
-    on QueryBuilder<PersonModel, PersonModel, QQueryProperty> {
-  QueryBuilder<PersonModel, int, QQueryOperations> idProperty() {
+extension PersonQueryProperty on QueryBuilder<Person, Person, QQueryProperty> {
+  QueryBuilder<Person, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
     });
   }
 
-  QueryBuilder<PersonModel, String, QQueryOperations> firstNameProperty() {
+  QueryBuilder<Person, String, QQueryOperations> firstNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'firstName');
     });
   }
 
-  QueryBuilder<PersonModel, String?, QQueryOperations> lastNameProperty() {
+  QueryBuilder<Person, String?, QQueryOperations> lastNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'lastName');
     });
   }
 
-  QueryBuilder<PersonModel, String?, QQueryOperations> middleNameProperty() {
+  QueryBuilder<Person, String?, QQueryOperations> middleNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'middleName');
     });
   }
 
-  QueryBuilder<PersonModel, int, QQueryOperations> numberProperty() {
+  QueryBuilder<Person, int, QQueryOperations> numberProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'number');
     });
