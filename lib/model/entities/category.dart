@@ -1,4 +1,5 @@
 import 'package:expensetracker/model/entities/budget.dart';
+import 'package:expensetracker/model/entities/expenses.dart';
 import 'package:isar/isar.dart';
 
 part 'category.g.dart';
@@ -11,6 +12,8 @@ class Category {
   String icon;
   @Backlink(to: 'categories')
   final budget = IsarLink<Budget>();
+  @Backlink(to: 'category')
+  final expenses = IsarLinks<Expense>();
 
   Category({
     required this.name,
