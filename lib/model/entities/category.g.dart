@@ -41,6 +41,13 @@ const CategorySchema = CollectionSchema(
       target: r'Budget',
       single: true,
       linkName: r'categories',
+    ),
+    r'expenses': LinkSchema(
+      id: 8414127524801899185,
+      name: r'expenses',
+      target: r'Expense',
+      single: false,
+      linkName: r'category',
     )
   },
   embeddedSchemas: {},
@@ -106,12 +113,13 @@ Id _categoryGetId(Category object) {
 }
 
 List<IsarLinkBase<dynamic>> _categoryGetLinks(Category object) {
-  return [object.budget];
+  return [object.budget, object.expenses];
 }
 
 void _categoryAttach(IsarCollection<dynamic> col, Id id, Category object) {
   object.id = id;
   object.budget.attach(col, col.isar.collection<Budget>(), r'budget', id);
+  object.expenses.attach(col, col.isar.collection<Expense>(), r'expenses', id);
 }
 
 extension CategoryQueryWhereSort on QueryBuilder<Category, Category, QWhere> {
@@ -521,6 +529,64 @@ extension CategoryQueryLinks
       return query.linkLength(r'budget', 0, true, 0, true);
     });
   }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> expenses(
+      FilterQuery<Expense> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'expenses');
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> expensesLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'expenses', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> expensesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'expenses', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> expensesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'expenses', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition>
+      expensesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'expenses', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition>
+      expensesLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'expenses', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<Category, Category, QAfterFilterCondition> expensesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'expenses', lower, includeLower, upper, includeUpper);
+    });
+  }
 }
 
 extension CategoryQuerySortBy on QueryBuilder<Category, Category, QSortBy> {
@@ -625,3 +691,25 @@ extension CategoryQueryProperty
     });
   }
 }
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$categoriesHash() => r'd94ece0f9dbdbeb033dda90c57b230c4f3058f63';
+
+/// See also [Categories].
+@ProviderFor(Categories)
+final categoriesProvider =
+    AutoDisposeAsyncNotifierProvider<Categories, List<Category>>.internal(
+  Categories.new,
+  name: r'categoriesProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$categoriesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$Categories = AutoDisposeAsyncNotifier<List<Category>>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
