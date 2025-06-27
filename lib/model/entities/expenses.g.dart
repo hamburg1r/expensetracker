@@ -22,18 +22,13 @@ const ExpenseSchema = CollectionSchema(
       name: r'amount',
       type: IsarType.double,
     ),
-    r'category': PropertySchema(
-      id: 1,
-      name: r'category',
-      type: IsarType.string,
-    ),
     r'date': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'date',
       type: IsarType.dateTime,
     ),
     r'description': PropertySchema(
-      id: 3,
+      id: 2,
       name: r'description',
       type: IsarType.string,
     )
@@ -45,6 +40,12 @@ const ExpenseSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {
+    r'category': LinkSchema(
+      id: 6933751262338072598,
+      name: r'category',
+      target: r'Category',
+      single: false,
+    ),
     r'payer': LinkSchema(
       id: -3988055479429684766,
       name: r'payer',
@@ -71,7 +72,6 @@ int _expenseEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.category.length * 3;
   {
     final value = object.description;
     if (value != null) {
@@ -88,9 +88,8 @@ void _expenseSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDouble(offsets[0], object.amount);
-  writer.writeString(offsets[1], object.category);
-  writer.writeDateTime(offsets[2], object.date);
-  writer.writeString(offsets[3], object.description);
+  writer.writeDateTime(offsets[1], object.date);
+  writer.writeString(offsets[2], object.description);
 }
 
 Expense _expenseDeserialize(
@@ -101,9 +100,8 @@ Expense _expenseDeserialize(
 ) {
   final object = Expense(
     amount: reader.readDouble(offsets[0]),
-    category: reader.readString(offsets[1]),
-    date: reader.readDateTime(offsets[2]),
-    description: reader.readStringOrNull(offsets[3]),
+    date: reader.readDateTime(offsets[1]),
+    description: reader.readStringOrNull(offsets[2]),
   );
   return object;
 }
@@ -118,10 +116,8 @@ P _expenseDeserializeProp<P>(
     case 0:
       return (reader.readDouble(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
-    case 2:
       return (reader.readDateTime(offset)) as P;
-    case 3:
+    case 2:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -133,10 +129,11 @@ Id _expenseGetId(Expense object) {
 }
 
 List<IsarLinkBase<dynamic>> _expenseGetLinks(Expense object) {
-  return [object.payer, object.participants];
+  return [object.category, object.payer, object.participants];
 }
 
 void _expenseAttach(IsarCollection<dynamic> col, Id id, Expense object) {
+  object.category.attach(col, col.isar.collection<Category>(), r'category', id);
   object.payer.attach(col, col.isar.collection<Person>(), r'payer', id);
   object.participants
       .attach(col, col.isar.collection<Person>(), r'participants', id);
@@ -277,136 +274,6 @@ extension ExpenseQueryFilter
         upper: upper,
         includeUpper: includeUpper,
         epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'category',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'category',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'category',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'category',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'category',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'category',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryContains(
-      String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'category',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'category',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'category',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'category',
-        value: '',
       ));
     });
   }
@@ -669,6 +536,63 @@ extension ExpenseQueryObject
 
 extension ExpenseQueryLinks
     on QueryBuilder<Expense, Expense, QFilterCondition> {
+  QueryBuilder<Expense, Expense, QAfterFilterCondition> category(
+      FilterQuery<Category> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'category');
+    });
+  }
+
+  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'category', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'category', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'category', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'category', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<Expense, Expense, QAfterFilterCondition>
+      categoryLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'category', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<Expense, Expense, QAfterFilterCondition> categoryLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'category', lower, includeLower, upper, includeUpper);
+    });
+  }
+
   QueryBuilder<Expense, Expense, QAfterFilterCondition> payer(
       FilterQuery<Person> q) {
     return QueryBuilder.apply(this, (query) {
@@ -756,18 +680,6 @@ extension ExpenseQuerySortBy on QueryBuilder<Expense, Expense, QSortBy> {
     });
   }
 
-  QueryBuilder<Expense, Expense, QAfterSortBy> sortByCategory() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'category', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterSortBy> sortByCategoryDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'category', Sort.desc);
-    });
-  }
-
   QueryBuilder<Expense, Expense, QAfterSortBy> sortByDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'date', Sort.asc);
@@ -804,18 +716,6 @@ extension ExpenseQuerySortThenBy
   QueryBuilder<Expense, Expense, QAfterSortBy> thenByAmountDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'amount', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterSortBy> thenByCategory() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'category', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Expense, Expense, QAfterSortBy> thenByCategoryDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'category', Sort.desc);
     });
   }
 
@@ -864,13 +764,6 @@ extension ExpenseQueryWhereDistinct
     });
   }
 
-  QueryBuilder<Expense, Expense, QDistinct> distinctByCategory(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'category', caseSensitive: caseSensitive);
-    });
-  }
-
   QueryBuilder<Expense, Expense, QDistinct> distinctByDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'date');
@@ -899,12 +792,6 @@ extension ExpenseQueryProperty
     });
   }
 
-  QueryBuilder<Expense, String, QQueryOperations> categoryProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'category');
-    });
-  }
-
   QueryBuilder<Expense, DateTime, QQueryOperations> dateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'date');
@@ -917,3 +804,25 @@ extension ExpenseQueryProperty
     });
   }
 }
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$expensesHash() => r'edfda7f9a86ac7fc9f48eebbc1e278af20c50fc1';
+
+/// See also [Expenses].
+@ProviderFor(Expenses)
+final expensesProvider =
+    AutoDisposeAsyncNotifierProvider<Expenses, List<Expense>>.internal(
+  Expenses.new,
+  name: r'expensesProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$expensesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$Expenses = AutoDisposeAsyncNotifier<List<Expense>>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
