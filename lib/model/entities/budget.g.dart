@@ -612,3 +612,25 @@ extension BudgetQueryProperty on QueryBuilder<Budget, Budget, QQueryProperty> {
     });
   }
 }
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$budgetsHash() => r'e07b05b0aebf94e85360142ebe3c222895c81d2f';
+
+/// See also [Budgets].
+@ProviderFor(Budgets)
+final budgetsProvider =
+    AutoDisposeAsyncNotifierProvider<Budgets, List<Budget>>.internal(
+  Budgets.new,
+  name: r'budgetsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$budgetsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$Budgets = AutoDisposeAsyncNotifier<List<Budget>>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
