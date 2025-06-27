@@ -905,3 +905,25 @@ extension DebtQueryProperty on QueryBuilder<Debt, Debt, QQueryProperty> {
     });
   }
 }
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$debtsHash() => r'3807c68ad312447e687e28ee0250c5654c33ccc3';
+
+/// See also [Debts].
+@ProviderFor(Debts)
+final debtsProvider =
+    AutoDisposeAsyncNotifierProvider<Debts, List<Debt>>.internal(
+  Debts.new,
+  name: r'debtsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$debtsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$Debts = AutoDisposeAsyncNotifier<List<Debt>>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
