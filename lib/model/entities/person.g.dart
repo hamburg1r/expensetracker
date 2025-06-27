@@ -1111,3 +1111,25 @@ extension PersonQueryProperty on QueryBuilder<Person, Person, QQueryProperty> {
     });
   }
 }
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$peopleHash() => r'c7c02d690f565fd845d03e1b95920019aaf4a472';
+
+/// See also [People].
+@ProviderFor(People)
+final peopleProvider =
+    AutoDisposeAsyncNotifierProvider<People, List<Person>>.internal(
+  People.new,
+  name: r'peopleProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$peopleHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$People = AutoDisposeAsyncNotifier<List<Person>>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
