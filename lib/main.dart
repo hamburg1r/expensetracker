@@ -1,25 +1,15 @@
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:expensetracker/screens/overview/main.dart';
+import 'package:expensetracker/cubit/index_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'main.g.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  var path = await getApplicationDocumentsDirectory();
-  runApp(ProviderScope(
-    child: const App(),
-  ));
+void main() {
+  runApp(const App());
 }
 
 class App extends StatelessWidget {
-  const App({
-    super.key,
-  });
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +36,7 @@ class App extends StatelessWidget {
           // _isDemoUsingDynamicColors = true; // ignore, only for demo purposes
         } else {
           // Otherwise, use fallback schemes.
-          lightColorScheme = ColorScheme.fromSeed(
-            seedColor: Colors.blueAccent,
-          );
+          lightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blueAccent);
           darkColorScheme = ColorScheme.fromSeed(
             seedColor: Colors.blueAccent,
             brightness: Brightness.dark,
@@ -61,71 +49,71 @@ class App extends StatelessWidget {
             // primaryColor: MaterialAccentColor(accentColor),
             colorScheme: lightColorScheme,
           ),
-          darkTheme: ThemeData(
-            colorScheme: darkColorScheme,
-          ),
+          darkTheme: ThemeData(colorScheme: darkColorScheme),
           themeMode: ThemeMode.system,
-          home: HomeScreen(),
+          home: BlocProvider(
+            create: (BuildContext context) => IndexCubit(),
+            child: HomeScreen(),
+          ),
         );
       },
     );
   }
 }
 
-class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({
-    super.key,
-  });
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   final _advancedDrawerController = AdvancedDrawerController();
+
+  Widget _getScreen(int index) {
+    appBar(Widget title, [List<Widget> actions = const []]) => AppBar(
+      title: title,
+      leading: IconButton(
+        onPressed: _handleMenuButtonPressed,
+        icon: ValueListenableBuilder<AdvancedDrawerValue>(
+          valueListenable: _advancedDrawerController,
+          builder: (_, value, __) {
+            return AnimatedSwitcher(
+              duration: Duration(milliseconds: 250),
+              child: Icon(
+                value.visible ? Icons.clear : Icons.menu,
+                key: ValueKey<bool>(value.visible),
+              ),
+            );
+          },
+        ),
+      ),
+      actions: actions,
+    );
+
+    switch (index) {
+      case 0:
+        return Scaffold(
+          appBar: appBar(Text('0')),
+          body: Text('placeholder'),
+          floatingActionButton: FloatingActionButton(
+            shape: CircleBorder(),
+            onPressed: () => print("Hello"),
+            child: Icon(Icons.add),
+          ),
+        );
+      default:
+        return Scaffold(
+          body: Center(
+            child: FittedBox(child: Text('?', style: TextStyle(fontSize: 100))),
+          ),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    int currentScreen = ref.watch(indexStorageProvider);
-    var currentScreenNotifier = ref.read(indexStorageProvider.notifier);
-    appBar(
-      Widget title, [
-      List<Widget> actions = const [],
-    ]) =>
-        AppBar(
-          title: title,
-          leading: IconButton(
-            onPressed: _handleMenuButtonPressed,
-            icon: ValueListenableBuilder<AdvancedDrawerValue>(
-              valueListenable: _advancedDrawerController,
-              builder: (_, value, __) {
-                return AnimatedSwitcher(
-                  duration: Duration(milliseconds: 250),
-                  child: Icon(
-                    value.visible ? Icons.clear : Icons.menu,
-                    key: ValueKey<bool>(value.visible),
-                  ),
-                );
-              },
-            ),
-          ),
-          actions: actions,
-        );
-    var screens = <Widget>[
-      Overview(
-        appBar: appBar,
-      ),
-      Scaffold(
-        appBar: appBar(Text('1')),
-        body: Text('placeholder'),
-        floatingActionButton: FloatingActionButton(
-          shape: CircleBorder(),
-          onPressed: () => print("Hello"),
-          child: Icon(Icons.add),
-        ),
-      ),
-    ];
-
     return AdvancedDrawer(
       backdrop: Container(
         width: MediaQuery.of(context).size.width,
@@ -168,44 +156,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Spacer(),
               ListTile(
                 onTap: () {
-                  if (currentScreen != 0) {
-                    setState(() {
-                      currentScreenNotifier.update(0);
-                    });
+                  if (context.read<IndexCubit>().state != 0) {
+                    context.read<IndexCubit>().setIndex(0);
                   }
+                  _advancedDrawerController.hideDrawer();
                 },
                 // leading: Icon(Icons.notes),
                 title: Text('Overview'),
               ),
               ListTile(
                 onTap: () {
-                  if (currentScreen != 1) {
-                    setState(() {
-                      currentScreenNotifier.update(1);
-                    });
+                  if (context.read<IndexCubit>().state != 1) {
+                    context.read<IndexCubit>().setIndex(1);
                   }
+                  _advancedDrawerController.hideDrawer();
                 },
                 // leading: Icon(Icons.folder),
                 title: Text('Documents'),
               ),
               ListTile(
                 onTap: () {
-                  if (currentScreen != 2) {
-                    setState(() {
-                      currentScreenNotifier.update(2);
-                    });
+                  if (context.read<IndexCubit>().state != 2) {
+                    context.read<IndexCubit>().setIndex(2);
                   }
+                  _advancedDrawerController.hideDrawer();
                 },
                 // leading: Icon(Icons.calendar_month),
                 title: Text('Calendar'),
               ),
               ListTile(
                 onTap: () {
-                  if (currentScreen != 3) {
-                    setState(() {
-                      currentScreenNotifier.update(3);
-                    });
+                  if (context.read<IndexCubit>().state != 3) {
+                    context.read<IndexCubit>().setIndex(3);
                   }
+                  _advancedDrawerController.hideDrawer();
                 },
                 // leading: Icon(Icons.settings),
                 title: Text('Settings'),
@@ -215,7 +199,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      child: screens[currentScreen],
+      child: BlocBuilder<IndexCubit, int>(
+        builder: (BuildContext context, int index) {
+          return _getScreen(index);
+        },
+      ),
     );
   }
 
@@ -224,23 +212,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-@riverpod
-class IndexStorage extends _$IndexStorage {
-  @override
-  int build() {
-    // Initial value
-    return 0;
-  }
+class IndexStorage {
+  int index = 0;
 
   void update(int value) {
-    state = value;
+    index = value;
   }
 
   void increment() {
-    state++;
+    index++;
   }
 
   void decrement() {
-    state--;
+    index--;
   }
 }
