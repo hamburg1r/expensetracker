@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           body: Center(
             child: FittedBox(
-              child: Text(
+              child: const Text(
                 '?',
                 style: TextStyle(
                   fontSize: 100,
@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              Spacer(),
+              const Spacer(),
               ListTile(
                 onTap: () {
                   if (context.read<IndexCubit>().state != 0) {
@@ -177,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _advancedDrawerController.hideDrawer();
                 },
                 leading: Icon(Icons.notes),
-                title: Text('Overview'),
+                title: const Text('Overview'),
               ),
               ListTile(
                 onTap: () {
@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _advancedDrawerController.hideDrawer();
                 },
                 leading: Icon(Icons.contacts),
-                title: Text('People'),
+                title: const Text('People'),
               ),
               ListTile(
                 onTap: () {
@@ -197,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _advancedDrawerController.hideDrawer();
                 },
                 // leading: Icon(Icons.calendar_month),
-                title: Text('Calendar'),
+                title: const Text('Calendar'),
               ),
               ListTile(
                 onTap: () {
@@ -207,9 +207,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   _advancedDrawerController.hideDrawer();
                 },
                 // leading: Icon(Icons.settings),
-                title: Text('Settings'),
+                title: const Text('Settings'),
               ),
-              Spacer(flex: 4),
+              const Spacer(flex: 4),
             ],
           ),
         ),

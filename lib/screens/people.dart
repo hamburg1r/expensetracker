@@ -22,7 +22,7 @@ class PeopleScreen extends StatelessWidget {
       create: (ctx) => PersonCubit(OBPersonRepo(store)),
       child: Scaffold(
         appBar: appBar(
-          Text('People'),
+          const Text('People'),
         ),
         body: BlocBuilder<PersonCubit, PersonState>(
           builder: (BuildContext context, PersonState state) {
@@ -51,7 +51,7 @@ class PeopleScreen extends StatelessWidget {
               );
             } else {
               return Center(
-                child: Text("Error loading database"),
+                child: const Text("Error loading database"),
               );
             }
           },
