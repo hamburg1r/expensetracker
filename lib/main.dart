@@ -1,15 +1,25 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:expensetracker/cubit/index_cubit.dart';
+import 'package:expensetracker/objectbox.g.dart';
+import 'package:expensetracker/screens/people.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p show join;
 
-void main() {
-  runApp(const App());
+import 'screens/overview.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final path = await getApplicationDocumentsDirectory();
+  Store store = await openStore(directory: p.join(path.path, 'db'));
+  runApp(App(store: store));
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final Store store;
+  const App({required this.store, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +63,7 @@ class App extends StatelessWidget {
           themeMode: ThemeMode.system,
           home: BlocProvider(
             create: (BuildContext context) => IndexCubit(),
-            child: HomeScreen(),
+            child: HomeScreen(store: store),
           ),
         );
       },
@@ -62,7 +72,8 @@ class App extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Store store;
+  const HomeScreen({required this.store, super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -72,7 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final _advancedDrawerController = AdvancedDrawerController();
 
   Widget _getScreen(int index) {
-    appBar(Widget title, [List<Widget> actions = const []]) => AppBar(
+    appBar(
+      Widget title, [
+      List<Widget> actions = const [],
+    ]) => AppBar(
       title: title,
       leading: IconButton(
         onPressed: _handleMenuButtonPressed,
@@ -94,19 +108,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
     switch (index) {
       case 0:
-        return Scaffold(
-          appBar: appBar(Text('0')),
-          body: Text('placeholder'),
-          floatingActionButton: FloatingActionButton(
-            shape: CircleBorder(),
-            onPressed: () => print("Hello"),
-            child: Icon(Icons.add),
-          ),
-        );
+        return OverviewScreen(appBar, widget.store);
+      case 1:
+        return PeopleScreen(appBar, widget.store);
       default:
         return Scaffold(
           body: Center(
-            child: FittedBox(child: Text('?', style: TextStyle(fontSize: 100))),
+            child: FittedBox(
+              child: Text(
+                '?',
+                style: TextStyle(
+                  fontSize: 100,
+                ),
+              ),
+            ),
           ),
         );
     }
@@ -161,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                   _advancedDrawerController.hideDrawer();
                 },
-                // leading: Icon(Icons.notes),
+                leading: Icon(Icons.notes),
                 title: Text('Overview'),
               ),
               ListTile(
@@ -171,8 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                   _advancedDrawerController.hideDrawer();
                 },
-                // leading: Icon(Icons.folder),
-                title: Text('Documents'),
+                leading: Icon(Icons.contacts),
+                title: Text('People'),
               ),
               ListTile(
                 onTap: () {
