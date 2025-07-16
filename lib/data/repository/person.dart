@@ -5,7 +5,7 @@ import 'package:objectbox/objectbox.dart';
 
 class OBPersonRepo extends PersonRepo {
   late final Box<OBPerson> _box;
-  OBPersonRepo._create(Store store) {
+  OBPersonRepo(Store store) {
     _box = Box<OBPerson>(store);
   }
   @override
