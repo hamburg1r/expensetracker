@@ -6,7 +6,9 @@ part 'person_state.dart';
 
 class PersonCubit extends Cubit<PersonState> {
   final PersonRepo _repo;
-  PersonCubit(this._repo) : super(PersonInitial());
+  PersonCubit(this._repo) : super(PersonInitial()) {
+    load();
+  }
 
   Future<void> load() async {
     emit(PersonLoading());
