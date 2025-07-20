@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:expensetracker/cubit/person_cubit.dart';
 import 'package:expensetracker/data/repository/person.dart';
 import 'package:expensetracker/domain/model/person.dart';
+import 'package:expensetracker/screens/form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:objectbox/objectbox.dart';
@@ -27,7 +26,7 @@ class PeopleScreen extends StatelessWidget {
         body: BlocBuilder<PersonCubit, PersonState>(
           builder: (BuildContext context, PersonState state) {
             if (state is PersonLoading || state is PersonInitial) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
             if (state is PersonLoaded) {
               List<Person> people = state.people;
@@ -50,15 +49,22 @@ class PeopleScreen extends StatelessWidget {
                 ),
               );
             } else {
-              return Center(
-                child: const Text("Error loading database"),
+              return const Center(
+                child: Text("Error loading database"),
               );
             }
           },
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => print('hi'),
-          child: Icon(Icons.add),
+          onPressed: () =>
+              Navigator.of(
+                context,
+              ).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => const CustomForm(),
+                ),
+              ),
+          child: const Icon(Icons.add),
         ),
       ),
     );
