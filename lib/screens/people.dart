@@ -61,7 +61,9 @@ class PeopleScreen extends StatelessWidget {
                 context,
               ).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const CustomForm(),
+                  builder: (BuildContext context) => const CustomForm(
+                    type: FormType.person,
+                  ),
                 ),
               ),
           child: const Icon(Icons.add),
