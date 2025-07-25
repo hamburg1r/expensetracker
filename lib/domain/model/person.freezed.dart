@@ -209,8 +209,8 @@ return $default(_that.id,_that.firstName,_that.middleName,_that.lastName,_that.n
 /// @nodoc
 
 
-class _Person implements Person {
-  const _Person({this.id = 0, required this.firstName, required this.middleName, required this.lastName, required this.number});
+class _Person extends Person {
+  const _Person({this.id = 0, required this.firstName, required this.middleName, required this.lastName, required this.number}): super._();
   
 
 @override@JsonKey() final  int id;

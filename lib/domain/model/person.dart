@@ -14,4 +14,8 @@ abstract class Person with _$Person {
     // required participation,
     // required debts,
   }) = _Person;
+
+  String get name => firstName + (middleName ?? '') + (lastName ?? '');
+
+  const Person._();
 }
