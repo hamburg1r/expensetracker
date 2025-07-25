@@ -34,6 +34,7 @@ class PeopleScreen extends StatelessWidget {
                 return ListView.builder(
                   itemCount: people.length,
                   itemBuilder: (BuildContext context, int index) {
+                    Person person = people[index];
                     return ListTile(
                       title: Text(index.toString()),
                     );
@@ -55,18 +56,26 @@ class PeopleScreen extends StatelessWidget {
             }
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () =>
-              Navigator.of(
-                context,
-              ).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => const CustomForm(
-                    type: FormType.person,
+        floatingActionButton: BlocBuilder<PersonCubit, PersonState>(
+          builder: (BuildContext providerContext, _) {
+            return FloatingActionButton(
+              onPressed: () {
+                Navigator.of(
+                  context,
+                ).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext ctx) {
+                      return CustomForm(
+                        type: FormType.person,
+                        providerContext: providerContext,
+                      );
+                    },
                   ),
-                ),
-              ),
-          child: const Icon(Icons.add),
+                );
+              },
+              child: const Icon(Icons.add),
+            );
+          },
         ),
       ),
     );

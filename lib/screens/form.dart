@@ -2,8 +2,8 @@ import 'package:expensetracker/widgets/person_form.dart';
 import 'package:flutter/material.dart';
 
 abstract class CustomFormWidget {
-  void save();
-  void cancel();
+  void save(BuildContext context);
+  void cancel(BuildContext context);
 }
 
 enum FormType {
@@ -12,7 +12,9 @@ enum FormType {
 
 class CustomForm extends StatelessWidget {
   final FormType type;
+  final BuildContext providerContext;
   const CustomForm({
+    required this.providerContext,
     required this.type,
     super.key,
   });
@@ -36,14 +38,14 @@ class CustomForm extends StatelessWidget {
           children: [
             OutlinedButton(
               onPressed: () {
-                body.cancel();
+                body.cancel(providerContext);
                 Navigator.of(context).pop();
               },
               child: const Text('Cancel'),
             ),
             FilledButton(
               onPressed: () {
-                body.save();
+                body.save(providerContext);
                 // Navigator.of(context).pop();
               },
               child: const Text('Save'),
