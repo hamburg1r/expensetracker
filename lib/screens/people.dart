@@ -2,6 +2,7 @@ import 'package:expensetracker/cubit/person_cubit.dart';
 import 'package:expensetracker/data/repository/person.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/screens/form.dart';
+import 'package:expensetracker/widgets/person_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:objectbox/objectbox.dart';
@@ -34,10 +35,7 @@ class PeopleScreen extends StatelessWidget {
                 return ListView.builder(
                   itemCount: people.length,
                   itemBuilder: (BuildContext context, int index) {
-                    Person person = people[index];
-                    return ListTile(
-                      title: Text(index.toString()),
-                    );
+                    return PersonTile(person: people[index]);
                   },
                 );
               }
