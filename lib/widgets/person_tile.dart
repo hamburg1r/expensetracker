@@ -1,5 +1,6 @@
 import 'package:expensetracker/cubit/person_cubit.dart';
 import 'package:expensetracker/domain/model/person.dart';
+import 'package:expensetracker/screens/form.dart';
 import 'package:expensetracker/widgets/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +24,19 @@ class PersonTile extends StatelessWidget {
             items: {
               'Delete': () {
                 context.read<PersonCubit>().remove(person.id);
+              },
+              'Edit': () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext ctx) {
+                      return CustomForm(
+                        type: FormType.person,
+                        providerContext: context,
+                        person: person,
+                      );
+                    },
+                  ),
+                );
               },
             },
           ),
