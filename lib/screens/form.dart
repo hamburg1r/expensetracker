@@ -1,3 +1,4 @@
+import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/widgets/person_form.dart';
 import 'package:flutter/material.dart';
 
@@ -13,9 +14,11 @@ enum FormType {
 class CustomForm extends StatelessWidget {
   final FormType type;
   final BuildContext providerContext;
+  final Person? person;
   const CustomForm({
     required this.providerContext,
     required this.type,
+    this.person,
     super.key,
   });
 
@@ -25,7 +28,7 @@ class CustomForm extends StatelessWidget {
 
     switch (type) {
       case FormType.person:
-        body = PersonForm();
+        body = PersonForm(person: person);
     }
 
     return Scaffold(

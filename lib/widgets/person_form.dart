@@ -30,6 +30,7 @@ class PersonForm extends StatefulWidget implements CustomFormWidget {
     if (!isValid) return false;
 
     var person = Person(
+      id: this.person?.id ?? 0,
       name: _controllers.name.text,
       number: int.parse(_controllers.number.text),
     );
