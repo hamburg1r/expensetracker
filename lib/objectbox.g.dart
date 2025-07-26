@@ -22,7 +22,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 817311707611462368),
     name: 'OBPerson',
-    lastPropertyId: const obx_int.IdUid(5, 1013401106798143489),
+    lastPropertyId: const obx_int.IdUid(6, 7844175887754073587),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -32,27 +32,15 @@ final _entities = <obx_int.ModelEntity>[
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(2, 8578515136220843738),
-        name: 'firstName',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 1190439392344694794),
-        name: 'middleName',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 7252681734961514324),
-        name: 'lastName',
-        type: 9,
-        flags: 0,
-      ),
-      obx_int.ModelProperty(
         id: const obx_int.IdUid(5, 1013401106798143489),
         name: 'number',
         type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 7844175887754073587),
+        name: 'name',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -105,7 +93,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [],
+    retiredPropertyUids: const [
+      8578515136220843738,
+      1190439392344694794,
+      7252681734961514324,
+    ],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -122,19 +114,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
         object.id = id;
       },
       objectToFB: (OBPerson object, fb.Builder fbb) {
-        final firstNameOffset = fbb.writeString(object.firstName);
-        final middleNameOffset = object.middleName == null
-            ? null
-            : fbb.writeString(object.middleName!);
-        final lastNameOffset = object.lastName == null
-            ? null
-            : fbb.writeString(object.lastName!);
-        fbb.startTable(6);
+        final nameOffset = fbb.writeString(object.name);
+        fbb.startTable(7);
         fbb.addInt64(0, object.id);
-        fbb.addOffset(1, firstNameOffset);
-        fbb.addOffset(2, middleNameOffset);
-        fbb.addOffset(3, lastNameOffset);
         fbb.addInt64(4, object.number);
+        fbb.addOffset(5, nameOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -144,21 +128,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
 
         final object = OBPerson()
           ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-          ..firstName = const fb.StringReader(
+          ..number = const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0)
+          ..name = const fb.StringReader(
             asciiOptimization: true,
-          ).vTableGet(buffer, rootOffset, 6, '')
-          ..middleName = const fb.StringReader(
-            asciiOptimization: true,
-          ).vTableGetNullable(buffer, rootOffset, 8)
-          ..lastName = const fb.StringReader(
-            asciiOptimization: true,
-          ).vTableGetNullable(buffer, rootOffset, 10)
-          ..number = const fb.Int64Reader().vTableGet(
-            buffer,
-            rootOffset,
-            12,
-            0,
-          );
+          ).vTableGet(buffer, rootOffset, 14, '');
 
         return object;
       },
@@ -175,23 +148,13 @@ class OBPerson_ {
     _entities[0].properties[0],
   );
 
-  /// See [OBPerson.firstName].
-  static final firstName = obx.QueryStringProperty<OBPerson>(
+  /// See [OBPerson.number].
+  static final number = obx.QueryIntegerProperty<OBPerson>(
     _entities[0].properties[1],
   );
 
-  /// See [OBPerson.middleName].
-  static final middleName = obx.QueryStringProperty<OBPerson>(
+  /// See [OBPerson.name].
+  static final name = obx.QueryStringProperty<OBPerson>(
     _entities[0].properties[2],
-  );
-
-  /// See [OBPerson.lastName].
-  static final lastName = obx.QueryStringProperty<OBPerson>(
-    _entities[0].properties[3],
-  );
-
-  /// See [OBPerson.number].
-  static final number = obx.QueryIntegerProperty<OBPerson>(
-    _entities[0].properties[4],
   );
 }

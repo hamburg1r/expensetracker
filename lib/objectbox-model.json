@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:817311707611462368",
-      "lastPropertyId": "5:1013401106798143489",
+      "lastPropertyId": "6:7844175887754073587",
       "name": "OBPerson",
       "properties": [
         {
@@ -15,24 +15,14 @@
           "flags": 1
         },
         {
-          "id": "2:8578515136220843738",
-          "name": "firstName",
-          "type": 9
-        },
-        {
-          "id": "3:1190439392344694794",
-          "name": "middleName",
-          "type": 9
-        },
-        {
-          "id": "4:7252681734961514324",
-          "name": "lastName",
-          "type": 9
-        },
-        {
           "id": "5:1013401106798143489",
           "name": "number",
           "type": 6
+        },
+        {
+          "id": "6:7844175887754073587",
+          "name": "name",
+          "type": 9
         }
       ],
       "relations": []
@@ -46,7 +36,11 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    8578515136220843738,
+    1190439392344694794,
+    7252681734961514324
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

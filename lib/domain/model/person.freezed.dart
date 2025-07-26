@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Person {
 
- int get id; String get firstName; String? get middleName; String? get lastName; int get number;
+ int get id; String get name; int get number;
 /// Create a copy of Person
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $PersonCopyWith<Person> get copyWith => _$PersonCopyWithImpl<Person>(this as Per
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Person&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.middleName, middleName) || other.middleName == middleName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.number, number) || other.number == number));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Person&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.number, number) || other.number == number));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,firstName,middleName,lastName,number);
+int get hashCode => Object.hash(runtimeType,id,name,number);
 
 @override
 String toString() {
-  return 'Person(id: $id, firstName: $firstName, middleName: $middleName, lastName: $lastName, number: $number)';
+  return 'Person(id: $id, name: $name, number: $number)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $PersonCopyWith<$Res>  {
   factory $PersonCopyWith(Person value, $Res Function(Person) _then) = _$PersonCopyWithImpl;
 @useResult
 $Res call({
- int id, String firstName, String? middleName, String? lastName, int number
+ int id, String name, int number
 });
 
 
@@ -62,13 +62,11 @@ class _$PersonCopyWithImpl<$Res>
 
 /// Create a copy of Person
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? firstName = null,Object? middleName = freezed,Object? lastName = freezed,Object? number = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? number = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
-as String,middleName: freezed == middleName ? _self.middleName : middleName // ignore: cast_nullable_to_non_nullable
-as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String?,number: null == number ? _self.number : number // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,number: null == number ? _self.number : number // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -154,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String firstName,  String? middleName,  String? lastName,  int number)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  int number)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Person() when $default != null:
-return $default(_that.id,_that.firstName,_that.middleName,_that.lastName,_that.number);case _:
+return $default(_that.id,_that.name,_that.number);case _:
   return orElse();
 
 }
@@ -175,10 +173,10 @@ return $default(_that.id,_that.firstName,_that.middleName,_that.lastName,_that.n
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String firstName,  String? middleName,  String? lastName,  int number)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  int number)  $default,) {final _that = this;
 switch (_that) {
 case _Person():
-return $default(_that.id,_that.firstName,_that.middleName,_that.lastName,_that.number);case _:
+return $default(_that.id,_that.name,_that.number);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +193,10 @@ return $default(_that.id,_that.firstName,_that.middleName,_that.lastName,_that.n
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String firstName,  String? middleName,  String? lastName,  int number)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  int number)?  $default,) {final _that = this;
 switch (_that) {
 case _Person() when $default != null:
-return $default(_that.id,_that.firstName,_that.middleName,_that.lastName,_that.number);case _:
+return $default(_that.id,_that.name,_that.number);case _:
   return null;
 
 }
@@ -209,14 +207,12 @@ return $default(_that.id,_that.firstName,_that.middleName,_that.lastName,_that.n
 /// @nodoc
 
 
-class _Person extends Person {
-  const _Person({this.id = 0, required this.firstName, required this.middleName, required this.lastName, required this.number}): super._();
+class _Person implements Person {
+  const _Person({this.id = 0, required this.name, required this.number});
   
 
 @override@JsonKey() final  int id;
-@override final  String firstName;
-@override final  String? middleName;
-@override final  String? lastName;
+@override final  String name;
 @override final  int number;
 
 /// Create a copy of Person
@@ -229,16 +225,16 @@ _$PersonCopyWith<_Person> get copyWith => __$PersonCopyWithImpl<_Person>(this, _
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Person&&(identical(other.id, id) || other.id == id)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.middleName, middleName) || other.middleName == middleName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.number, number) || other.number == number));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Person&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.number, number) || other.number == number));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,firstName,middleName,lastName,number);
+int get hashCode => Object.hash(runtimeType,id,name,number);
 
 @override
 String toString() {
-  return 'Person(id: $id, firstName: $firstName, middleName: $middleName, lastName: $lastName, number: $number)';
+  return 'Person(id: $id, name: $name, number: $number)';
 }
 
 
@@ -249,7 +245,7 @@ abstract mixin class _$PersonCopyWith<$Res> implements $PersonCopyWith<$Res> {
   factory _$PersonCopyWith(_Person value, $Res Function(_Person) _then) = __$PersonCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String firstName, String? middleName, String? lastName, int number
+ int id, String name, int number
 });
 
 
@@ -266,13 +262,11 @@ class __$PersonCopyWithImpl<$Res>
 
 /// Create a copy of Person
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? firstName = null,Object? middleName = freezed,Object? lastName = freezed,Object? number = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? number = null,}) {
   return _then(_Person(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
-as String,middleName: freezed == middleName ? _self.middleName : middleName // ignore: cast_nullable_to_non_nullable
-as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String?,number: null == number ? _self.number : number // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,number: null == number ? _self.number : number // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

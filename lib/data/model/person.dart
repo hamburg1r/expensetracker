@@ -5,17 +5,13 @@ import 'package:objectbox/objectbox.dart';
 class OBPerson {
   @Id()
   late int id;
-  late String firstName;
-  late String? middleName;
-  late String? lastName;
+  late String name;
   late int number;
 
   Person toDomain() {
     return Person(
       id: id,
-      firstName: firstName,
-      middleName: middleName,
-      lastName: lastName,
+      name: name,
       number: number,
     );
   }
@@ -23,9 +19,7 @@ class OBPerson {
   static OBPerson fromDomain(Person person) {
     return OBPerson()
       ..id = person.id
-      ..firstName = person.firstName
-      ..middleName = person.middleName
-      ..lastName = person.lastName
+      ..name = person.name
       ..number = person.number;
   }
 }

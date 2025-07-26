@@ -16,31 +16,21 @@ class _PersonControllers {
 class PersonForm extends StatefulWidget implements CustomFormWidget {
   final _formKey = GlobalKey<FormState>();
   final _PersonControllers _controllers = _PersonControllers();
+  final Person? person;
 
   PersonForm({
+    this.person,
     super.key,
   });
 
   @override
   bool save(BuildContext context) {
     print('Saving Person form');
-    final List<String> name = _controllers.name.text.split(' ');
     final bool isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return false;
 
-    String? middleName;
-    String? lastName;
-
-    if (name.length > 1) {
-      lastName = name.last;
-      if (name.length > 2) {
-        middleName = name.getRange(1, name.length - 1).join(' ');
-      }
-    }
     var person = Person(
-      firstName: name.first,
-      middleName: middleName,
-      lastName: lastName,
+      name: _controllers.name.text,
       number: int.parse(_controllers.number.text),
     );
     BlocProvider.of<PersonCubit>(context).add(person);
@@ -67,6 +57,11 @@ class _PersonFormState extends State<PersonForm> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.person != null) {
+      widget._controllers
+        ..name.text = widget.person?.name ?? ''
+        ..number.text = widget.person?.number.toString() ?? '';
+    }
     return Form(
       key: widget._formKey,
       child: Padding(
