@@ -22,9 +22,6 @@ class PersonTile extends StatelessWidget {
           subtitle: Text(person.number.toString()),
           trailing: CustomMenu(
             items: {
-              'Delete': () {
-                context.read<PersonCubit>().remove(person.id);
-              },
               'Edit': () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -37,6 +34,9 @@ class PersonTile extends StatelessWidget {
                     },
                   ),
                 );
+              },
+              'Delete': () {
+                context.read<PersonCubit>().remove(person.id);
               },
             },
           ),
