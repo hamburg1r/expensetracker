@@ -3,7 +3,7 @@ import 'package:expensetracker/widgets/person_form.dart';
 import 'package:flutter/material.dart';
 
 abstract class CustomFormWidget {
-  void save(BuildContext context);
+  bool save(BuildContext context);
   void cancel(BuildContext context);
 }
 
@@ -32,7 +32,9 @@ class CustomForm extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(type.name),
+      ),
       body: (body as Widget),
       bottomNavigationBar: BottomAppBar(
         child: Row(
@@ -48,8 +50,17 @@ class CustomForm extends StatelessWidget {
             ),
             FilledButton(
               onPressed: () {
-                body.save(providerContext);
-                // Navigator.of(context).pop();
+                if (!body.save(providerContext)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Error saving ${type.name}',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                Navigator.of(context).pop();
               },
               child: const Text('Save'),
             ),
