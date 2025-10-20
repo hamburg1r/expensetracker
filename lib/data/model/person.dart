@@ -6,13 +6,13 @@ class OBPerson {
   @Id()
   late int id;
   late String name;
-  late int number;
+  late String phoneNumber;
 
   Person toDomain() {
     return Person(
       id: id,
       name: name,
-      number: number,
+      phoneNumber: phoneNumber,
     );
   }
 
@@ -20,6 +20,6 @@ class OBPerson {
     return OBPerson()
       ..id = person.id
       ..name = person.name
-      ..number = person.number;
+      ..phoneNumber = person.phoneNumber;
   }
 }
