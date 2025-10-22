@@ -1,4 +1,5 @@
 import 'package:expensetracker/data/model/debt.dart';
+import 'package:expensetracker/data/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -12,6 +13,9 @@ class OBPerson {
   final debtsReceivable = ToMany<OBDebt>();
   @Backlink("creditor")
   final debtsOwed = ToMany<OBDebt>();
+  @Backlink("payer")
+  final transactions = ToMany<OBExpense>();
+  final participations = ToMany<OBExpense>();
 
   Person toDomain() {
     return Person(

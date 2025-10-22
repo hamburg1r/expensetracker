@@ -1,3 +1,4 @@
+import 'package:expensetracker/data/model/expense.dart';
 import 'package:expensetracker/data/model/person.dart';
 import 'package:expensetracker/objectbox.g.dart';
 import 'package:objectbox/objectbox.dart';
@@ -11,6 +12,7 @@ class OBDebt {
   late String note;
   late List<String> tags;
   late double paidAmount;
+  final expense = ToOne<OBExpense>();
   final debtor = ToOne<OBPerson>();
   final creditor = ToOne<OBPerson>();
 }
