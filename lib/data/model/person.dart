@@ -1,3 +1,4 @@
+import 'package:expensetracker/data/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:objectbox/objectbox.dart';
 
@@ -7,6 +8,10 @@ class OBPerson {
   late int id;
   late String name;
   late String phoneNumber;
+  @Backlink("debtor")
+  final debtsReceivable = ToMany<OBDebt>();
+  @Backlink("creditor")
+  final debtsOwed = ToMany<OBDebt>();
 
   Person toDomain() {
     return Person(
