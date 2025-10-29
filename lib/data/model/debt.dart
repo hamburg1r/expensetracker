@@ -8,6 +8,7 @@ class OBDebt {
   @Id()
   late int id;
   late double amount;
+  @Property(type: PropertyType.date)
   late DateTime date;
   late String note;
   late List<String> tags;

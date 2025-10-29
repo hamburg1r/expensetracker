@@ -10,6 +10,7 @@ class OBExpense {
   late String name;
   late String description;
   late List<String> tags;
+  @Property(type: PropertyType.date)
   late DateTime date;
   late double amount;
   final payer = ToOne<OBPerson>();
