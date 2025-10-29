@@ -1,5 +1,8 @@
+import 'package:expensetracker/domain/model/account.dart';
+import 'package:expensetracker/domain/model/category.dart';
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
+import 'package:expensetracker/objectbox.g.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'expense.freezed.dart';
@@ -16,5 +19,7 @@ abstract class Expense with _$Expense {
     Person? payer,
     required List<Person> participation,
     @Default([]) List<Debt> debts,
+    Category? category,
+    required Account account,
   }) = _Expense;
 }

@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Expense {
 
- int get id; String get name; String get description; List<String> get tags; DateTime get date; double get amount; Person? get payer; List<Person> get participation; List<Debt> get debts;
+ int get id; String get name; String get description; List<String> get tags; DateTime get date; double get amount; Person? get payer; List<Person> get participation; List<Debt> get debts; Category? get category; Account get account;
 /// Create a copy of Expense
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $ExpenseCopyWith<Expense> get copyWith => _$ExpenseCopyWithImpl<Expense>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Expense&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.date, date) || other.date == date)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.payer, payer) || other.payer == payer)&&const DeepCollectionEquality().equals(other.participation, participation)&&const DeepCollectionEquality().equals(other.debts, debts));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Expense&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.tags, tags)&&(identical(other.date, date) || other.date == date)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.payer, payer) || other.payer == payer)&&const DeepCollectionEquality().equals(other.participation, participation)&&const DeepCollectionEquality().equals(other.debts, debts)&&(identical(other.category, category) || other.category == category)&&(identical(other.account, account) || other.account == account));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,const DeepCollectionEquality().hash(tags),date,amount,payer,const DeepCollectionEquality().hash(participation),const DeepCollectionEquality().hash(debts));
+int get hashCode => Object.hash(runtimeType,id,name,description,const DeepCollectionEquality().hash(tags),date,amount,payer,const DeepCollectionEquality().hash(participation),const DeepCollectionEquality().hash(debts),category,account);
 
 @override
 String toString() {
-  return 'Expense(id: $id, name: $name, description: $description, tags: $tags, date: $date, amount: $amount, payer: $payer, participation: $participation, debts: $debts)';
+  return 'Expense(id: $id, name: $name, description: $description, tags: $tags, date: $date, amount: $amount, payer: $payer, participation: $participation, debts: $debts, category: $category, account: $account)';
 }
 
 
@@ -45,11 +45,11 @@ abstract mixin class $ExpenseCopyWith<$Res>  {
   factory $ExpenseCopyWith(Expense value, $Res Function(Expense) _then) = _$ExpenseCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String description, List<String> tags, DateTime date, double amount, Person? payer, List<Person> participation, List<Debt> debts
+ int id, String name, String description, List<String> tags, DateTime date, double amount, Person? payer, List<Person> participation, List<Debt> debts, Category? category, Account account
 });
 
 
-$PersonCopyWith<$Res>? get payer;
+$PersonCopyWith<$Res>? get payer;$CategoryCopyWith<$Res>? get category;$AccountCopyWith<$Res> get account;
 
 }
 /// @nodoc
@@ -62,7 +62,7 @@ class _$ExpenseCopyWithImpl<$Res>
 
 /// Create a copy of Expense
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? tags = null,Object? date = null,Object? amount = null,Object? payer = freezed,Object? participation = null,Object? debts = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? tags = null,Object? date = null,Object? amount = null,Object? payer = freezed,Object? participation = null,Object? debts = null,Object? category = freezed,Object? account = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,9 @@ as DateTime,amount: null == amount ? _self.amount : amount // ignore: cast_nulla
 as double,payer: freezed == payer ? _self.payer : payer // ignore: cast_nullable_to_non_nullable
 as Person?,participation: null == participation ? _self.participation : participation // ignore: cast_nullable_to_non_nullable
 as List<Person>,debts: null == debts ? _self.debts : debts // ignore: cast_nullable_to_non_nullable
-as List<Debt>,
+as List<Debt>,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as Category?,account: null == account ? _self.account : account // ignore: cast_nullable_to_non_nullable
+as Account,
   ));
 }
 /// Create a copy of Expense
@@ -87,6 +89,27 @@ $PersonCopyWith<$Res>? get payer {
 
   return $PersonCopyWith<$Res>(_self.payer!, (value) {
     return _then(_self.copyWith(payer: value));
+  });
+}/// Create a copy of Expense
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CategoryCopyWith<$Res>? get category {
+    if (_self.category == null) {
+    return null;
+  }
+
+  return $CategoryCopyWith<$Res>(_self.category!, (value) {
+    return _then(_self.copyWith(category: value));
+  });
+}/// Create a copy of Expense
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AccountCopyWith<$Res> get account {
+  
+  return $AccountCopyWith<$Res>(_self.account, (value) {
+    return _then(_self.copyWith(account: value));
   });
 }
 }
@@ -170,10 +193,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String description,  List<String> tags,  DateTime date,  double amount,  Person? payer,  List<Person> participation,  List<Debt> debts)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String description,  List<String> tags,  DateTime date,  double amount,  Person? payer,  List<Person> participation,  List<Debt> debts,  Category? category,  Account account)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Expense() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_that.amount,_that.payer,_that.participation,_that.debts);case _:
+return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_that.amount,_that.payer,_that.participation,_that.debts,_that.category,_that.account);case _:
   return orElse();
 
 }
@@ -191,10 +214,10 @@ return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String description,  List<String> tags,  DateTime date,  double amount,  Person? payer,  List<Person> participation,  List<Debt> debts)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String description,  List<String> tags,  DateTime date,  double amount,  Person? payer,  List<Person> participation,  List<Debt> debts,  Category? category,  Account account)  $default,) {final _that = this;
 switch (_that) {
 case _Expense():
-return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_that.amount,_that.payer,_that.participation,_that.debts);case _:
+return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_that.amount,_that.payer,_that.participation,_that.debts,_that.category,_that.account);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -211,10 +234,10 @@ return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String description,  List<String> tags,  DateTime date,  double amount,  Person? payer,  List<Person> participation,  List<Debt> debts)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String description,  List<String> tags,  DateTime date,  double amount,  Person? payer,  List<Person> participation,  List<Debt> debts,  Category? category,  Account account)?  $default,) {final _that = this;
 switch (_that) {
 case _Expense() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_that.amount,_that.payer,_that.participation,_that.debts);case _:
+return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_that.amount,_that.payer,_that.participation,_that.debts,_that.category,_that.account);case _:
   return null;
 
 }
@@ -226,7 +249,7 @@ return $default(_that.id,_that.name,_that.description,_that.tags,_that.date,_tha
 
 
 class _Expense implements Expense {
-  const _Expense({this.id = 0, required this.name, this.description = "", final  List<String> tags = const [], required this.date, required this.amount, this.payer, required final  List<Person> participation, final  List<Debt> debts = const []}): _tags = tags,_participation = participation,_debts = debts;
+  const _Expense({this.id = 0, required this.name, this.description = "", final  List<String> tags = const [], required this.date, required this.amount, this.payer, required final  List<Person> participation, final  List<Debt> debts = const [], this.category, required this.account}): _tags = tags,_participation = participation,_debts = debts;
   
 
 @override@JsonKey() final  int id;
@@ -256,6 +279,8 @@ class _Expense implements Expense {
   return EqualUnmodifiableListView(_debts);
 }
 
+@override final  Category? category;
+@override final  Account account;
 
 /// Create a copy of Expense
 /// with the given fields replaced by the non-null parameter values.
@@ -267,16 +292,16 @@ _$ExpenseCopyWith<_Expense> get copyWith => __$ExpenseCopyWithImpl<_Expense>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Expense&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.date, date) || other.date == date)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.payer, payer) || other.payer == payer)&&const DeepCollectionEquality().equals(other._participation, _participation)&&const DeepCollectionEquality().equals(other._debts, _debts));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Expense&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._tags, _tags)&&(identical(other.date, date) || other.date == date)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.payer, payer) || other.payer == payer)&&const DeepCollectionEquality().equals(other._participation, _participation)&&const DeepCollectionEquality().equals(other._debts, _debts)&&(identical(other.category, category) || other.category == category)&&(identical(other.account, account) || other.account == account));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,const DeepCollectionEquality().hash(_tags),date,amount,payer,const DeepCollectionEquality().hash(_participation),const DeepCollectionEquality().hash(_debts));
+int get hashCode => Object.hash(runtimeType,id,name,description,const DeepCollectionEquality().hash(_tags),date,amount,payer,const DeepCollectionEquality().hash(_participation),const DeepCollectionEquality().hash(_debts),category,account);
 
 @override
 String toString() {
-  return 'Expense(id: $id, name: $name, description: $description, tags: $tags, date: $date, amount: $amount, payer: $payer, participation: $participation, debts: $debts)';
+  return 'Expense(id: $id, name: $name, description: $description, tags: $tags, date: $date, amount: $amount, payer: $payer, participation: $participation, debts: $debts, category: $category, account: $account)';
 }
 
 
@@ -287,11 +312,11 @@ abstract mixin class _$ExpenseCopyWith<$Res> implements $ExpenseCopyWith<$Res> {
   factory _$ExpenseCopyWith(_Expense value, $Res Function(_Expense) _then) = __$ExpenseCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String description, List<String> tags, DateTime date, double amount, Person? payer, List<Person> participation, List<Debt> debts
+ int id, String name, String description, List<String> tags, DateTime date, double amount, Person? payer, List<Person> participation, List<Debt> debts, Category? category, Account account
 });
 
 
-@override $PersonCopyWith<$Res>? get payer;
+@override $PersonCopyWith<$Res>? get payer;@override $CategoryCopyWith<$Res>? get category;@override $AccountCopyWith<$Res> get account;
 
 }
 /// @nodoc
@@ -304,7 +329,7 @@ class __$ExpenseCopyWithImpl<$Res>
 
 /// Create a copy of Expense
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? tags = null,Object? date = null,Object? amount = null,Object? payer = freezed,Object? participation = null,Object? debts = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? tags = null,Object? date = null,Object? amount = null,Object? payer = freezed,Object? participation = null,Object? debts = null,Object? category = freezed,Object? account = null,}) {
   return _then(_Expense(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -315,7 +340,9 @@ as DateTime,amount: null == amount ? _self.amount : amount // ignore: cast_nulla
 as double,payer: freezed == payer ? _self.payer : payer // ignore: cast_nullable_to_non_nullable
 as Person?,participation: null == participation ? _self._participation : participation // ignore: cast_nullable_to_non_nullable
 as List<Person>,debts: null == debts ? _self._debts : debts // ignore: cast_nullable_to_non_nullable
-as List<Debt>,
+as List<Debt>,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as Category?,account: null == account ? _self.account : account // ignore: cast_nullable_to_non_nullable
+as Account,
   ));
 }
 
@@ -330,6 +357,27 @@ $PersonCopyWith<$Res>? get payer {
 
   return $PersonCopyWith<$Res>(_self.payer!, (value) {
     return _then(_self.copyWith(payer: value));
+  });
+}/// Create a copy of Expense
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$CategoryCopyWith<$Res>? get category {
+    if (_self.category == null) {
+    return null;
+  }
+
+  return $CategoryCopyWith<$Res>(_self.category!, (value) {
+    return _then(_self.copyWith(category: value));
+  });
+}/// Create a copy of Expense
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AccountCopyWith<$Res> get account {
+  
+  return $AccountCopyWith<$Res>(_self.account, (value) {
+    return _then(_self.copyWith(account: value));
   });
 }
 }
