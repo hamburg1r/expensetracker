@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Account {
 
- int get id; String get name; List<Expense> get expenses; List<DateTime> get durations;
+ int get id; String get name; Map<DateTime, List<Expense>> get expenses; List<DateTime> get durations;
 /// Create a copy of Account
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $AccountCopyWith<$Res>  {
   factory $AccountCopyWith(Account value, $Res Function(Account) _then) = _$AccountCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, List<Expense> expenses, List<DateTime> durations
+ int id, String name, Map<DateTime, List<Expense>> expenses, List<DateTime> durations
 });
 
 
@@ -67,7 +67,7 @@ class _$AccountCopyWithImpl<$Res>
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,expenses: null == expenses ? _self.expenses : expenses // ignore: cast_nullable_to_non_nullable
-as List<Expense>,durations: null == durations ? _self.durations : durations // ignore: cast_nullable_to_non_nullable
+as Map<DateTime, List<Expense>>,durations: null == durations ? _self.durations : durations // ignore: cast_nullable_to_non_nullable
 as List<DateTime>,
   ));
 }
@@ -153,7 +153,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  List<Expense> expenses,  List<DateTime> durations)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  Map<DateTime, List<Expense>> expenses,  List<DateTime> durations)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Account() when $default != null:
 return $default(_that.id,_that.name,_that.expenses,_that.durations);case _:
@@ -174,7 +174,7 @@ return $default(_that.id,_that.name,_that.expenses,_that.durations);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  List<Expense> expenses,  List<DateTime> durations)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  Map<DateTime, List<Expense>> expenses,  List<DateTime> durations)  $default,) {final _that = this;
 switch (_that) {
 case _Account():
 return $default(_that.id,_that.name,_that.expenses,_that.durations);case _:
@@ -194,7 +194,7 @@ return $default(_that.id,_that.name,_that.expenses,_that.durations);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  List<Expense> expenses,  List<DateTime> durations)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  Map<DateTime, List<Expense>> expenses,  List<DateTime> durations)?  $default,) {final _that = this;
 switch (_that) {
 case _Account() when $default != null:
 return $default(_that.id,_that.name,_that.expenses,_that.durations);case _:
@@ -209,16 +209,16 @@ return $default(_that.id,_that.name,_that.expenses,_that.durations);case _:
 
 
 class _Account implements Account {
-   _Account({this.id = 0, required this.name, final  List<Expense> expenses = const [], final  List<DateTime> durations = const []}): _expenses = expenses,_durations = durations;
+   _Account({this.id = 0, required this.name, final  Map<DateTime, List<Expense>> expenses = const {}, final  List<DateTime> durations = const []}): _expenses = expenses,_durations = durations;
   
 
 @override@JsonKey() final  int id;
 @override final  String name;
- final  List<Expense> _expenses;
-@override@JsonKey() List<Expense> get expenses {
-  if (_expenses is EqualUnmodifiableListView) return _expenses;
+ final  Map<DateTime, List<Expense>> _expenses;
+@override@JsonKey() Map<DateTime, List<Expense>> get expenses {
+  if (_expenses is EqualUnmodifiableMapView) return _expenses;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_expenses);
+  return EqualUnmodifiableMapView(_expenses);
 }
 
  final  List<DateTime> _durations;
@@ -259,7 +259,7 @@ abstract mixin class _$AccountCopyWith<$Res> implements $AccountCopyWith<$Res> {
   factory _$AccountCopyWith(_Account value, $Res Function(_Account) _then) = __$AccountCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, List<Expense> expenses, List<DateTime> durations
+ int id, String name, Map<DateTime, List<Expense>> expenses, List<DateTime> durations
 });
 
 
@@ -281,7 +281,7 @@ class __$AccountCopyWithImpl<$Res>
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,expenses: null == expenses ? _self._expenses : expenses // ignore: cast_nullable_to_non_nullable
-as List<Expense>,durations: null == durations ? _self._durations : durations // ignore: cast_nullable_to_non_nullable
+as Map<DateTime, List<Expense>>,durations: null == durations ? _self._durations : durations // ignore: cast_nullable_to_non_nullable
 as List<DateTime>,
   ));
 }

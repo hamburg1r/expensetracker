@@ -14,38 +14,197 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'data/model/debt.dart';
+import 'data/model/expense.dart';
 import 'data/model/person.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-    id: const obx_int.IdUid(1, 817311707611462368),
-    name: 'OBPerson',
-    lastPropertyId: const obx_int.IdUid(6, 7844175887754073587),
+    id: const obx_int.IdUid(2, 2445613785266042951),
+    name: 'OBDebt',
+    lastPropertyId: const obx_int.IdUid(9, 7082948524147438658),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(1, 8347214923850553636),
+        id: const obx_int.IdUid(1, 336099987186454698),
         name: 'id',
         type: 6,
         flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 1013401106798143489),
-        name: 'number',
-        type: 6,
+        id: const obx_int.IdUid(2, 3949873268750953304),
+        name: 'amount',
+        type: 8,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(6, 7844175887754073587),
-        name: 'name',
+        id: const obx_int.IdUid(3, 7616327942404029730),
+        name: 'date',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 5918280236910046278),
+        name: 'note',
         type: 9,
         flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 7206979859761473093),
+        name: 'tags',
+        type: 30,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 9159787616931479886),
+        name: 'paidAmount',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 8304716868787576237),
+        name: 'debtorId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(1, 985886955960758025),
+        relationTarget: 'OBPerson',
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 8337041739748472738),
+        name: 'creditorId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(2, 6140196101466139600),
+        relationTarget: 'OBPerson',
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 7082948524147438658),
+        name: 'expenseId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(3, 537635620833946579),
+        relationTarget: 'OBExpense',
       ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(3, 4487090410891947663),
+    name: 'OBPerson',
+    lastPropertyId: const obx_int.IdUid(5, 3876466848901037816),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 9039165891874986836),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 203290391395914590),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 32341545479097471),
+        name: 'phoneNumber',
+        type: 9,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[
+      obx_int.ModelRelation(
+        id: const obx_int.IdUid(3, 2841504452468327254),
+        name: 'participations',
+        targetId: const obx_int.IdUid(4, 5683479295731595408),
+      ),
+    ],
+    backlinks: <obx_int.ModelBacklink>[
+      obx_int.ModelBacklink(
+        name: 'debtsReceivable',
+        srcEntity: 'OBDebt',
+        srcField: 'debtor',
+      ),
+      obx_int.ModelBacklink(
+        name: 'debtsOwed',
+        srcEntity: 'OBDebt',
+        srcField: 'creditor',
+      ),
+      obx_int.ModelBacklink(
+        name: 'transactions',
+        srcEntity: 'OBExpense',
+        srcField: 'payer',
+      ),
+    ],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(4, 5683479295731595408),
+    name: 'OBExpense',
+    lastPropertyId: const obx_int.IdUid(8, 6566835646797777210),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 7704762616507767284),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 8873466872967733294),
+        name: 'name',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7115171715674474599),
+        name: 'description',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 1119830084398209627),
+        name: 'date',
+        type: 10,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 8658528555920804113),
+        name: 'amount',
+        type: 8,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 7219314778872199131),
+        name: 'payerId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(4, 5728563829134857763),
+        relationTarget: 'OBPerson',
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 6566835646797777210),
+        name: 'tags',
+        type: 30,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[
+      obx_int.ModelBacklink(
+        name: 'participation',
+        srcEntity: 'OBPerson',
+        srcField: 'participations',
+      ),
+      obx_int.ModelBacklink(
+        name: 'debts',
+        srcEntity: 'OBDebt',
+        srcField: 'expense',
+      ),
+    ],
   ),
 ];
 
@@ -87,38 +246,149 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(1, 817311707611462368),
-    lastIndexId: const obx_int.IdUid(0, 0),
-    lastRelationId: const obx_int.IdUid(0, 0),
+    lastEntityId: const obx_int.IdUid(4, 5683479295731595408),
+    lastIndexId: const obx_int.IdUid(4, 5728563829134857763),
+    lastRelationId: const obx_int.IdUid(3, 2841504452468327254),
     lastSequenceId: const obx_int.IdUid(0, 0),
-    retiredEntityUids: const [],
+    retiredEntityUids: const [817311707611462368],
     retiredIndexUids: const [],
     retiredPropertyUids: const [
       8578515136220843738,
       1190439392344694794,
       7252681734961514324,
+      1013401106798143489,
+      4172181305503858925,
+      5220608794289500829,
+      8347214923850553636,
+      7844175887754073587,
+      4178599761699272465,
+      5983914138490095417,
+      4796393970501934024,
+      6178339454721235195,
+      3876466848901037816,
+      6702401269967689265,
     ],
-    retiredRelationUids: const [],
+    retiredRelationUids: const [5155405881113679368, 1922103353264904797],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
     version: 1,
   );
 
   final bindings = <Type, obx_int.EntityDefinition>{
-    OBPerson: obx_int.EntityDefinition<OBPerson>(
+    OBDebt: obx_int.EntityDefinition<OBDebt>(
       model: _entities[0],
+      toOneRelations: (OBDebt object) => [
+        object.debtor,
+        object.creditor,
+        object.expense,
+      ],
+      toManyRelations: (OBDebt object) => {},
+      getId: (OBDebt object) => object.id,
+      setId: (OBDebt object, int id) {
+        object.id = id;
+      },
+      objectToFB: (OBDebt object, fb.Builder fbb) {
+        final noteOffset = fbb.writeString(object.note);
+        final tagsOffset = fbb.writeList(
+          object.tags.map(fbb.writeString).toList(growable: false),
+        );
+        fbb.startTable(10);
+        fbb.addInt64(0, object.id);
+        fbb.addFloat64(1, object.amount);
+        fbb.addInt64(2, object.date.millisecondsSinceEpoch);
+        fbb.addOffset(3, noteOffset);
+        fbb.addOffset(4, tagsOffset);
+        fbb.addFloat64(5, object.paidAmount);
+        fbb.addInt64(6, object.debtor.targetId);
+        fbb.addInt64(7, object.creditor.targetId);
+        fbb.addInt64(8, object.expense.targetId);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+
+        final object = OBDebt()
+          ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+          ..amount = const fb.Float64Reader().vTableGet(
+            buffer,
+            rootOffset,
+            6,
+            0,
+          )
+          ..date = DateTime.fromMillisecondsSinceEpoch(
+            const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0),
+          )
+          ..note = const fb.StringReader(
+            asciiOptimization: true,
+          ).vTableGet(buffer, rootOffset, 10, '')
+          ..tags = const fb.ListReader<String>(
+            fb.StringReader(asciiOptimization: true),
+            lazy: false,
+          ).vTableGet(buffer, rootOffset, 12, [])
+          ..paidAmount = const fb.Float64Reader().vTableGet(
+            buffer,
+            rootOffset,
+            14,
+            0,
+          );
+        object.debtor.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          0,
+        );
+        object.debtor.attach(store);
+        object.creditor.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          18,
+          0,
+        );
+        object.creditor.attach(store);
+        object.expense.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          20,
+          0,
+        );
+        object.expense.attach(store);
+        return object;
+      },
+    ),
+    OBPerson: obx_int.EntityDefinition<OBPerson>(
+      model: _entities[1],
       toOneRelations: (OBPerson object) => [],
-      toManyRelations: (OBPerson object) => {},
+      toManyRelations: (OBPerson object) => {
+        obx_int.RelInfo<OBPerson>.toMany(3, object.id): object.participations,
+        obx_int.RelInfo<OBDebt>.toOneBacklink(
+          7,
+          object.id,
+          (OBDebt srcObject) => srcObject.debtor,
+        ): object.debtsReceivable,
+        obx_int.RelInfo<OBDebt>.toOneBacklink(
+          8,
+          object.id,
+          (OBDebt srcObject) => srcObject.creditor,
+        ): object.debtsOwed,
+        obx_int.RelInfo<OBExpense>.toOneBacklink(
+          7,
+          object.id,
+          (OBExpense srcObject) => srcObject.payer,
+        ): object.transactions,
+      },
       getId: (OBPerson object) => object.id,
       setId: (OBPerson object, int id) {
         object.id = id;
       },
       objectToFB: (OBPerson object, fb.Builder fbb) {
         final nameOffset = fbb.writeString(object.name);
-        fbb.startTable(7);
+        final phoneNumberOffset = fbb.writeString(object.phoneNumber);
+        fbb.startTable(6);
         fbb.addInt64(0, object.id);
-        fbb.addInt64(4, object.number);
-        fbb.addOffset(5, nameOffset);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, phoneNumberOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -128,11 +398,126 @@ obx_int.ModelDefinition getObjectBoxModel() {
 
         final object = OBPerson()
           ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
-          ..number = const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0)
           ..name = const fb.StringReader(
             asciiOptimization: true,
-          ).vTableGet(buffer, rootOffset, 14, '');
+          ).vTableGet(buffer, rootOffset, 6, '')
+          ..phoneNumber = const fb.StringReader(
+            asciiOptimization: true,
+          ).vTableGet(buffer, rootOffset, 8, '');
+        obx_int.InternalToManyAccess.setRelInfo<OBPerson>(
+          object.participations,
+          store,
+          obx_int.RelInfo<OBPerson>.toMany(3, object.id),
+        );
+        obx_int.InternalToManyAccess.setRelInfo<OBPerson>(
+          object.debtsReceivable,
+          store,
+          obx_int.RelInfo<OBDebt>.toOneBacklink(
+            7,
+            object.id,
+            (OBDebt srcObject) => srcObject.debtor,
+          ),
+        );
+        obx_int.InternalToManyAccess.setRelInfo<OBPerson>(
+          object.debtsOwed,
+          store,
+          obx_int.RelInfo<OBDebt>.toOneBacklink(
+            8,
+            object.id,
+            (OBDebt srcObject) => srcObject.creditor,
+          ),
+        );
+        obx_int.InternalToManyAccess.setRelInfo<OBPerson>(
+          object.transactions,
+          store,
+          obx_int.RelInfo<OBExpense>.toOneBacklink(
+            7,
+            object.id,
+            (OBExpense srcObject) => srcObject.payer,
+          ),
+        );
+        return object;
+      },
+    ),
+    OBExpense: obx_int.EntityDefinition<OBExpense>(
+      model: _entities[2],
+      toOneRelations: (OBExpense object) => [object.payer],
+      toManyRelations: (OBExpense object) => {
+        obx_int.RelInfo<OBPerson>.toManyBacklink(3, object.id):
+            object.participation,
+        obx_int.RelInfo<OBDebt>.toOneBacklink(
+          9,
+          object.id,
+          (OBDebt srcObject) => srcObject.expense,
+        ): object.debts,
+      },
+      getId: (OBExpense object) => object.id,
+      setId: (OBExpense object, int id) {
+        object.id = id;
+      },
+      objectToFB: (OBExpense object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final descriptionOffset = fbb.writeString(object.description);
+        final tagsOffset = fbb.writeList(
+          object.tags.map(fbb.writeString).toList(growable: false),
+        );
+        fbb.startTable(9);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, descriptionOffset);
+        fbb.addInt64(4, object.date.millisecondsSinceEpoch);
+        fbb.addFloat64(5, object.amount);
+        fbb.addInt64(6, object.payer.targetId);
+        fbb.addOffset(7, tagsOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
 
+        final object = OBExpense()
+          ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+          ..name = const fb.StringReader(
+            asciiOptimization: true,
+          ).vTableGet(buffer, rootOffset, 6, '')
+          ..description = const fb.StringReader(
+            asciiOptimization: true,
+          ).vTableGet(buffer, rootOffset, 8, '')
+          ..date = DateTime.fromMillisecondsSinceEpoch(
+            const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0),
+          )
+          ..amount = const fb.Float64Reader().vTableGet(
+            buffer,
+            rootOffset,
+            14,
+            0,
+          )
+          ..tags = const fb.ListReader<String>(
+            fb.StringReader(asciiOptimization: true),
+            lazy: false,
+          ).vTableGet(buffer, rootOffset, 18, []);
+        object.payer.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          0,
+        );
+        object.payer.attach(store);
+        obx_int.InternalToManyAccess.setRelInfo<OBExpense>(
+          object.participation,
+          store,
+          obx_int.RelInfo<OBPerson>.toManyBacklink(3, object.id),
+        );
+        obx_int.InternalToManyAccess.setRelInfo<OBExpense>(
+          object.debts,
+          store,
+          obx_int.RelInfo<OBDebt>.toOneBacklink(
+            9,
+            object.id,
+            (OBDebt srcObject) => srcObject.expense,
+          ),
+        );
         return object;
       },
     ),
@@ -141,20 +526,129 @@ obx_int.ModelDefinition getObjectBoxModel() {
   return obx_int.ModelDefinition(model, bindings);
 }
 
+/// [OBDebt] entity fields to define ObjectBox queries.
+class OBDebt_ {
+  /// See [OBDebt.id].
+  static final id = obx.QueryIntegerProperty<OBDebt>(
+    _entities[0].properties[0],
+  );
+
+  /// See [OBDebt.amount].
+  static final amount = obx.QueryDoubleProperty<OBDebt>(
+    _entities[0].properties[1],
+  );
+
+  /// See [OBDebt.date].
+  static final date = obx.QueryDateProperty<OBDebt>(_entities[0].properties[2]);
+
+  /// See [OBDebt.note].
+  static final note = obx.QueryStringProperty<OBDebt>(
+    _entities[0].properties[3],
+  );
+
+  /// See [OBDebt.tags].
+  static final tags = obx.QueryStringVectorProperty<OBDebt>(
+    _entities[0].properties[4],
+  );
+
+  /// See [OBDebt.paidAmount].
+  static final paidAmount = obx.QueryDoubleProperty<OBDebt>(
+    _entities[0].properties[5],
+  );
+
+  /// See [OBDebt.debtor].
+  static final debtor = obx.QueryRelationToOne<OBDebt, OBPerson>(
+    _entities[0].properties[6],
+  );
+
+  /// See [OBDebt.creditor].
+  static final creditor = obx.QueryRelationToOne<OBDebt, OBPerson>(
+    _entities[0].properties[7],
+  );
+
+  /// See [OBDebt.expense].
+  static final expense = obx.QueryRelationToOne<OBDebt, OBExpense>(
+    _entities[0].properties[8],
+  );
+}
+
 /// [OBPerson] entity fields to define ObjectBox queries.
 class OBPerson_ {
   /// See [OBPerson.id].
   static final id = obx.QueryIntegerProperty<OBPerson>(
-    _entities[0].properties[0],
-  );
-
-  /// See [OBPerson.number].
-  static final number = obx.QueryIntegerProperty<OBPerson>(
-    _entities[0].properties[1],
+    _entities[1].properties[0],
   );
 
   /// See [OBPerson.name].
   static final name = obx.QueryStringProperty<OBPerson>(
-    _entities[0].properties[2],
+    _entities[1].properties[1],
+  );
+
+  /// See [OBPerson.phoneNumber].
+  static final phoneNumber = obx.QueryStringProperty<OBPerson>(
+    _entities[1].properties[2],
+  );
+
+  /// see [OBPerson.participations]
+  static final participations = obx.QueryRelationToMany<OBPerson, OBExpense>(
+    _entities[1].relations[0],
+  );
+
+  /// see [OBPerson.debtsReceivable]
+  static final debtsReceivable = obx.QueryBacklinkToMany<OBDebt, OBPerson>(
+    OBDebt_.debtor,
+  );
+
+  /// see [OBPerson.debtsOwed]
+  static final debtsOwed = obx.QueryBacklinkToMany<OBDebt, OBPerson>(
+    OBDebt_.creditor,
+  );
+
+  /// see [OBPerson.transactions]
+  static final transactions = obx.QueryBacklinkToMany<OBExpense, OBPerson>(
+    OBExpense_.payer,
+  );
+}
+
+/// [OBExpense] entity fields to define ObjectBox queries.
+class OBExpense_ {
+  /// See [OBExpense.id].
+  static final id = obx.QueryIntegerProperty<OBExpense>(
+    _entities[2].properties[0],
+  );
+
+  /// See [OBExpense.name].
+  static final name = obx.QueryStringProperty<OBExpense>(
+    _entities[2].properties[1],
+  );
+
+  /// See [OBExpense.description].
+  static final description = obx.QueryStringProperty<OBExpense>(
+    _entities[2].properties[2],
+  );
+
+  /// See [OBExpense.date].
+  static final date = obx.QueryDateProperty<OBExpense>(
+    _entities[2].properties[3],
+  );
+
+  /// See [OBExpense.amount].
+  static final amount = obx.QueryDoubleProperty<OBExpense>(
+    _entities[2].properties[4],
+  );
+
+  /// See [OBExpense.payer].
+  static final payer = obx.QueryRelationToOne<OBExpense, OBPerson>(
+    _entities[2].properties[5],
+  );
+
+  /// See [OBExpense.tags].
+  static final tags = obx.QueryStringVectorProperty<OBExpense>(
+    _entities[2].properties[6],
+  );
+
+  /// see [OBExpense.debts]
+  static final debts = obx.QueryBacklinkToMany<OBDebt, OBExpense>(
+    OBDebt_.expense,
   );
 }

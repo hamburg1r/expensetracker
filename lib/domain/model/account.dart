@@ -8,7 +8,7 @@ abstract class Account with _$Account {
   factory Account({
     @Default(0) int id,
     required String name,
-    @Default([]) List<Expense> expenses,
+    @Default({}) Map<DateTime, List<Expense>> expenses,
     @Default([]) List<DateTime> durations,
   }) = _Account;
 }

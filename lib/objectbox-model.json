@@ -4,43 +4,175 @@
   "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
   "entities": [
     {
-      "id": "1:817311707611462368",
-      "lastPropertyId": "6:7844175887754073587",
-      "name": "OBPerson",
+      "id": "2:2445613785266042951",
+      "lastPropertyId": "9:7082948524147438658",
+      "name": "OBDebt",
       "properties": [
         {
-          "id": "1:8347214923850553636",
+          "id": "1:336099987186454698",
           "name": "id",
           "type": 6,
           "flags": 1
         },
         {
-          "id": "5:1013401106798143489",
-          "name": "number",
-          "type": 6
+          "id": "2:3949873268750953304",
+          "name": "amount",
+          "type": 8
         },
         {
-          "id": "6:7844175887754073587",
+          "id": "3:7616327942404029730",
+          "name": "date",
+          "type": 10
+        },
+        {
+          "id": "4:5918280236910046278",
+          "name": "note",
+          "type": 9
+        },
+        {
+          "id": "5:7206979859761473093",
+          "name": "tags",
+          "type": 30
+        },
+        {
+          "id": "6:9159787616931479886",
+          "name": "paidAmount",
+          "type": 8
+        },
+        {
+          "id": "7:8304716868787576237",
+          "name": "debtorId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "1:985886955960758025",
+          "relationTarget": "OBPerson"
+        },
+        {
+          "id": "8:8337041739748472738",
+          "name": "creditorId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "2:6140196101466139600",
+          "relationTarget": "OBPerson"
+        },
+        {
+          "id": "9:7082948524147438658",
+          "name": "expenseId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "3:537635620833946579",
+          "relationTarget": "OBExpense"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:4487090410891947663",
+      "lastPropertyId": "5:3876466848901037816",
+      "name": "OBPerson",
+      "properties": [
+        {
+          "id": "1:9039165891874986836",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:203290391395914590",
           "name": "name",
           "type": 9
+        },
+        {
+          "id": "3:32341545479097471",
+          "name": "phoneNumber",
+          "type": 9
+        }
+      ],
+      "relations": [
+        {
+          "id": "3:2841504452468327254",
+          "name": "participations",
+          "targetId": "4:5683479295731595408"
+        }
+      ]
+    },
+    {
+      "id": "4:5683479295731595408",
+      "lastPropertyId": "8:6566835646797777210",
+      "name": "OBExpense",
+      "properties": [
+        {
+          "id": "1:7704762616507767284",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8873466872967733294",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:7115171715674474599",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "5:1119830084398209627",
+          "name": "date",
+          "type": 10
+        },
+        {
+          "id": "6:8658528555920804113",
+          "name": "amount",
+          "type": 8
+        },
+        {
+          "id": "7:7219314778872199131",
+          "name": "payerId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "4:5728563829134857763",
+          "relationTarget": "OBPerson"
+        },
+        {
+          "id": "8:6566835646797777210",
+          "name": "tags",
+          "type": 30
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "1:817311707611462368",
-  "lastIndexId": "0:0",
-  "lastRelationId": "0:0",
+  "lastEntityId": "4:5683479295731595408",
+  "lastIndexId": "4:5728563829134857763",
+  "lastRelationId": "3:2841504452468327254",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
-  "retiredEntityUids": [],
+  "retiredEntityUids": [
+    817311707611462368
+  ],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
     8578515136220843738,
     1190439392344694794,
-    7252681734961514324
+    7252681734961514324,
+    1013401106798143489,
+    4172181305503858925,
+    5220608794289500829,
+    8347214923850553636,
+    7844175887754073587,
+    4178599761699272465,
+    5983914138490095417,
+    4796393970501934024,
+    6178339454721235195,
+    3876466848901037816,
+    6702401269967689265
   ],
-  "retiredRelationUids": [],
+  "retiredRelationUids": [
+    5155405881113679368,
+    1922103353264904797
+  ],
   "version": 1
 }
