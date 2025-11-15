@@ -19,7 +19,7 @@ class PersonTile extends StatelessWidget {
         return ListTile(
           leading: Icon(Icons.person),
           title: Text(person.name),
-          subtitle: Text(person.number.toString()),
+          subtitle: Text(person.phoneNumber.toString()),
           trailing: CustomMenu(
             items: {
               'Edit': () {

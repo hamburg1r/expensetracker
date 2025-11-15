@@ -32,7 +32,7 @@ class PersonForm extends StatefulWidget implements CustomFormWidget {
     var person = Person(
       id: this.person?.id ?? 0,
       name: _controllers.name.text,
-      number: int.parse(_controllers.number.text),
+      phoneNumber: _controllers.number.text,
     );
     BlocProvider.of<PersonCubit>(context).add(person);
     print(person);
@@ -61,7 +61,7 @@ class _PersonFormState extends State<PersonForm> {
     if (widget.person != null) {
       widget._controllers
         ..name.text = widget.person?.name ?? ''
-        ..number.text = widget.person?.number.toString() ?? '';
+        ..number.text = widget.person?.phoneNumber.toString() ?? '';
     }
     return Form(
       key: widget._formKey,
