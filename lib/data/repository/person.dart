@@ -14,7 +14,7 @@ class OBPersonRepo extends PersonRepo {
   }
 
   @override
-  Future<int> add(Person person) async {
+  Future<int> create(Person person) async {
     return _box.putAsync(OBPerson.fromDomain(person));
   }
 
@@ -29,7 +29,7 @@ class OBPersonRepo extends PersonRepo {
   }
 
   @override
-  Future<Person?> getFromId(int id) async {
+  Future<Person?> getById(int id) async {
     return _box.get(id)?.toDomain();
   }
 }

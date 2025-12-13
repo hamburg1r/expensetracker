@@ -21,7 +21,7 @@ class PersonCubit extends Cubit<PersonState> {
   }
 
   Future<void> add(Person person) async {
-    await _repo.add(person);
+    await _repo.create(person);
     await load();
   }
 
@@ -36,6 +36,6 @@ class PersonCubit extends Cubit<PersonState> {
   }
 
   Future<Person?> getById(int id) async {
-    return _repo.getFromId(id);
+    return _repo.getById(id);
   }
 }

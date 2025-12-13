@@ -3,11 +3,11 @@ import 'package:expensetracker/domain/model/expense.dart';
 abstract class ExpenseRepo {
   Future<List<Expense>> getAll();
 
-  Future<int> add(Expense expense);
-
-  Future<bool> delete(int id);
+  Future<int> create(Expense expense);
 
   Future<void> update(Expense expense);
 
-  Future<Expense?> getFromId(int id);
+  Future<bool> delete(int id);
+
+  Future<Expense?> getById(int id);
 }
