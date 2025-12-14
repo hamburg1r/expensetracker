@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:expensetracker/cubit/index_cubit.dart';
+import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/objectbox.g.dart';
 import 'package:expensetracker/screens/people.dart';
 import 'package:flutter/material.dart';
@@ -13,13 +14,24 @@ import 'screens/overview.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final path = await getApplicationDocumentsDirectory();
-  Store store = await openStore(directory: p.join(path.path, 'db'));
-  runApp(App(store: store));
+  final Store store = await openStore(directory: p.join(path.path, 'db'));
+  final Cache cache = Cache();
+  runApp(
+    App(
+      store: store,
+      cache: cache,
+    ),
+  );
 }
 
 class App extends StatelessWidget {
   final Store store;
-  const App({required this.store, super.key});
+  final Cache cache;
+  const App({
+    required this.store,
+    required this.cache,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +75,10 @@ class App extends StatelessWidget {
           themeMode: ThemeMode.system,
           home: BlocProvider(
             create: (BuildContext context) => IndexCubit(),
-            child: HomeScreen(store: store),
+            child: HomeScreen(
+              store: store,
+              cache: cache,
+            ),
           ),
         );
       },
@@ -73,7 +88,12 @@ class App extends StatelessWidget {
 
 class HomeScreen extends StatefulWidget {
   final Store store;
-  const HomeScreen({required this.store, super.key});
+  final Cache cache;
+  const HomeScreen({
+    required this.store,
+    required this.cache,
+    super.key,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -83,6 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _advancedDrawerController = AdvancedDrawerController();
 
   Widget _getScreen(int index) {
+    // TODO: possibly move this to a util function
     appBar(
       Widget title, [
       List<Widget> actions = const [],
@@ -110,7 +131,11 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return OverviewScreen(appBar, widget.store);
       case 1:
-        return PeopleScreen(appBar, widget.store);
+        return PeopleScreen(
+          appBar,
+          widget.store,
+          widget.cache,
+        );
       default:
         return Scaffold(
           body: Center(

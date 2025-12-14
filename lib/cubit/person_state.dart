@@ -1,17 +1,19 @@
 part of 'person_cubit.dart';
 
-sealed class PersonState {}
-
-class PersonInitial extends PersonState {}
-
-class PersonLoading extends PersonState {}
-
-class PersonLoaded extends PersonState {
-  final List<Person> people;
-  PersonLoaded(this.people);
+sealed class PersonState {
+  const PersonState();
 }
 
-class PersonError extends PersonState {
+final class PersonInitial extends PersonState {}
+
+final class PersonLoading extends PersonState {}
+
+final class PersonLoaded extends PersonState {
+  final Map<int, CacheItem<Person>> people;
+  const PersonLoaded(this.people);
+}
+
+final class PersonError extends PersonState {
   final String message;
-  PersonError(this.message);
+  const PersonError(this.message);
 }

@@ -34,7 +34,7 @@ class PersonForm extends StatefulWidget implements CustomFormWidget {
       name: _controllers.name.text,
       phoneNumber: _controllers.number.text,
     );
-    BlocProvider.of<PersonCubit>(context).add(person);
+    BlocProvider.of<PersonCubit>(context).create(person);
     print(person);
 
     return true;

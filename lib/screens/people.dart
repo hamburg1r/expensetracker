@@ -1,5 +1,6 @@
 import 'package:expensetracker/cubit/person_cubit.dart';
 import 'package:expensetracker/data/repository/person.dart';
+import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/screens/form.dart';
 import 'package:expensetracker/widgets/person_tile.dart';
@@ -10,16 +11,18 @@ import 'package:objectbox/objectbox.dart';
 class PeopleScreen extends StatelessWidget {
   final AppBar Function(Widget, [List<Widget>]) appBar;
   final Store store;
+  final Cache cache;
   const PeopleScreen(
     this.appBar,
-    this.store, {
+    this.store,
+    this.cache, {
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<PersonCubit>(
-      create: (ctx) => PersonCubit(OBPersonRepo(store)),
+      create: (ctx) => PersonCubit(OBPersonRepo(store), cache),
       child: Scaffold(
         appBar: appBar(
           const Text('People'),
@@ -30,7 +33,9 @@ class PeopleScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (state is PersonLoaded) {
-              List<Person> people = state.people;
+              List<Person> people = state.people.values
+                  .map((item) => item.value)
+                  .toList();
               if (people.isNotEmpty) {
                 return ListView.builder(
                   itemCount: people.length,
