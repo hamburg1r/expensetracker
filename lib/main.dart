@@ -1,6 +1,8 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:expensetracker/cubit/index_cubit.dart';
+import 'package:expensetracker/data/repository/person.dart';
 import 'package:expensetracker/domain/cache.dart';
+import 'package:expensetracker/domain/repository/person.dart';
 import 'package:expensetracker/objectbox.g.dart';
 import 'package:expensetracker/screens/people.dart';
 import 'package:flutter/material.dart';
@@ -127,17 +129,21 @@ class _HomeScreenState extends State<HomeScreen> {
       actions: actions,
     );
 
+    final Widget child;
+
     switch (index) {
       case 0:
-        return OverviewScreen(appBar, widget.store);
+        child = OverviewScreen(appBar, widget.store);
+        break;
       case 1:
-        return PeopleScreen(
+        child = PeopleScreen(
           appBar,
           widget.store,
           widget.cache,
         );
+        break;
       default:
-        return Scaffold(
+        child = Scaffold(
           body: Center(
             child: FittedBox(
               child: const Text(
@@ -150,6 +156,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
     }
+
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<PersonRepo>(
+          create: (context) => OBPersonRepo(widget.store),
+        ),
+      ],
+      child: child,
+    );
   }
 
   @override
@@ -249,21 +264,5 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _handleMenuButtonPressed() {
     _advancedDrawerController.showDrawer();
-  }
-}
-
-class IndexStorage {
-  int index = 0;
-
-  void update(int value) {
-    index = value;
-  }
-
-  void increment() {
-    index++;
-  }
-
-  void decrement() {
-    index--;
   }
 }
