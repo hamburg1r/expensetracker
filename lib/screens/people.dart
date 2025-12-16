@@ -2,6 +2,8 @@ import 'package:expensetracker/cubit/person_cubit.dart';
 import 'package:expensetracker/data/repository/person.dart';
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/model/person.dart';
+import 'package:expensetracker/domain/repository/debt.dart';
+import 'package:expensetracker/domain/repository/person.dart';
 import 'package:expensetracker/screens/form.dart';
 import 'package:expensetracker/widgets/person_tile.dart';
 import 'package:flutter/material.dart';
@@ -10,11 +12,9 @@ import 'package:objectbox/objectbox.dart';
 
 class PeopleScreen extends StatelessWidget {
   final AppBar Function(Widget, [List<Widget>]) appBar;
-  final Store store;
   final Cache cache;
   const PeopleScreen(
     this.appBar,
-    this.store,
     this.cache, {
     super.key,
   });
@@ -22,7 +22,11 @@ class PeopleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<PersonCubit>(
-      create: (ctx) => PersonCubit(OBPersonRepo(store), cache),
+      create: (ctx) => PersonCubit(
+        RepositoryProvider.of<PersonRepo>(context),
+        RepositoryProvider.of<DebtRepo>(context),
+        cache,
+      ),
       child: Scaffold(
         appBar: appBar(
           const Text('People'),

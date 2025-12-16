@@ -133,12 +133,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     switch (index) {
       case 0:
-        child = OverviewScreen(appBar, widget.store);
+        child = OverviewScreen(appBar);
         break;
       case 1:
         child = PeopleScreen(
           appBar,
-          widget.store,
           widget.cache,
         );
         break;

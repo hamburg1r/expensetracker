@@ -3,10 +3,8 @@ import 'package:objectbox/objectbox.dart';
 
 class OverviewScreen extends StatelessWidget {
   final AppBar Function(Widget, [List<Widget>]) appBar;
-  final Store store;
   const OverviewScreen(
-    this.appBar,
-    this.store, {
+    this.appBar, {
     super.key,
   });
 
