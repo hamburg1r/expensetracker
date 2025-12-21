@@ -17,11 +17,9 @@ class Cache {
 class CacheItem<T> {
   T value;
   int references;
-  bool partial;
   CacheItem({
     required this.value,
     this.references = 1,
-    this.partial = true,
   });
 
   void increment() => references++;

@@ -27,7 +27,6 @@ class PersonCubit extends Cubit<PersonState> {
 
     cache.people[person.id] = CacheItem(
       value: person,
-      partial: partial,
     );
   }
 
