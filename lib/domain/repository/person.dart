@@ -4,6 +4,8 @@ import 'package:expensetracker/domain/model/person.dart';
 abstract class PersonRepo {
   Future<List<Person>> getAll();
 
+  Future<List<Person>> getPage(int page);
+
   Future<int> create(Person person);
 
   Future<void> update(Person person);

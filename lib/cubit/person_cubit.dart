@@ -23,6 +23,7 @@ class PersonCubit extends Cubit<PersonState> {
     if (cache.people.containsKey(person.id)) {
       cache.people[person.id]!.increment();
       cache.people[person.id]!.value = person;
+      return;
     }
 
     cache.people[person.id] = CacheItem(
@@ -41,7 +42,7 @@ class PersonCubit extends Cubit<PersonState> {
   Future<void> loadAll() async {
     emit(PersonLoading());
     try {
-      final all = await personRepo.getAll();
+      final List<Person> all = await personRepo.getAll();
       all.forEach(_addToCache);
       _emitLoadedPeople();
     } catch (e) {
@@ -64,6 +65,27 @@ class PersonCubit extends Cubit<PersonState> {
     }
   }
 
+  Future<void> loadPage(int page) async {
+    emit(PersonLoading());
+    try {
+      final List<Person> pageData = await personRepo.getPage(page);
+      pageData.forEach(_addToCache);
+      _emitLoadedPeople();
+    } catch (e) {
+      emit(PersonError("$e\nFailed to fetch Person for page: $page"));
+    }
+  }
+
+  // TODO: logic needs to be moved to repository
+  List<Debt> getDebtsOwed(id) {
+    debtRepo.getById(id);
+    List<Debt>? debtsOwed = cache.people[id]?.value.debtsOwed;
+    if (debtsOwed?.isNotEmpty ?? false) {
+      return debtsOwed!;
+    }
+    return [];
+  }
+
   Future<void> create(Person person) async {
     await personRepo.create(person);
     _emitLoadedPeople();
@@ -76,10 +98,16 @@ class PersonCubit extends Cubit<PersonState> {
 
   Future<void> update(Person person) async {
     await personRepo.update(person);
-    await loadAll();
+    _emitLoadedPeople();
+  }
+
+  Future<List<Person>> getAllLoaded() async {
+    return cache.people.values
+        .map((item) => item.value)
+        .toList(growable: false);
   }
 
   Future<Person?> getById(int id) async {
-    return personRepo.getById(id);
+    return cache.people[id]?.value;
   }
 }
