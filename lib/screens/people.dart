@@ -39,10 +39,10 @@ class PeopleScreen extends StatelessWidget {
             if (state is PersonLoaded) {
               List<Person> people = state.people.values
                   .map((item) => item.value)
-                  .toList();
+                  .toList(growable: false);
               if (people.isNotEmpty) {
                 return ListView.builder(
-                  itemCount: people.length,
+                  itemCount: state.people.keys.last,
                   itemBuilder: (BuildContext context, int index) {
                     return PersonTile(person: people[index]);
                   },
