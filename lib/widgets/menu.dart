@@ -20,7 +20,7 @@ class CustomMenu extends StatelessWidget {
               ),
             ),
           )
-          .toList(),
+          .toList(growable: false),
       builder: (context, controller, widget) {
         return IconButton(
           onPressed: () {
