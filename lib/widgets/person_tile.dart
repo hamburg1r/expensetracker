@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PersonTile extends StatelessWidget {
-  final Person person;
+  final Person? person;
   const PersonTile({
     required this.person,
     super.key,
@@ -14,34 +14,35 @@ class PersonTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PersonCubit, PersonState>(
-      builder: (context, state) {
-        return ListTile(
-          leading: Icon(Icons.person),
-          title: Text(person.name),
-          subtitle: Text(person.phoneNumber.toString()),
-          trailing: CustomMenu(
-            items: {
-              'Edit': () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext ctx) {
-                      return CustomForm(
-                        type: FormType.person,
-                        providerContext: context,
-                        person: person,
-                      );
-                    },
-                  ),
-                );
-              },
-              'Delete': () {
-                context.read<PersonCubit>().remove(person.id);
-              },
+    if (person != null) {
+      return ListTile(
+        leading: Icon(Icons.person),
+        title: Text(person!.name),
+        subtitle: Text(person!.phoneNumber.toString()),
+        trailing: CustomMenu(
+          items: {
+            'Edit': () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext ctx) {
+                    return CustomForm(
+                      type: FormType.person,
+                      providerContext: context,
+                      person: person,
+                    );
+                  },
+                ),
+              );
             },
-          ),
-        );
-      },
+            'Delete': () {
+              context.read<PersonCubit>().remove(person!.id);
+            },
+          },
+        ),
+      );
+    }
+    return ListTile(
+      title: Text("id contains null"),
     );
   }
 }
