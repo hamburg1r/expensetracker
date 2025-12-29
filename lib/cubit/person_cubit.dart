@@ -65,10 +65,13 @@ class PersonCubit extends Cubit<PersonState> {
     }
   }
 
-  Future<void> loadPage(int page) async {
+  Future<void> loadPage(
+    int page, [
+    int limit = 20,
+  ]) async {
     emit(PersonLoading());
     try {
-      final List<Person> pageData = await personRepo.getPage(page);
+      final List<Person> pageData = await personRepo.getPage(page, limit);
       pageData.forEach(_addToCache);
       _emitLoadedPeople();
     } catch (e) {
@@ -76,9 +79,11 @@ class PersonCubit extends Cubit<PersonState> {
     }
   }
 
-  // TODO: logic needs to be moved to repository
-  List<Debt> getDebtsOwed(id) {
-    debtRepo.getById(id);
+  Future<List<Debt>> getDebtsOwed(
+    int id,
+    int page, [
+    int limit = 20,
+  ]) async {
     List<Debt>? debtsOwed = cache.people[id]?.value.debtsOwed;
     if (debtsOwed?.isNotEmpty ?? false) {
       return debtsOwed!;
