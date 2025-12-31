@@ -12,6 +12,37 @@ class Cache {
   final Map<int, CacheItem<Debt>> debts = {};
   final Map<int, CacheItem<Expense>> expenses = {};
   final Map<int, CacheItem<Person>> people = {};
+
+  void addStrongAccount(Account account) {
+    if (accounts.containsKey(account.id)) {
+      accounts[account.id]!.increment();
+    } else {
+      accounts[account.id] = CacheItem(value: account);
+    }
+  }
+
+  void addWeakAccount(Account account) {
+    if (!accounts.containsKey(account.id)) {
+      accounts[account.id] = CacheItem(
+        value: account,
+        references: 0,
+      );
+    }
+  }
+
+  void releaseStrongAccount(Account account) {
+    if (!accounts.containsKey(account.id)) return;
+
+    accounts[account.id]!.decrement();
+
+    if (accounts[account.id]!.references == 0) {
+      accounts.remove(account.id);
+    }
+  }
+
+  void _garbageCollectAccount(Account account) {
+    for (var child in account.expenses) {}
+  }
 }
 
 class CacheItem<T> {
@@ -23,5 +54,8 @@ class CacheItem<T> {
   });
 
   void increment() => references++;
-  void decrement() => references--;
+  void decrement() {
+    if (references == 0) return;
+    references--;
+  }
 }
