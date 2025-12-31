@@ -1,53 +1,80 @@
-import 'package:expensetracker/domain/model/account.dart';
-import 'package:expensetracker/domain/model/budget.dart';
-import 'package:expensetracker/domain/model/debt.dart';
-import 'package:expensetracker/domain/model/expense.dart';
-import 'package:expensetracker/domain/model/person.dart';
-import 'package:flutter/foundation.dart';
-
 class Cache {
-  final Map<int, CacheItem<Account>> accounts = {};
-  final Map<int, CacheItem<Budget>> budgets = {};
-  final Map<int, CacheItem<Category>> categories = {};
-  final Map<int, CacheItem<Debt>> debts = {};
-  final Map<int, CacheItem<Expense>> expenses = {};
-  final Map<int, CacheItem<Person>> people = {};
+  final Map<Type, Map<int, CacheItem<dynamic>>> _caches = {};
+  final Map<Type, void Function(dynamic, Cache)> _garbageCollectors = {};
 
-  void addStrongAccount(Account account) {
-    if (accounts.containsKey(account.id)) {
-      accounts[account.id]!.increment();
+  void registerGarbageCollector<T>(void Function(T, Cache) collector) {
+    _garbageCollectors[T] = (dynamic item, Cache cache) =>
+        collector(item as T, cache);
+  }
+
+  Map<int, CacheItem<T>> _getCacheFor<T>() {
+    return _caches.putIfAbsent(T, () => <int, CacheItem<T>>{})
+        as Map<int, CacheItem<T>>;
+  }
+
+  void addStrong<T>(T item) {
+    final cache = _getCacheFor<T>();
+    final int id = (item as dynamic).id;
+
+    if (cache.containsKey(id)) {
+      cache[id]!.increment();
     } else {
-      accounts[account.id] = CacheItem(value: account);
+      cache[id] = CacheItem(value: item);
     }
   }
 
-  void addWeakAccount(Account account) {
-    if (!accounts.containsKey(account.id)) {
-      accounts[account.id] = CacheItem(
-        value: account,
+  void addWeak<T>(T item) {
+    final cache = _getCacheFor<T>();
+    final int id = (item as dynamic).id;
+
+    if (!cache.containsKey(id)) {
+      cache[id] = CacheItem(
+        value: item,
         references: 0,
       );
     }
   }
 
-  void releaseStrongAccount(Account account) {
-    if (!accounts.containsKey(account.id)) return;
+  void releaseStrong<T>(T item) {
+    final cache = _getCacheFor<T>();
+    final int id = (item as dynamic).id;
 
-    accounts[account.id]!.decrement();
+    if (!cache.containsKey(id)) return;
 
-    if (accounts[account.id]!.references == 0) {
-      accounts.remove(account.id);
+    cache[id]!.decrement();
+
+    if (cache[id]!.references == 0) {
+      final removedItem = cache.remove(id);
+      final collector = _garbageCollectors[T];
+      if (collector != null && removedItem != null) {
+        collector(removedItem.value, this);
+      }
     }
   }
 
-  void _garbageCollectAccount(Account account) {
-    for (var child in account.expenses) {}
+  T? get<T>(int id) {
+    final cache = _getCacheFor<T>();
+    return cache[id]?.value;
+  }
+
+  Map<int, T> getAll<T>() {
+    return _getCacheFor<T>().map((key, value) => MapEntry(key, value.value));
+  }
+
+  void clear<T>() {
+    final cache = _getCacheFor<T>();
+    cache.clear();
+  }
+
+  void clearAll() {
+    _caches.clear();
   }
 }
 
 class CacheItem<T> {
   T value;
   int references;
+
   CacheItem({
     required this.value,
     this.references = 1,
