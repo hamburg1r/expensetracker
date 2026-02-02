@@ -37,9 +37,7 @@ class PeopleScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (state is PersonLoaded) {
-              List<Person> people = state.people.values
-                  .map((item) => item.value)
-                  .toList(growable: false);
+              List<Person> people = state.people.values.toList(growable: false);
               if (people.isNotEmpty) {
                 return ListView.builder(
                   itemCount: state.people.keys.last,
