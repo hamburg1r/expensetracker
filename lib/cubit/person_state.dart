@@ -9,7 +9,7 @@ final class PersonInitial extends PersonState {}
 final class PersonLoading extends PersonState {}
 
 final class PersonLoaded extends PersonState {
-  final Map<int, CacheItem<Person>> people;
+  final Map<int, Person> people;
   const PersonLoaded(this.people);
 }
 
