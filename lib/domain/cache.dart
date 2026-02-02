@@ -35,6 +35,32 @@ class Cache {
     }
   }
 
+  int references<T>(T item) {
+    final cache = _getCacheFor<T>();
+    final int id = (item as dynamic).id;
+    return cache[id]?.references ?? -1;
+  }
+
+  void update<T>(T item) {
+    final cache = _getCacheFor<T>();
+    final int id = (item as dynamic).id;
+
+    if (cache.containsKey(id)) {
+      cache[id]!.value = item;
+    }
+  }
+
+  void remove<T>(int id) {
+    final cache = _getCacheFor<T>();
+    if (cache.containsKey(id)) {
+      final removedItem = cache.remove(id);
+      final collector = _garbageCollectors[T];
+      if (collector != null && removedItem != null) {
+        collector(removedItem.value, this);
+      }
+    }
+  }
+
   void releaseStrong<T>(T item) {
     final cache = _getCacheFor<T>();
     final int id = (item as dynamic).id;
