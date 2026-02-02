@@ -1,6 +1,4 @@
 import 'package:expensetracker/data/model/person.dart';
-import 'package:expensetracker/domain/cache.dart';
-import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/person.dart';
 import 'package:objectbox/objectbox.dart';
@@ -36,6 +34,24 @@ class OBPersonRepo extends PersonRepo {
   Future<Person?> getById(int id) async {
     return null;
     // return _box.get(id)?.toDomain();
+  }
+
+  @override
+  Future<List<int>> getDebtsOwed(int id, int page, [int limit = 20]) {
+    // TODO: implement getDebtsOwed
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<int>> getDebtsReceivable(int id, int page, [int limit = 20]) {
+    // TODO: implement getDebtsReceivable
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Person>> getPage(int page, [int limit = 20]) {
+    // TODO: implement getPage
+    throw UnimplementedError();
   }
 
   // @override
