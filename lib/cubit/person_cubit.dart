@@ -42,8 +42,10 @@ class PersonCubit extends Cubit<PersonState> {
   ]) async {
     Person? person = cache.get<Person>(id);
     if (person == null) {
-      throw StateError(
-        'Person with id $id is not loaded. Debts cannot be fetched.',
+      emit(
+        PersonError(
+          'Person with id $id is not loaded. Debts cannot be fetched.',
+        ),
       );
     }
 
