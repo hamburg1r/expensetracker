@@ -4,6 +4,7 @@ import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
 import 'package:expensetracker/domain/repository/person.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:equatable/equatable.dart';
 
 part 'person_state.dart';
 
@@ -14,9 +15,12 @@ class PersonCubit extends Cubit<PersonState> {
   PersonCubit(
     this.personRepo,
     this.debtRepo,
-    this.cache,
-  ) : super(PersonInitial()) {
-    loadAll();
+    this.cache, [
+    bool initialLoad = true,
+  ]) : super(PersonInitial()) {
+    if (initialLoad) {
+      loadAll();
+    }
   }
 
   void _emitLoadedPeople() {
@@ -47,6 +51,7 @@ class PersonCubit extends Cubit<PersonState> {
           'Person with id $id is not loaded. Debts cannot be fetched.',
         ),
       );
+      return [];
     }
 
     List<int> debtIds = await personRepo.getDebtsOwed(id, page, limit);
