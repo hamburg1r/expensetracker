@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:objectbox/objectbox.dart';
 
 class OverviewScreen extends StatelessWidget {
   final AppBar Function(Widget, [List<Widget>]) appBar;

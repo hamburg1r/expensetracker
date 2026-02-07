@@ -1,36 +1,28 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:expensetracker/cubit/index_cubit.dart';
-import 'package:expensetracker/data/repository/person.dart';
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/repository/person.dart';
-import 'package:expensetracker/objectbox.g.dart';
+import 'package:expensetracker/domain/repository/mock/person.dart';
 import 'package:expensetracker/screens/people.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p show join;
 
 import 'screens/overview.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final path = await getApplicationDocumentsDirectory();
-  final Store store = await openStore(directory: p.join(path.path, 'db'));
   final Cache cache = Cache();
   runApp(
     App(
-      store: store,
       cache: cache,
     ),
   );
 }
 
 class App extends StatelessWidget {
-  final Store store;
   final Cache cache;
   const App({
-    required this.store,
     required this.cache,
     super.key,
   });
@@ -78,7 +70,6 @@ class App extends StatelessWidget {
           home: BlocProvider(
             create: (BuildContext context) => IndexCubit(),
             child: HomeScreen(
-              store: store,
               cache: cache,
             ),
           ),
@@ -89,10 +80,8 @@ class App extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  final Store store;
   final Cache cache;
   const HomeScreen({
-    required this.store,
     required this.cache,
     super.key,
   });
@@ -159,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<PersonRepo>(
-          create: (context) => OBPersonRepo(widget.store),
+          create: (context) => MockPersonRepo(),
         ),
       ],
       child: child,

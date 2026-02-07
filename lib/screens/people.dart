@@ -1,5 +1,4 @@
 import 'package:expensetracker/cubit/person_cubit.dart';
-import 'package:expensetracker/data/repository/person.dart';
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
@@ -8,7 +7,6 @@ import 'package:expensetracker/screens/form.dart';
 import 'package:expensetracker/widgets/person_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:objectbox/objectbox.dart';
 
 class PeopleScreen extends StatelessWidget {
   final AppBar Function(Widget, [List<Widget>]) appBar;
