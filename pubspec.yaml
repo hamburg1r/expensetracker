@@ -43,6 +43,8 @@ dependencies:
   flutter_bloc: ^9.1.1
   path_provider: ^2.1.5
   path: ^1.9.1
+  read_pdf_text: ^0.3.1
+  equatable: ^2.0.5 # Added for Bloc state equality
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +56,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  bloc_test: ^10.0.0 # Updated to resolve version conflict
+  mockito: ^5.0.0 # Added for mock generation
   build_runner: ^2.5.4
   objectbox_generator: any
   freezed: ^3.1.0
