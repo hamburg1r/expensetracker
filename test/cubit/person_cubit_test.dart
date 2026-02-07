@@ -264,14 +264,26 @@ void main() {
 
       test('fetches debts and updates cache on success', () async {
         // Arrange
-        final personWithNoDebts = Person(id: 1, name: 'John Doe', phoneNumber: '1234567890', debtsOwed: []);
+        final personWithNoDebts = Person(
+          id: 1,
+          name: 'John Doe',
+          phoneNumber: '1234567890',
+          debtsOwed: [],
+        );
         when(mockCache.get<Person>(1)).thenReturn(personWithNoDebts);
-        when(mockPersonRepo.getDebtsOwed(1, 0, 20)).thenAnswer((_) async => [debt.id]);
+        when(
+          mockPersonRepo.getDebtsOwed(1, 0, 20),
+        ).thenAnswer((_) async => [debt.id]);
         when(mockDebtRepo.getById(debt.id)).thenAnswer((_) async => debt);
         when(mockCache.addWeak(debt)).thenReturn(1);
         when(mockCache.update(any)).thenReturn(1);
 
-        final cubit = PersonCubit(mockPersonRepo, mockDebtRepo, mockCache, false);
+        final cubit = PersonCubit(
+          mockPersonRepo,
+          mockDebtRepo,
+          mockCache,
+          false,
+        );
 
         // Act
         final result = await cubit.getDebtsOwed(1, 0);
@@ -281,49 +293,82 @@ void main() {
         verify(mockPersonRepo.getDebtsOwed(1, 0, 20)).called(1);
         verify(mockDebtRepo.getById(debt.id)).called(1);
         verify(mockCache.addWeak(debt)).called(1);
-        
+
         final verificationResult = verify(mockCache.update(captureAny));
         verificationResult.called(1);
         final capturedPerson = verificationResult.captured.single as Person;
         expect(capturedPerson.debtsOwed, [debt]);
       });
 
-      test('fetches debts and replaces cache on success when replace is true', () async {
-        // Arrange
-        final oldDebt = Debt(id: 100, creditor: person, amount: 50, date: DateTime(2023, 1, 1));
-        final personWithOldDebts = Person(id: 1, name: 'John Doe', phoneNumber: '1234567890', debtsOwed: [oldDebt]);
-        final newDebt = Debt(id: 2, creditor: person, amount: 200, date: DateTime.now());
+      test(
+        'fetches debts and replaces cache on success when replace is true',
+        () async {
+          // Arrange
+          final oldDebt = Debt(
+            id: 100,
+            creditor: person,
+            amount: 50,
+            date: DateTime(2023, 1, 1),
+          );
+          final personWithOldDebts = Person(
+            id: 1,
+            name: 'John Doe',
+            phoneNumber: '1234567890',
+            debtsOwed: [oldDebt],
+          );
+          final newDebt = Debt(
+            id: 2,
+            creditor: person,
+            amount: 200,
+            date: DateTime.now(),
+          );
 
-        when(mockCache.get<Person>(1)).thenReturn(personWithOldDebts);
-        when(mockPersonRepo.getDebtsOwed(1, 0, 20)).thenAnswer((_) async => [newDebt.id]);
-        when(mockDebtRepo.getById(newDebt.id)).thenAnswer((_) async => newDebt);
-        when(mockCache.addWeak(newDebt)).thenReturn(1);
-        when(mockCache.update(any)).thenReturn(1);
-        when(mockCache.releaseStrong(oldDebt)).thenReturn(1); // Expect old debt to be released
+          when(mockCache.get<Person>(1)).thenReturn(personWithOldDebts);
+          when(
+            mockPersonRepo.getDebtsOwed(1, 0, 20),
+          ).thenAnswer((_) async => [newDebt.id]);
+          when(
+            mockDebtRepo.getById(newDebt.id),
+          ).thenAnswer((_) async => newDebt);
+          when(mockCache.addWeak(newDebt)).thenReturn(1);
+          when(mockCache.update(any)).thenReturn(1);
+          when(
+            mockCache.releaseStrong(oldDebt),
+          ).thenReturn(1); // Expect old debt to be released
 
-        final cubit = PersonCubit(mockPersonRepo, mockDebtRepo, mockCache, false);
+          final cubit = PersonCubit(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+            false,
+          );
 
-        // Act
-        final result = await cubit.getDebtsOwed(1, 0, true); // replace = true
+          // Act
+          final result = await cubit.getDebtsOwed(1, 0, true); // replace = true
 
-        // Assert
-        expect(result, [newDebt]);
-        verify(mockPersonRepo.getDebtsOwed(1, 0, 20)).called(1);
-        verify(mockDebtRepo.getById(newDebt.id)).called(1);
-        verify(mockCache.addWeak(newDebt)).called(1);
-        verify(mockCache.releaseStrong(oldDebt)).called(1);
-        
-        final verificationResult = verify(mockCache.update(captureAny));
-        verificationResult.called(1);
-        final capturedPerson = verificationResult.captured.single as Person;
-        expect(capturedPerson.debtsOwed, [newDebt]);
-      });
+          // Assert
+          expect(result, [newDebt]);
+          verify(mockPersonRepo.getDebtsOwed(1, 0, 20)).called(1);
+          verify(mockDebtRepo.getById(newDebt.id)).called(1);
+          verify(mockCache.addWeak(newDebt)).called(1);
+          verify(mockCache.releaseStrong(oldDebt)).called(1);
+
+          final verificationResult = verify(mockCache.update(captureAny));
+          verificationResult.called(1);
+          final capturedPerson = verificationResult.captured.single as Person;
+          expect(capturedPerson.debtsOwed, [newDebt]);
+        },
+      );
     });
 
     test('getAllLoaded returns people from cache', () async {
       // Arrange
-      final people = [Person(id: 1, name: 'John Doe', phoneNumber: '1234567890')];
-      when(mockCache.getAll<Person>()).thenReturn({ for (var p in people) p.id: p });
+      final people = [
+        Person(id: 1, name: 'John Doe', phoneNumber: '1234567890'),
+      ];
+      when(
+        mockCache.getAll<Person>(),
+      ).thenReturn({for (var p in people) p.id: p});
       final cubit = PersonCubit(mockPersonRepo, mockDebtRepo, mockCache, false);
 
       // Act
@@ -335,20 +380,26 @@ void main() {
     });
 
     group('getPage', () {
-      final people = [Person(id: 1, name: 'John Doe', phoneNumber: '1234567890')];
+      final people = [
+        Person(id: 1, name: 'John Doe', phoneNumber: '1234567890'),
+      ];
 
       blocTest<PersonCubit, PersonState>(
         'emits [PersonLoading, PersonLoaded] when successful',
         build: () {
           when(mockPersonRepo.getPage(1, 20)).thenAnswer((_) async => people);
-          when(mockCache.getAll<Person>()).thenReturn({ for (var p in people) p.id: p });
+          when(
+            mockCache.getAll<Person>(),
+          ).thenReturn({for (var p in people) p.id: p});
           when(mockCache.addStrong(any)).thenReturn(1);
           return PersonCubit(mockPersonRepo, mockDebtRepo, mockCache, false);
         },
         act: (cubit) => cubit.getPage(1),
         expect: () => [
           isA<PersonLoading>(),
-          isA<PersonLoaded>().having((s) => s.people, 'people', { for (var p in people) p.id: p }),
+          isA<PersonLoaded>().having((s) => s.people, 'people', {
+            for (var p in people) p.id: p,
+          }),
         ],
         verify: (_) {
           verify(mockPersonRepo.getPage(1, 20)).called(1);
@@ -359,7 +410,9 @@ void main() {
       blocTest<PersonCubit, PersonState>(
         'emits [PersonLoading, PersonError] when fails',
         build: () {
-          when(mockPersonRepo.getPage(1, 20)).thenThrow(Exception('Failed to load'));
+          when(
+            mockPersonRepo.getPage(1, 20),
+          ).thenThrow(Exception('Failed to load'));
           return PersonCubit(mockPersonRepo, mockDebtRepo, mockCache, false);
         },
         act: (cubit) => cubit.getPage(1),

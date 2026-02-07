@@ -3,6 +3,7 @@ import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
 import 'package:expensetracker/domain/repository/person.dart';
+import 'package:expensetracker/utils/list_utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -44,34 +45,34 @@ class PersonCubit extends Cubit<PersonState> {
     bool replace = false,
     int limit = 20,
   ]) async {
-    Person? person = cache.get<Person>(id);
-    if (person == null) {
-      emit(
-        PersonError(
-          'Person with id $id is not loaded. Debts cannot be fetched.',
-        ),
-      );
-      return [];
-    }
+    return _handleDebtFetchingLogic(
+      id: id,
+      page: page,
+      replace: replace,
+      limit: limit,
+      getDebtIdsFromRepo: personRepo.getDebtsOwed,
+      getCurrentPersonDebts: (person) => person.debtsOwed,
+      copyWithPersonDebts: (person, newDebts) =>
+          person.copyWith(debtsOwed: newDebts),
+    );
+  }
 
-    List<int> debtIds = await personRepo.getDebtsOwed(id, page, limit);
-    List<Debt> debts = (await Future.wait(
-      debtIds.map(debtRepo.getById),
-    )).nonNulls.toList(growable: false);
-
-    debts.forEach(cache.addWeak);
-
-    if (replace) {
-      person.debtsOwed
-          .toSet()
-          .difference(debts.toSet())
-          .forEach(cache.releaseStrong);
-
-      cache.update(person.copyWith(debtsOwed: debts));
-    } else {
-      cache.update(person.copyWith(debtsOwed: [...person.debtsOwed, ...debts]));
-    }
-    return debts;
+  Future<List<Debt>> getDebtsRecievable(
+    int id,
+    int page, [
+    bool replace = false,
+    int limit = 20,
+  ]) async {
+    return _handleDebtFetchingLogic(
+      id: id,
+      page: page,
+      replace: replace,
+      limit: limit,
+      getDebtIdsFromRepo: personRepo.getDebtsReceivable,
+      getCurrentPersonDebts: (person) => person.debtsReceivable,
+      copyWithPersonDebts: (person, newDebts) =>
+          person.copyWith(debtsReceivable: newDebts),
+    );
   }
 
   Future<void> create(Person person) async {
@@ -129,5 +130,59 @@ class PersonCubit extends Cubit<PersonState> {
     } catch (e) {
       emit(PersonError("$e\nFailed to fetch Person for page: $page"));
     }
+  }
+
+  Future<List<Debt>> _handleDebtFetchingLogic({
+    required int id,
+    required int page,
+    required bool replace,
+    required int limit,
+    required Future<List<int>> Function(int id, int page, int limit)
+    getDebtIdsFromRepo,
+    required List<Debt> Function(Person person) getCurrentPersonDebts,
+    required Person Function(Person person, List<Debt> newDebts)
+    copyWithPersonDebts,
+  }) async {
+    Person? person = cache.get<Person>(id);
+    if (person == null) {
+      emit(
+        PersonError(
+          'Person with id $id is not loaded. Debts cannot be fetched.',
+        ),
+      );
+      return [];
+    }
+
+    List<int> debtIds = await getDebtIdsFromRepo(id, page, limit);
+    List<Debt> debts = (await Future.wait(
+      debtIds.map(debtRepo.getById),
+    )).nonNulls.toList(growable: false);
+
+    debts.forEach(cache.addWeak);
+
+    if (replace) {
+      final List<Debt> debtsToRemove = mergeOrDifferenceLists(
+        getCurrentPersonDebts(person),
+        debts,
+        true, // getDifference
+        growable: false,
+      );
+      debtsToRemove.forEach(cache.releaseStrong);
+
+      cache.update(copyWithPersonDebts(person, debts));
+    } else {
+      cache.update(
+        copyWithPersonDebts(
+          person,
+          mergeOrDifferenceLists(
+            getCurrentPersonDebts(person),
+            debts,
+            false, // getDifference
+            growable: false,
+          ),
+        ),
+      );
+    }
+    return debts;
   }
 }
