@@ -28,5 +28,15 @@ abstract class PersonRepo {
     int limit = 20,
   ]);
 
-  // Future<List<int>> getTransactions(Person person);
+  Future<List<int>> getTransactions(
+    int id,
+    int page, [
+    int limit = 20,
+  ]);
+
+  Future<List<int>> getParticipations(
+    int id,
+    int page, [
+    int limit = 20,
+  ]);
 }
