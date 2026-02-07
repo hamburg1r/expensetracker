@@ -2,7 +2,6 @@ import 'package:expensetracker/domain/model/account.dart';
 import 'package:expensetracker/domain/model/category.dart';
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
-import 'package:expensetracker/objectbox.g.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'expense.freezed.dart';
