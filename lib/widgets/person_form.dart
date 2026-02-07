@@ -1,4 +1,4 @@
-import 'package:expensetracker/cubit/person_cubit.dart';
+import 'package:expensetracker/cubit/person_bloc.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/screens/form.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +34,7 @@ class PersonForm extends StatefulWidget implements CustomFormWidget {
       name: _controllers.name.text,
       phoneNumber: _controllers.number.text,
     );
-    BlocProvider.of<PersonCubit>(context).create(person);
+    BlocProvider.of<PersonBloc>(context).add(CreatePersonEvent(person));
     print(person);
 
     return true;

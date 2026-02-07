@@ -1,4 +1,4 @@
-import 'package:expensetracker/cubit/person_cubit.dart';
+import 'package:expensetracker/cubit/person_bloc.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/screens/form.dart';
 import 'package:expensetracker/widgets/menu.dart';
@@ -35,7 +35,7 @@ class PersonTile extends StatelessWidget {
               );
             },
             'Delete': () {
-              context.read<PersonCubit>().remove(person!.id);
+              context.read<PersonBloc>().add(RemovePersonEvent(person!.id));
             },
           },
         ),

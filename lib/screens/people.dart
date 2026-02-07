@@ -1,4 +1,4 @@
-import 'package:expensetracker/cubit/person_cubit.dart';
+import 'package:expensetracker/cubit/person_bloc.dart';
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
@@ -19,17 +19,17 @@ class PeopleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<PersonCubit>(
-      create: (ctx) => PersonCubit(
+    return BlocProvider<PersonBloc>(
+      create: (ctx) => PersonBloc(
         RepositoryProvider.of<PersonRepo>(context),
         RepositoryProvider.of<DebtRepo>(context),
         cache,
-      ),
+      )..add(LoadAllPeopleEvent()), // Dispatch LoadAllPeopleEvent when bloc is created
       child: Scaffold(
         appBar: appBar(
           const Text('People'),
         ),
-        body: BlocBuilder<PersonCubit, PersonState>(
+        body: BlocBuilder<PersonBloc, PersonState>(
           builder: (BuildContext context, PersonState state) {
             if (state is PersonLoading || state is PersonInitial) {
               return const Center(child: CircularProgressIndicator());
@@ -38,7 +38,7 @@ class PeopleScreen extends StatelessWidget {
               List<Person> people = state.people.values.toList(growable: false);
               if (people.isNotEmpty) {
                 return ListView.builder(
-                  itemCount: state.people.keys.last,
+                  itemCount: people.length, // Corrected to use people.length
                   itemBuilder: (BuildContext context, int index) {
                     return PersonTile(person: people[index]);
                   },
@@ -59,7 +59,7 @@ class PeopleScreen extends StatelessWidget {
             }
           },
         ),
-        floatingActionButton: BlocBuilder<PersonCubit, PersonState>(
+        floatingActionButton: BlocBuilder<PersonBloc, PersonState>(
           builder: (BuildContext providerContext, _) {
             return FloatingActionButton(
               onPressed: () {

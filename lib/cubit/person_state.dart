@@ -1,4 +1,4 @@
-part of 'person_cubit.dart';
+part of 'person_bloc.dart';
 
 sealed class PersonState {
   const PersonState();
