@@ -1,4 +1,4 @@
-import 'package:expensetracker/cubit/person_bloc.dart';
+import 'package:expensetracker/bloc/person_bloc.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/screens/form.dart';
 import 'package:expensetracker/widgets/menu.dart';

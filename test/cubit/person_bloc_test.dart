@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:bloc_test/bloc_test.dart';
-import 'package:expensetracker/cubit/person_bloc.dart'; // Changed from person_cubit.dart
+import 'package:expensetracker/bloc/person_bloc.dart';
 import 'package:expensetracker/domain/repository/person.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
 import 'package:expensetracker/domain/cache.dart';
@@ -13,7 +13,7 @@ import 'person_bloc_test.mocks.dart';
 
 @GenerateMocks([PersonRepo, DebtRepo, Cache])
 void main() {
-  group('PersonBloc', () { // Changed from PersonCubit
+  group('PersonBloc', () {
     late MockPersonRepo mockPersonRepo;
     late MockDebtRepo mockDebtRepo;
     late MockCache mockCache;
@@ -24,7 +24,8 @@ void main() {
       mockCache = MockCache();
     });
 
-    test('initial state is PersonInitial', () { // Removed initialLoad parameter
+    test('initial state is PersonInitial', () {
+      // Removed initialLoad parameter
       final personBloc = PersonBloc(
         mockPersonRepo,
         mockDebtRepo,
@@ -42,16 +43,20 @@ void main() {
         Person(id: 1, name: 'John Doe', phoneNumber: '1234567890'),
       ];
 
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'emits [PersonLoading, PersonLoaded] when successful',
         build: () {
           when(mockPersonRepo.getAll()).thenAnswer((_) async => people);
           when(
             mockCache.getAll<Person>(),
           ).thenReturn({for (var p in people) p.id: p});
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(LoadAllPeopleEvent()), // Changed to event
+        act: (bloc) => bloc.add(LoadAllPeopleEvent()),
         expect: () => [
           isA<PersonLoading>(),
           isA<PersonLoaded>().having((s) => s.people, 'people', {
@@ -64,13 +69,17 @@ void main() {
         },
       );
 
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'emits [PersonLoading, PersonError] when fails',
         build: () {
           when(mockPersonRepo.getAll()).thenThrow(Exception('Failed to load'));
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(LoadAllPeopleEvent()), // Changed to event
+        act: (bloc) => bloc.add(LoadAllPeopleEvent()),
         expect: () => [
           isA<PersonLoading>(),
           isA<PersonError>(),
@@ -84,14 +93,18 @@ void main() {
     group('create', () {
       final person = Person(id: 1, name: 'John Doe', phoneNumber: '1234567890');
 
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'calls create on repo and emits PersonLoaded',
         build: () {
           when(mockPersonRepo.create(person)).thenAnswer((_) async => 1);
           when(mockCache.getAll<Person>()).thenReturn({person.id: person});
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(CreatePersonEvent(person)), // Changed to event
+        act: (bloc) => bloc.add(CreatePersonEvent(person)),
         expect: () => [
           isA<PersonLoaded>().having((s) => s.people, 'people', {
             person.id: person,
@@ -105,14 +118,18 @@ void main() {
     });
 
     group('remove', () {
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'calls delete on repo and emits PersonLoaded',
         build: () {
           when(mockPersonRepo.delete(1)).thenAnswer((_) async => true);
           when(mockCache.getAll<Person>()).thenReturn({});
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(RemovePersonEvent(1)), // Changed to event
+        act: (bloc) => bloc.add(RemovePersonEvent(1)),
         expect: () => [
           isA<PersonLoaded>().having((s) => s.people, 'people', {}),
         ],
@@ -126,14 +143,18 @@ void main() {
     group('update', () {
       final person = Person(id: 1, name: 'John Doe', phoneNumber: '1234567890');
 
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'calls update on repo and emits PersonLoaded',
         build: () {
           when(mockPersonRepo.update(person)).thenAnswer((_) async {});
           when(mockCache.getAll<Person>()).thenReturn({person.id: person});
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(UpdatePersonEvent(person)), // Changed to event
+        act: (bloc) => bloc.add(UpdatePersonEvent(person)),
         expect: () => [
           isA<PersonLoaded>().having((s) => s.people, 'people', {
             person.id: person,
@@ -154,7 +175,7 @@ void main() {
       test('returns person from cache if exists', () async {
         when(mockCache.get<Person>(1)).thenReturn(person);
         when(mockCache.references(any)).thenReturn(0);
-        final personBloc = PersonBloc( // Changed from PersonCubit
+        final personBloc = PersonBloc(
           mockPersonRepo,
           mockDebtRepo,
           mockCache,
@@ -175,13 +196,17 @@ void main() {
       // Let's assume getById is just a getter and doesn't change the bloc state directly.
       // If it should emit PersonLoaded, it would need to dispatch an event internally or externally.
       // For now, I'm adapting the existing test to reflect that getById itself doesn't trigger state changes for PersonBloc.
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'fetches from repo if not in cache', // Removed "and emits PersonLoaded"
         build: () {
           when(mockCache.get<Person>(1)).thenReturn(null);
           when(mockPersonRepo.getById(1)).thenAnswer((_) async => person);
           when(mockCache.getAll<Person>()).thenReturn({person.id: person});
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
         act: (bloc) async {
           final result = await bloc.getById(1); // Direct method call
@@ -194,12 +219,16 @@ void main() {
         },
       );
 
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'does not emit PersonError on failure if getById is just a getter', // Adjusted description
         build: () {
           when(mockCache.get<Person>(1)).thenReturn(null);
           when(mockPersonRepo.getById(1)).thenThrow(Exception('error'));
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
         act: (bloc) async {
           final result = await bloc.getById(1); // Direct method call
@@ -230,13 +259,27 @@ void main() {
         date: DateTime.now(),
       );
 
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'emits PersonError when person is not in cache',
         build: () {
           when(mockCache.get<Person>(1)).thenReturn(null);
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(GetDebtsOwedEvent(1, 0)), // Changed to event
+        act: (bloc) => bloc.add(
+          GetPersonDebtsOwedEvent(
+            Person(
+              id: 1,
+              name: 'John Doe',
+              phoneNumber: '1234567890',
+              debtsOwed: [],
+            ),
+            0,
+          ),
+        ),
         expect: () => [
           isA<PersonError>().having(
             (e) => e.message,
@@ -246,7 +289,7 @@ void main() {
         ],
       );
 
-      blocTest<PersonBloc, PersonState>( // Changed to blocTest for event
+      blocTest<PersonBloc, PersonState>(
         'fetches debts and updates cache on success',
         build: () {
           final personWithNoDebts = Person(
@@ -262,13 +305,33 @@ void main() {
           when(mockDebtRepo.getById(debt.id)).thenAnswer((_) async => debt);
           when(mockCache.addWeak(debt)).thenReturn(1);
           when(mockCache.update(any)).thenReturn(1);
-          when(mockCache.getAll<Person>()).thenReturn({person.id: person.copyWith(debtsOwed: [debt])});
+          when(mockCache.getAll<Person>()).thenReturn({
+            person.id: person.copyWith(debtsOwed: [debt]),
+          });
 
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(GetDebtsOwedEvent(1, 0)), // Changed to event
+        act: (bloc) => bloc.add(
+          GetPersonDebtsOwedEvent(
+            Person(
+              id: 1,
+              name: 'John Doe',
+              phoneNumber: '1234567890',
+              debtsOwed: [],
+            ),
+            0,
+          ),
+        ),
         expect: () => [
-          isA<PersonLoaded>().having((s) => s.people.values.first.debtsOwed, 'debtsOwed', [debt]),
+          isA<PersonLoaded>().having(
+            (s) => s.people.values.first.debtsOwed,
+            'debtsOwed',
+            [debt],
+          ),
         ],
         verify: (_) {
           verify(mockPersonRepo.getDebtsOwed(1, 0, 20)).called(1);
@@ -278,7 +341,7 @@ void main() {
         },
       );
 
-      blocTest<PersonBloc, PersonState>( // Changed to blocTest for event
+      blocTest<PersonBloc, PersonState>(
         'fetches debts and replaces cache on success when replace is true',
         build: () {
           final oldDebt = Debt(
@@ -312,14 +375,34 @@ void main() {
           when(
             mockCache.releaseStrong(oldDebt),
           ).thenReturn(1);
-          when(mockCache.getAll<Person>()).thenReturn({person.id: person.copyWith(debtsOwed: [newDebt])});
+          when(mockCache.getAll<Person>()).thenReturn({
+            person.id: person.copyWith(debtsOwed: [newDebt]),
+          });
 
-
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(GetDebtsOwedEvent(1, 0, true)), // Changed to event
+        act: (bloc) => bloc.add(
+          GetPersonDebtsOwedEvent(
+            Person(
+              id: 1,
+              name: 'John Doe',
+              phoneNumber: '1234567890',
+              debtsOwed: [],
+            ),
+            0,
+            true,
+          ),
+        ),
         expect: () => [
-          isA<PersonLoaded>().having((s) => s.people.values.first.debtsOwed, 'debtsOwed', [newDebt]),
+          isA<PersonLoaded>().having(
+            (s) => s.people.values.first.debtsOwed,
+            'debtsOwed',
+            [newDebt],
+          ),
         ],
         verify: (_) {
           verify(mockPersonRepo.getDebtsOwed(1, 0, 20)).called(1);
@@ -331,7 +414,8 @@ void main() {
       );
     });
 
-    group('getAllLoaded', () { // getAllLoaded is a direct method call
+    group('getAllLoaded', () {
+      // getAllLoaded is a direct method call
       final people = [
         Person(id: 1, name: 'John Doe', phoneNumber: '1234567890'),
       ];
@@ -340,7 +424,11 @@ void main() {
         when(
           mockCache.getAll<Person>(),
         ).thenReturn({for (var p in people) p.id: p});
-        final bloc = PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+        final bloc = PersonBloc(
+          mockPersonRepo,
+          mockDebtRepo,
+          mockCache,
+        );
 
         final result = await bloc.getAllLoaded();
 
@@ -354,7 +442,7 @@ void main() {
         Person(id: 1, name: 'John Doe', phoneNumber: '1234567890'),
       ];
 
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'emits [PersonLoading, PersonLoaded] when successful',
         build: () {
           when(mockPersonRepo.getPage(1, 20)).thenAnswer((_) async => people);
@@ -362,9 +450,13 @@ void main() {
             mockCache.getAll<Person>(),
           ).thenReturn({for (var p in people) p.id: p});
           when(mockCache.addStrong(any)).thenReturn(1);
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(GetPagePeopleEvent(1)), // Changed to event
+        act: (bloc) => bloc.add(GetPagePeopleEvent(1)),
         expect: () => [
           isA<PersonLoading>(),
           isA<PersonLoaded>().having((s) => s.people, 'people', {
@@ -377,15 +469,19 @@ void main() {
         },
       );
 
-      blocTest<PersonBloc, PersonState>( // Changed from PersonCubit
+      blocTest<PersonBloc, PersonState>(
         'emits [PersonLoading, PersonError] when fails',
         build: () {
           when(
             mockPersonRepo.getPage(1, 20),
           ).thenThrow(Exception('Failed to load'));
-          return PersonBloc(mockPersonRepo, mockDebtRepo, mockCache); // Changed constructor
+          return PersonBloc(
+            mockPersonRepo,
+            mockDebtRepo,
+            mockCache,
+          );
         },
-        act: (bloc) => bloc.add(GetPagePeopleEvent(1)), // Changed to event
+        act: (bloc) => bloc.add(GetPagePeopleEvent(1)),
         expect: () => [
           isA<PersonLoading>(),
           isA<PersonError>(),
@@ -397,4 +493,3 @@ void main() {
     });
   });
 }
-

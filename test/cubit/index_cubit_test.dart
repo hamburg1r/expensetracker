@@ -1,5 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:expensetracker/cubit/index_cubit.dart';
+import 'package:expensetracker/bloc/index_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -46,28 +46,36 @@ class GetPagePeopleEvent extends PersonEvent {
   List<Object> get props => [page, limit];
 }
 
-class GetDebtsOwedEvent extends PersonEvent {
-  final int id;
+class GetPersonDebtsOwedEvent extends PersonEvent {
+  final Person person;
   final int page;
   final bool replace;
   final int limit;
 
-  const GetDebtsOwedEvent(this.id, this.page,
-      [this.replace = false, this.limit = 20]);
+  const GetPersonDebtsOwedEvent(
+    this.person,
+    this.page, [
+    this.replace = false,
+    this.limit = 20,
+  ]);
 
   @override
-  List<Object> get props => [id, page, replace, limit];
+  List<Object> get props => [person, page, replace, limit];
 }
 
-class GetDebtsReceivableEvent extends PersonEvent {
-  final int id;
+class GetPersonDebtsReceivableEvent extends PersonEvent {
+  final Person person;
   final int page;
   final bool replace;
   final int limit;
 
-  const GetDebtsReceivableEvent(this.id, this.page,
-      [this.replace = false, this.limit = 20]);
+  const GetPersonDebtsReceivableEvent(
+    this.person,
+    this.page, [
+    this.replace = false,
+    this.limit = 20,
+  ]);
 
   @override
-  List<Object> get props => [id, page, replace, limit];
+  List<Object> get props => [person, page, replace, limit];
 }

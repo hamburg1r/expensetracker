@@ -1,4 +1,4 @@
-import 'package:expensetracker/cubit/person_bloc.dart';
+import 'package:expensetracker/bloc/person_bloc.dart';
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
@@ -20,11 +20,14 @@ class PeopleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<PersonBloc>(
-      create: (ctx) => PersonBloc(
-        RepositoryProvider.of<PersonRepo>(context),
-        RepositoryProvider.of<DebtRepo>(context),
-        cache,
-      )..add(LoadAllPeopleEvent()), // Dispatch LoadAllPeopleEvent when bloc is created
+      create: (ctx) =>
+          PersonBloc(
+            RepositoryProvider.of<PersonRepo>(context),
+            RepositoryProvider.of<DebtRepo>(context),
+            cache,
+          )..add(
+            LoadAllPeopleEvent(),
+          ), // Dispatch LoadAllPeopleEvent when bloc is created
       child: Scaffold(
         appBar: appBar(
           const Text('People'),

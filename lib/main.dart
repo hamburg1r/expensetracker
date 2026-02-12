@@ -1,5 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:expensetracker/cubit/index_cubit.dart';
+import 'package:expensetracker/bloc/index_cubit.dart';
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/repository/person.dart';
 import 'package:expensetracker/domain/repository/mock/person.dart';

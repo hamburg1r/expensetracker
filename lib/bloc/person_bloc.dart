@@ -15,21 +15,25 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   final DebtRepo debtRepo;
   final Cache cache;
 
-  PersonBloc(this.personRepo, this.debtRepo, this.cache) : super(PersonInitial()) {
+  PersonBloc(this.personRepo, this.debtRepo, this.cache)
+    : super(PersonInitial()) {
     on<LoadAllPeopleEvent>(_onLoadAllPeople);
     on<CreatePersonEvent>(_onCreatePerson);
     on<RemovePersonEvent>(_onRemovePerson);
     on<UpdatePersonEvent>(_onUpdatePerson);
     on<GetPagePeopleEvent>(_onGetPagePeople);
-    on<GetDebtsOwedEvent>(_onGetDebtsOwed);
-    on<GetDebtsReceivableEvent>(_onGetDebtsReceivable);
+    on<GetPersonDebtsOwedEvent>(_onGetDebtsOwed);
+    on<GetPersonDebtsReceivableEvent>(_onGetDebtsReceivable);
   }
 
   void _emitLoadedPeople(Emitter<PersonState> emit) {
     emit(PersonLoaded(cache.getAll<Person>()));
   }
 
-  Future<void> _onLoadAllPeople(LoadAllPeopleEvent event, Emitter<PersonState> emit) async {
+  Future<void> _onLoadAllPeople(
+    LoadAllPeopleEvent event,
+    Emitter<PersonState> emit,
+  ) async {
     emit(PersonLoading());
     try {
       final List<Person> all = await personRepo.getAll();
@@ -40,28 +44,43 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     }
   }
 
-  Future<void> _onCreatePerson(CreatePersonEvent event, Emitter<PersonState> emit) async {
+  Future<void> _onCreatePerson(
+    CreatePersonEvent event,
+    Emitter<PersonState> emit,
+  ) async {
     await personRepo.create(event.person);
     cache.addStrong(event.person);
     _emitLoadedPeople(emit);
   }
 
-  Future<void> _onRemovePerson(RemovePersonEvent event, Emitter<PersonState> emit) async {
+  Future<void> _onRemovePerson(
+    RemovePersonEvent event,
+    Emitter<PersonState> emit,
+  ) async {
     await personRepo.delete(event.id);
     cache.remove<Person>(event.id);
     _emitLoadedPeople(emit);
   }
 
-  Future<void> _onUpdatePerson(UpdatePersonEvent event, Emitter<PersonState> emit) async {
+  Future<void> _onUpdatePerson(
+    UpdatePersonEvent event,
+    Emitter<PersonState> emit,
+  ) async {
     await personRepo.update(event.person);
     cache.update(event.person);
     _emitLoadedPeople(emit);
   }
 
-  Future<void> _onGetPagePeople(GetPagePeopleEvent event, Emitter<PersonState> emit) async {
+  Future<void> _onGetPagePeople(
+    GetPagePeopleEvent event,
+    Emitter<PersonState> emit,
+  ) async {
     emit(PersonLoading());
     try {
-      final List<Person> pageData = await personRepo.getPage(event.page, event.limit);
+      final List<Person> pageData = await personRepo.getPage(
+        event.page,
+        event.limit,
+      );
       pageData.forEach(cache.addStrong);
       _emitLoadedPeople(emit);
     } catch (e) {
@@ -69,28 +88,36 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     }
   }
 
-  Future<void> _onGetDebtsOwed(GetDebtsOwedEvent event, Emitter<PersonState> emit) async {
+  Future<void> _onGetDebtsOwed(
+    GetPersonDebtsOwedEvent event,
+    Emitter<PersonState> emit,
+  ) async {
     await _handleDebtFetchingLogic(
-      id: event.id,
+      id: event.person.id,
       page: event.page,
       replace: event.replace,
       limit: event.limit,
       getDebtIdsFromRepo: personRepo.getDebtsOwed,
       getCurrentPersonDebts: (person) => person.debtsOwed,
-      copyWithPersonDebts: (person, newDebts) => person.copyWith(debtsOwed: newDebts),
+      copyWithPersonDebts: (person, newDebts) =>
+          person.copyWith(debtsOwed: newDebts),
       emit: emit,
     );
   }
 
-  Future<void> _onGetDebtsReceivable(GetDebtsReceivableEvent event, Emitter<PersonState> emit) async {
+  Future<void> _onGetDebtsReceivable(
+    GetPersonDebtsReceivableEvent event,
+    Emitter<PersonState> emit,
+  ) async {
     await _handleDebtFetchingLogic(
-      id: event.id,
+      id: event.person.id,
       page: event.page,
       replace: event.replace,
       limit: event.limit,
       getDebtIdsFromRepo: personRepo.getDebtsReceivable,
       getCurrentPersonDebts: (person) => person.debtsReceivable,
-      copyWithPersonDebts: (person, newDebts) => person.copyWith(debtsReceivable: newDebts),
+      copyWithPersonDebts: (person, newDebts) =>
+          person.copyWith(debtsReceivable: newDebts),
       emit: emit,
     );
   }
@@ -101,9 +128,11 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     required int page,
     required bool replace,
     required int limit,
-    required Future<List<int>> Function(int id, int page, int limit) getDebtIdsFromRepo,
+    required Future<List<int>> Function(int id, int page, int limit)
+    getDebtIdsFromRepo,
     required List<Debt> Function(Person person) getCurrentPersonDebts,
-    required Person Function(Person person, List<Debt> newDebts) copyWithPersonDebts,
+    required Person Function(Person person, List<Debt> newDebts)
+    copyWithPersonDebts,
     required Emitter<PersonState> emit, // Emitter is passed here
   }) async {
     Person? person = cache.get<Person>(id);
