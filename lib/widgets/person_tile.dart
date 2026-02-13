@@ -35,7 +35,7 @@ class PersonTile extends StatelessWidget {
               );
             },
             'Delete': () {
-              context.read<PersonBloc>().add(RemovePersonEvent(person!.id));
+              context.read<PersonBloc>().add(RemovePersonEvent(person!));
             },
           },
         ),

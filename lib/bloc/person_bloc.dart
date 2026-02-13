@@ -24,6 +24,8 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     on<GetPagePeopleEvent>(_onGetPagePeople);
     on<GetPersonDebtsOwedEvent>(_onGetDebtsOwed);
     on<GetPersonDebtsReceivableEvent>(_onGetDebtsReceivable);
+    on<UnloadPersonEvent>(_onUnloadPerson);
+    on<UnloadPeopleEvent>(_onUnloadPeople);
   }
 
   void _emitLoadedPeople(Emitter<PersonState> emit) {
@@ -44,31 +46,64 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     }
   }
 
+  Future<void> _onUnloadPerson(
+    UnloadPersonEvent event,
+    Emitter<PersonState> emit,
+  ) async {
+    cache.releaseStrong<Person>(event.person);
+    _emitLoadedPeople(emit);
+  }
+
+  Future<void> _onUnloadPeople(
+    UnloadPeopleEvent event,
+    Emitter<PersonState> emit,
+  ) async {
+    for (var person in event.people) {
+      cache.releaseStrong<Person>(person);
+    }
+    _emitLoadedPeople(emit);
+  }
+
   Future<void> _onCreatePerson(
     CreatePersonEvent event,
     Emitter<PersonState> emit,
   ) async {
-    await personRepo.create(event.person);
-    cache.addStrong(event.person);
-    _emitLoadedPeople(emit);
+    emit(PersonLoading());
+    try {
+      await personRepo.create(event.person);
+      cache.addStrong(event.person);
+      _emitLoadedPeople(emit);
+    } catch (e) {
+      emit(PersonError("$e\nFailed to create Person"));
+    }
   }
 
   Future<void> _onRemovePerson(
     RemovePersonEvent event,
     Emitter<PersonState> emit,
   ) async {
-    await personRepo.delete(event.id);
-    cache.remove<Person>(event.id);
-    _emitLoadedPeople(emit);
+    emit(PersonLoading());
+    try {
+      await personRepo.delete(event.person.id);
+      cache.remove<Person>(event.person.id);
+      _emitLoadedPeople(emit);
+    } catch (e) {
+      emit(PersonError("$e\nFailed to remove Person"));
+    }
   }
 
   Future<void> _onUpdatePerson(
     UpdatePersonEvent event,
     Emitter<PersonState> emit,
   ) async {
-    await personRepo.update(event.person);
-    cache.update(event.person);
-    _emitLoadedPeople(emit);
+    emit(PersonLoading());
+    try {
+      await personRepo.update(event.person);
+      cache.update(event.person);
+      _emitLoadedPeople(emit);
+    } catch (e) {
+      emit(PersonError("$e\nFailed to update Person"));
+    }
   }
 
   Future<void> _onGetPagePeople(
@@ -92,34 +127,44 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     GetPersonDebtsOwedEvent event,
     Emitter<PersonState> emit,
   ) async {
-    await _handleDebtFetchingLogic(
-      id: event.person.id,
-      page: event.page,
-      replace: event.replace,
-      limit: event.limit,
-      getDebtIdsFromRepo: personRepo.getDebtsOwed,
-      getCurrentPersonDebts: (person) => person.debtsOwed,
-      copyWithPersonDebts: (person, newDebts) =>
-          person.copyWith(debtsOwed: newDebts),
-      emit: emit,
-    );
+    emit(PersonLoading());
+    try {
+      await _handleDebtFetchingLogic(
+        id: event.person.id,
+        page: event.page,
+        replace: event.replace,
+        limit: event.limit,
+        getDebtIdsFromRepo: personRepo.getDebtsOwed,
+        getCurrentPersonDebts: (person) => person.debtsOwed,
+        copyWithPersonDebts: (person, newDebts) =>
+            person.copyWith(debtsOwed: newDebts),
+        emit: emit,
+      );
+    } catch (e) {
+      emit(PersonError("$e\nFailed to fetch debts owed for Person"));
+    }
   }
 
   Future<void> _onGetDebtsReceivable(
     GetPersonDebtsReceivableEvent event,
     Emitter<PersonState> emit,
   ) async {
-    await _handleDebtFetchingLogic(
-      id: event.person.id,
-      page: event.page,
-      replace: event.replace,
-      limit: event.limit,
-      getDebtIdsFromRepo: personRepo.getDebtsReceivable,
-      getCurrentPersonDebts: (person) => person.debtsReceivable,
-      copyWithPersonDebts: (person, newDebts) =>
-          person.copyWith(debtsReceivable: newDebts),
-      emit: emit,
-    );
+    emit(PersonLoading());
+    try {
+      await _handleDebtFetchingLogic(
+        id: event.person.id,
+        page: event.page,
+        replace: event.replace,
+        limit: event.limit,
+        getDebtIdsFromRepo: personRepo.getDebtsReceivable,
+        getCurrentPersonDebts: (person) => person.debtsReceivable,
+        copyWithPersonDebts: (person, newDebts) =>
+            person.copyWith(debtsReceivable: newDebts),
+        emit: emit,
+      );
+    } catch (e) {
+      emit(PersonError("$e\nFailed to fetch debts receivable for Person"));
+    }
   }
 
   // Helper method for fetching debts, now using Emitter
@@ -142,40 +187,44 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
           'Person with id $id is not loaded. Debts cannot be fetched.',
         ),
       );
-      return; // Return void as it's a Future<void>
+      return;
     }
 
-    List<int> debtIds = await getDebtIdsFromRepo(id, page, limit);
-    List<Debt> debts = (await Future.wait(
-      debtIds.map(debtRepo.getById),
-    )).nonNulls.toList(growable: false);
+    try {
+      List<int> debtIds = await getDebtIdsFromRepo(id, page, limit);
+      List<Debt> debts = (await Future.wait(
+        debtIds.map(debtRepo.getById),
+      )).nonNulls.toList(growable: false);
 
-    debts.forEach(cache.addWeak);
+      debts.forEach(cache.addWeak);
 
-    if (replace) {
-      final List<Debt> debtsToRemove = mergeOrDifferenceLists(
-        getCurrentPersonDebts(person),
-        debts,
-        true, // getDifference
-        growable: false,
-      );
-      debtsToRemove.forEach(cache.releaseStrong);
+      if (replace) {
+        final List<Debt> debtsToRemove = mergeOrDifferenceLists(
+          getCurrentPersonDebts(person),
+          debts,
+          true, // getDifference
+          growable: false,
+        );
+        debtsToRemove.forEach(cache.releaseStrong);
 
-      cache.update(copyWithPersonDebts(person, debts));
-    } else {
-      cache.update(
-        copyWithPersonDebts(
-          person,
-          mergeOrDifferenceLists(
-            getCurrentPersonDebts(person),
-            debts,
-            false, // getDifference
-            growable: false,
+        cache.update(copyWithPersonDebts(person, debts));
+      } else {
+        cache.update(
+          copyWithPersonDebts(
+            person,
+            mergeOrDifferenceLists(
+              getCurrentPersonDebts(person),
+              debts,
+              false, // getDifference
+              growable: false,
+            ),
           ),
-        ),
-      );
+        );
+      }
+      _emitLoadedPeople(emit); // Refresh the state after update
+    } catch (e) {
+      emit(PersonError("$e\nError during debt fetching logic for Person $id"));
     }
-    _emitLoadedPeople(emit); // Refresh the state after update
   }
 
   // This method is not part of the Bloc event stream directly.

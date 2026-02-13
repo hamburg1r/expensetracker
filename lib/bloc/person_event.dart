@@ -19,12 +19,12 @@ class CreatePersonEvent extends PersonEvent {
 }
 
 class RemovePersonEvent extends PersonEvent {
-  final int id;
+  final Person person;
 
-  const RemovePersonEvent(this.id);
+  const RemovePersonEvent(this.person);
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [person];
 }
 
 class UpdatePersonEvent extends PersonEvent {
@@ -78,4 +78,22 @@ class GetPersonDebtsReceivableEvent extends PersonEvent {
 
   @override
   List<Object> get props => [person, page, replace, limit];
+}
+
+class UnloadPersonEvent extends PersonEvent {
+  final Person person;
+
+  const UnloadPersonEvent(this.person);
+
+  @override
+  List<Object> get props => [person];
+}
+
+class UnloadPeopleEvent extends PersonEvent {
+  final List<Person> people;
+
+  const UnloadPeopleEvent(this.people);
+
+  @override
+  List<Object> get props => [people];
 }
