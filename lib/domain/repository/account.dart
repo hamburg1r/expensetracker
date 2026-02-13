@@ -1,13 +1,23 @@
 import 'package:expensetracker/domain/model/account.dart';
+import 'package:expensetracker/domain/model/expense.dart'; // Import Expense
 
 abstract class AccountRepo {
   Future<List<Account>> getAll();
 
-  Future<void> create(Account account);
+  Future<Account?> getById(int id);
+
+  Future<List<Account>> getPage(
+    int page, [
+    int limit = 20,
+  ]);
+
+  Future<int> create(Account account);
 
   Future<void> update(Account account);
 
-  Future<void> delete(int id);
+  Future<bool> delete(int id);
 
-  Future<int?> getById(int id);
+  Future<List<Expense>> getExpensesForAccount(int accountId);
+
+  Future<List<Expense>> getExpensesForAccountAndDate(int accountId, DateTime date);
 }

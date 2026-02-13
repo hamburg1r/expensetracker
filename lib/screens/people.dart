@@ -1,5 +1,6 @@
 import 'package:expensetracker/bloc/person_bloc.dart';
 import 'package:expensetracker/domain/cache.dart';
+import 'package:expensetracker/domain/event_bus/event_bus.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
 import 'package:expensetracker/domain/repository/person.dart';
@@ -7,13 +8,12 @@ import 'package:expensetracker/screens/form.dart';
 import 'package:expensetracker/widgets/person_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 class PeopleScreen extends StatelessWidget {
   final AppBar Function(Widget, [List<Widget>]) appBar;
-  final Cache cache;
   const PeopleScreen(
-    this.appBar,
-    this.cache, {
+    this.appBar, {
     super.key,
   });
 
@@ -22,9 +22,10 @@ class PeopleScreen extends StatelessWidget {
     return BlocProvider<PersonBloc>(
       create: (ctx) =>
           PersonBloc(
-            RepositoryProvider.of<PersonRepo>(context),
-            RepositoryProvider.of<DebtRepo>(context),
-            cache,
+            Provider.of<PersonRepo>(context),
+            Provider.of<DebtRepo>(context),
+            Provider.of<Cache>(context),
+            Provider.of<EventBus>(context),
           )..add(
             LoadAllPeopleEvent(),
           ), // Dispatch LoadAllPeopleEvent when bloc is created

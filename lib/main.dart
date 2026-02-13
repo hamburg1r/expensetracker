@@ -1,29 +1,26 @@
-import 'package:dynamic_color/dynamic_color.dart';
-import 'package:expensetracker/bloc/index_cubit.dart';
-import 'package:expensetracker/domain/cache.dart';
-import 'package:expensetracker/domain/repository/person.dart';
-import 'package:expensetracker/domain/repository/mock/person.dart';
-import 'package:expensetracker/screens/people.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 
-import 'screens/overview.dart';
+// Import the single aggregated provider list
+import 'package:expensetracker/di/app_providers.dart';
+
+// ... other necessary imports for widgets within MyApp and HomeScreen
+import 'package:expensetracker/bloc/index_cubit.dart';
+import 'package:expensetracker/screens/overview.dart';
+import 'package:expensetracker/screens/people.dart';
+import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final Cache cache = Cache();
   runApp(
-    App(
-      cache: cache,
-    ),
+    const App(),
   );
 }
 
 class App extends StatelessWidget {
-  final Cache cache;
   const App({
-    required this.cache,
     super.key,
   });
 
@@ -35,43 +32,26 @@ class App extends StatelessWidget {
         ColorScheme darkColorScheme;
 
         if (lightDynamic != null && darkDynamic != null) {
-          // On Android S+ devices, use the provided dynamic color scheme.
-          // (Recommended) Harmonize the dynamic color scheme' built-in semantic colors.
           lightColorScheme = lightDynamic.harmonized();
-          // (Optional) Customize the scheme as desired. For example, one might
-          // want to use a brand color to override the dynamic [ColorScheme.secondary].
-          // lightColorScheme = lightColorScheme.copyWith(secondary: _brandBlue);
-          // (Optional) If applicable, harmonize custom colors.
-          // lightCustomColors = lightCustomColors.harmonized(lightColorScheme);
-
-          // Repeat for the dark color scheme.
           darkColorScheme = darkDynamic.harmonized();
-          // darkColorScheme = darkColorScheme.copyWith(secondary: _brandBlue);
-          // darkCustomColors = darkCustomColors.harmonized(darkColorScheme);
-
-          // _isDemoUsingDynamicColors = true; // ignore, only for demo purposes
         } else {
-          // Otherwise, use fallback schemes.
           lightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blueAccent);
           darkColorScheme = ColorScheme.fromSeed(
             seedColor: Colors.blueAccent,
             brightness: Brightness.dark,
           );
         }
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: "NoteQuest",
-          theme: ThemeData(
-            // primaryColor: MaterialAccentColor(accentColor),
-            colorScheme: lightColorScheme,
-          ),
-          darkTheme: ThemeData(colorScheme: darkColorScheme),
-          themeMode: ThemeMode.system,
-          home: BlocProvider(
-            create: (BuildContext context) => IndexCubit(),
-            child: HomeScreen(
-              cache: cache,
+        return MultiProvider(
+          providers: appProviders, // <<< Use the aggregated list
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: "NoteQuest",
+            theme: ThemeData(
+              colorScheme: lightColorScheme,
             ),
+            darkTheme: ThemeData(colorScheme: darkColorScheme),
+            themeMode: ThemeMode.system,
+            home: const HomeScreen(),
           ),
         );
       },
@@ -80,9 +60,7 @@ class App extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  final Cache cache;
   const HomeScreen({
-    required this.cache,
     super.key,
   });
 
@@ -94,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _advancedDrawerController = AdvancedDrawerController();
 
   Widget _getScreen(int index) {
-    // TODO: possibly move this to a util function
     appBar(
       Widget title, [
       List<Widget> actions = const [],
@@ -127,7 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         child = PeopleScreen(
           appBar,
-          widget.cache,
         );
         break;
       default:
@@ -145,14 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
     }
 
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<PersonRepo>(
-          create: (context) => MockPersonRepo(),
-        ),
-      ],
-      child: child,
-    );
+    return child;
   }
 
   @override
@@ -162,13 +131,6 @@ class _HomeScreenState extends State<HomeScreen> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         color: Theme.of(context).focusColor,
-        // decoration: BoxDecoration(
-        //   gradient: LinearGradient(
-        //     begin: Alignment.topLeft,
-        //     end: Alignment.bottomRight,
-        //     colors: [Colors.blueGrey, Colors.blueGrey.withOpacity(0.2)],
-        //   ),
-        // ),
       ),
       controller: _advancedDrawerController,
       animationCurve: Curves.fastOutSlowIn,
@@ -179,14 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
       openRatio: 0.6,
       disabledGestures: false,
       childDecoration: const BoxDecoration(
-        // NOTICE: Uncomment if you want to add shadow behind the page.
-        // Keep in mind that it may cause animation jerks.
-        // boxShadow: <BoxShadow>[
-        //   BoxShadow(
-        //     color: Colors.black12,
-        //     blurRadius: 1.0,
-        //   ),
-        // ],
         borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
       drawer: SafeArea(

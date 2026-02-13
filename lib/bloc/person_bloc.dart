@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'package:expensetracker/domain/cache.dart';
+import 'package:expensetracker/domain/event_bus/domain_event.dart';
+import 'package:expensetracker/domain/event_bus/event_bus.dart';
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
@@ -14,8 +17,10 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   final PersonRepo personRepo;
   final DebtRepo debtRepo;
   final Cache cache;
+  final EventBus _eventBus;
+  late StreamSubscription _personDataChangedSubscription;
 
-  PersonBloc(this.personRepo, this.debtRepo, this.cache)
+  PersonBloc(this.personRepo, this.debtRepo, this.cache, this._eventBus)
     : super(PersonInitial()) {
     on<LoadAllPeopleEvent>(_onLoadAllPeople);
     on<CreatePersonEvent>(_onCreatePerson);
@@ -26,6 +31,18 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     on<GetPersonDebtsReceivableEvent>(_onGetDebtsReceivable);
     on<UnloadPersonEvent>(_onUnloadPerson);
     on<UnloadPeopleEvent>(_onUnloadPeople);
+
+    _personDataChangedSubscription = _eventBus
+        .on<PersonDataChangedEvent>()
+        .listen((event) {
+          add(UpdatePersonEvent(event.updatedPerson));
+        });
+  }
+
+  @override
+  Future<void> close() {
+    _personDataChangedSubscription.cancel();
+    return super.close();
   }
 
   void _emitLoadedPeople(Emitter<PersonState> emit) {
@@ -167,7 +184,6 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     }
   }
 
-  // Helper method for fetching debts, now using Emitter
   Future<void> _handleDebtFetchingLogic({
     required int id,
     required int page,
@@ -178,7 +194,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     required List<Debt> Function(Person person) getCurrentPersonDebts,
     required Person Function(Person person, List<Debt> newDebts)
     copyWithPersonDebts,
-    required Emitter<PersonState> emit, // Emitter is passed here
+    required Emitter<PersonState> emit,
   }) async {
     Person? person = cache.get<Person>(id);
     if (person == null) {
@@ -202,7 +218,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
         final List<Debt> debtsToRemove = mergeOrDifferenceLists(
           getCurrentPersonDebts(person),
           debts,
-          true, // getDifference
+          true,
           growable: false,
         );
         debtsToRemove.forEach(cache.releaseStrong);
@@ -215,27 +231,22 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
             mergeOrDifferenceLists(
               getCurrentPersonDebts(person),
               debts,
-              false, // getDifference
+              false,
               growable: false,
             ),
           ),
         );
       }
-      _emitLoadedPeople(emit); // Refresh the state after update
+      _emitLoadedPeople(emit);
     } catch (e) {
       emit(PersonError("$e\nError during debt fetching logic for Person $id"));
     }
   }
 
-  // This method is not part of the Bloc event stream directly.
-  // It's meant to be called externally to get loaded data.
-  // Its name should probably reflect it's not part of the Bloc's state changes.
   Future<List<Person>> getAllLoaded() async {
     return cache.getAll<Person>().values.toList(growable: false);
   }
 
-  // This method is not part of the Bloc event stream directly.
-  // It's meant to be called externally to get a single person.
   Future<Person?> getById(int id, [bool strong = true]) async {
     final person = cache.get<Person>(id);
     if (person != null) {
@@ -249,12 +260,8 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
         return null;
       }
       cache.addStrong(repoPerson);
-      // No emit here, as this is a read operation not changing the overall state of the Bloc.
-      // If a state change is needed, an event should be dispatched.
       return repoPerson;
     } catch (e) {
-      // Should not emit directly here in a normal read function.
-      // If this error affects the Bloc's overall state, an event should be dispatched.
       return null;
     }
   }
