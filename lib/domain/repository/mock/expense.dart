@@ -21,5 +21,8 @@ class MockExpenseRepo implements ExpenseRepo {
   Future<List<Expense>> getExpensesForAccount(int accountId) async => [];
 
   @override
-  Future<List<Expense>> getExpensesForAccountAndDate(int accountId, DateTime date) async => [];
+  Future<List<Expense>> getExpensesForAccountAndDate(
+    int accountId,
+    DateTime date,
+  ) async => [];
 }

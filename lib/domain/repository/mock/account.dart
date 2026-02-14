@@ -29,4 +29,15 @@ class MockAccountRepo implements AccountRepo {
     int accountId,
     DateTime date,
   ) async => [];
+
+  @override
+  Future<List<Expense>> getExpensesForAccountAndDateRange(
+      int accountId, DateTime startDate, DateTime endDate) async {
+    return []; // Mock implementation
+  }
+
+  @override
+  Future<double> getTotalBalance(int accountId) async {
+    return 0.0; // Mock implementation
+  }
 }

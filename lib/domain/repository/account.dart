@@ -20,4 +20,9 @@ abstract class AccountRepo {
   Future<List<Expense>> getExpensesForAccount(int accountId);
 
   Future<List<Expense>> getExpensesForAccountAndDate(int accountId, DateTime date);
+
+  Future<List<Expense>> getExpensesForAccountAndDateRange(
+      int accountId, DateTime startDate, DateTime endDate);
+
+  Future<double> getTotalBalance(int accountId);
 }
