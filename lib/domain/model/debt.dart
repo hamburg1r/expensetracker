@@ -8,7 +8,7 @@ part 'debt.freezed.dart';
 abstract class Debt with _$Debt {
   const factory Debt({
     @Default(0) int id,
-    Person? debtor,
+    required Person debtor,
     required Person creditor,
     required double amount,
     required DateTime date,
