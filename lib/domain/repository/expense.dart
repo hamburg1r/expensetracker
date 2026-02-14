@@ -10,6 +10,7 @@ abstract class ExpenseRepo {
   Future<bool> delete(int id);
 
   Future<Expense?> getById(int id);
-  Future<List<Expense>> getExpensesForAccount(int accountId);
-  Future<List<Expense>> getExpensesForAccountAndDate(int accountId, DateTime date);
+  Future<List<Expense>> getPage(int page, [int limit = 20]);
+  Future<List<Expense>> getExpensesForAccount(int accountId, int page, [int limit = 20]);
+  Future<List<Expense>> getExpensesForAccountAndDate(int accountId, DateTime date, int page, [int limit = 20]);
 }

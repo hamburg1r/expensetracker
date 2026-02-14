@@ -37,4 +37,14 @@ class MockUnaccountedMoneyRepo implements UnaccountedMoneyRepo {
     _entries.removeWhere((entry) => entry.id == id);
     return Future.value(_entries.length < initialLength);
   }
+
+  @override
+  Future<List<UnaccountedMoney>> getPage(int page, [int limit = 20]) async {
+    final startIndex = page * limit;
+    if (startIndex >= _entries.length) {
+      return Future.value([]);
+    }
+    final endIndex = (startIndex + limit).clamp(0, _entries.length);
+    return Future.value(_entries.sublist(startIndex, endIndex));
+  }
 }

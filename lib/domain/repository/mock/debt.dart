@@ -16,4 +16,13 @@ class MockDebtRepo implements DebtRepo {
 
   @override
   Future<void> update(Debt debt) async {}
+
+  @override
+  Future<List<Debt>> getDebtsByCreditorId(int creditorId, int page, [int limit = 20]) async => [];
+
+  @override
+  Future<List<Debt>> getDebtsByDebtorId(int debtorId, int page, [int limit = 20]) async => [];
+
+  @override
+  Future<List<Debt>> getPage(int page, [int limit = 20]) async => [];
 }

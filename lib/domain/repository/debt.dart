@@ -7,7 +7,11 @@ abstract class DebtRepo {
 
   Future<void> update(Debt expense);
 
+  // TODO: needs usecase for deletion
   Future<bool> delete(int id);
 
   Future<Debt?> getById(int id);
+  Future<List<Debt>> getPage(int page, [int limit = 20]);
+  Future<List<Debt>> getDebtsByCreditorId(int creditorId, int page, [int limit = 20]);
+  Future<List<Debt>> getDebtsByDebtorId(int debtorId, int page, [int limit = 20]);
 }

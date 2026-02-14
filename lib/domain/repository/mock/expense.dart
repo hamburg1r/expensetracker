@@ -18,11 +18,16 @@ class MockExpenseRepo implements ExpenseRepo {
   Future<void> update(Expense expense) async {}
 
   @override
-  Future<List<Expense>> getExpensesForAccount(int accountId) async => [];
+  Future<List<Expense>> getExpensesForAccount(int accountId, int page, [int limit = 20]) async => [];
 
   @override
   Future<List<Expense>> getExpensesForAccountAndDate(
     int accountId,
     DateTime date,
-  ) async => [];
+    int page, [
+    int limit = 20,
+  ]) async => [];
+
+  @override
+  Future<List<Expense>> getPage(int page, [int limit = 20]) async => [];
 }

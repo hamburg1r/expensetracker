@@ -10,4 +10,5 @@ abstract class BudgetRepo {
   Future<bool> delte(int id);
 
   Future<Budget?> getById(int id);
+  Future<List<Budget>> getPage(int page, [int limit = 20]);
 }

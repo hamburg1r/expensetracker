@@ -10,4 +10,5 @@ abstract class CategoryRepo {
   Future<bool> delete(int id);
 
   Future<Category?> getById(int id);
+  Future<List<Category>> getPage(int page, [int limit = 20]);
 }
