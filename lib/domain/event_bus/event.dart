@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:expensetracker/domain/event_bus/domain_event.dart';
+
+abstract class DomainEvent {}
 
 class EventBus {
   final _controller = StreamController<DomainEvent>.broadcast();
