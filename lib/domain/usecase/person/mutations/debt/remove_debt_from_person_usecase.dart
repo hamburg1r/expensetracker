@@ -1,8 +1,8 @@
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/person.dart';
-import 'package:expensetracker/domain/event_bus/domain_event.dart';
-import 'package:expensetracker/domain/event_bus/event_bus.dart';
+import 'package:expensetracker/domain/event_bus/event.dart';
+import 'package:expensetracker/domain/event_bus/events/person_event.dart';
 
 class RemoveDebtFromPersonUseCase {
   final PersonRepo _personRepo;
@@ -29,7 +29,6 @@ class RemoveDebtFromPersonUseCase {
       updatedPerson = person.copyWith(debtsReceivable: newDebtsReceivable);
     }
 
-    await _personRepo.update(updatedPerson);
-    _eventBus.fire(PersonDataChangedEvent(updatedPerson));
+    _eventBus.fire(PersonUpdatedEvent(updatedPerson));
   }
 }

@@ -1,8 +1,8 @@
 import 'package:expensetracker/domain/repository/unaccountedmoney.dart';
 import 'package:expensetracker/domain/repository/account.dart'; // Import AccountRepo
 import 'package:expensetracker/domain/model/unaccountedmoney.dart'; // Import UnaccountedMoney model
-import 'package:expensetracker/domain/event_bus/event_bus.dart';
-import 'package:expensetracker/domain/event_bus/domain_event.dart'; // Import AccountDataChangedEvent
+import 'package:expensetracker/domain/event_bus/event.dart';
+import 'package:expensetracker/domain/event_bus/events/account_event.dart';
 
 class DeleteUnaccountedMoneyUseCase {
   final UnaccountedMoneyRepo _unaccountedMoneyRepo;

@@ -1,14 +1,14 @@
 import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/person.dart';
-import 'package:expensetracker/domain/event_bus/domain_event.dart';
-import 'package:expensetracker/domain/event_bus/event_bus.dart';
+import 'package:expensetracker/domain/event_bus/event.dart';
+import 'package:expensetracker/domain/event_bus/events/person_event.dart';
 
-class RemoveTransactionFromPersonUseCase {
+class RemoveParticipationFromPersonUseCase {
   final PersonRepo _personRepo;
   final EventBus _eventBus;
 
-  RemoveTransactionFromPersonUseCase(this._personRepo, this._eventBus);
+  RemoveParticipationFromPersonUseCase(this._personRepo, this._eventBus);
 
   Future<void> call(int personId, int expenseId) async {
     Person? person = await _personRepo.getById(personId);
@@ -16,12 +16,11 @@ class RemoveTransactionFromPersonUseCase {
       throw Exception('Person with ID $personId not found.');
     }
 
-    final List<Expense> newTransactions = person.transactions
+    final List<Expense> newParticipations = person.participations
         .where((e) => e.id != expenseId)
         .toList();
-    final updatedPerson = person.copyWith(transactions: newTransactions);
+    final updatedPerson = person.copyWith(participations: newParticipations);
 
-    await _personRepo.update(updatedPerson);
-    _eventBus.fire(PersonDataChangedEvent(updatedPerson));
+    _eventBus.fire(PersonUpdatedEvent(updatedPerson));
   }
 }

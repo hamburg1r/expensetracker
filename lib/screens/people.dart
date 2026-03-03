@@ -1,9 +1,18 @@
 import 'package:expensetracker/bloc/person_bloc.dart';
 import 'package:expensetracker/domain/cache.dart';
-import 'package:expensetracker/domain/event_bus/event_bus.dart';
+import 'package:expensetracker/domain/event_bus/event.dart';
 import 'package:expensetracker/domain/model/person.dart';
-import 'package:expensetracker/domain/repository/debt.dart';
-import 'package:expensetracker/domain/repository/person.dart';
+import 'package:expensetracker/domain/usecase/person/getters/debt/get_person_debts_owed_usecase.dart';
+import 'package:expensetracker/domain/usecase/person/getters/debt/get_person_debts_receivable_usecase.dart';
+// Removed unused PersonRepo and DebtRepo imports
+import 'package:expensetracker/domain/usecase/person/mutations/delete_person_usecase.dart'; // Path changed
+
+// New use cases for PersonBloc
+import 'package:expensetracker/domain/usecase/person/getters/get_all_people_usecase.dart';
+import 'package:expensetracker/domain/usecase/person/mutations/create_person_usecase.dart';
+import 'package:expensetracker/domain/usecase/person/mutations/update_person_usecase.dart';
+import 'package:expensetracker/domain/usecase/person/getters/get_page_people_usecase.dart';
+import 'package:expensetracker/domain/usecase/person/getters/get_person_by_id_usecase.dart';
 import 'package:expensetracker/screens/form.dart';
 import 'package:expensetracker/widgets/person_tile.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +31,14 @@ class PeopleScreen extends StatelessWidget {
     return BlocProvider<PersonBloc>(
       create: (ctx) =>
           PersonBloc(
-            Provider.of<PersonRepo>(context),
-            Provider.of<DebtRepo>(context),
+            Provider.of<GetAllPeopleUseCase>(context),
+            Provider.of<CreatePersonUseCase>(context),
+            Provider.of<UpdatePersonUseCase>(context),
+            Provider.of<DeletePersonUseCase>(context),
+            Provider.of<GetPagePeopleUseCase>(context),
+            Provider.of<GetPersonByIdUseCase>(context),
+            Provider.of<GetPersonDebtsOwedUseCase>(context),
+            Provider.of<GetPersonDebtsReceivableUseCase>(context),
             Provider.of<Cache>(context),
             Provider.of<EventBus>(context),
           )..add(

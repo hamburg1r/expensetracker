@@ -18,6 +18,15 @@ class CreatePersonEvent extends PersonEvent {
   List<Object> get props => [person];
 }
 
+class DeletePersonEvent extends PersonEvent {
+  final Person person;
+
+  const DeletePersonEvent(this.person);
+
+  @override
+  List<Object> get props => [person];
+}
+
 class RemovePersonEvent extends PersonEvent {
   final Person person;
 
@@ -96,4 +105,13 @@ class UnloadPeopleEvent extends PersonEvent {
 
   @override
   List<Object> get props => [people];
+}
+
+class PersonUpdatedEvent extends PersonEvent {
+  final Person person;
+
+  const PersonUpdatedEvent(this.person);
+
+  @override
+  List<Object> get props => [person];
 }
