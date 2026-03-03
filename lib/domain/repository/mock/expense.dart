@@ -30,4 +30,10 @@ class MockExpenseRepo implements ExpenseRepo {
 
   @override
   Future<List<Expense>> getPage(int page, [int limit = 20]) async => [];
+
+  @override
+  Future<List<Expense>> getExpensesByPayerId(int personId, int page, [int limit = 20]) async => [];
+
+  @override
+  Future<List<Expense>> getParticipatedExpensesByPersonId(int personId, int page, [int limit = 20]) async => [];
 }

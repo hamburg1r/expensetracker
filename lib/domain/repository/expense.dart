@@ -13,4 +13,6 @@ abstract class ExpenseRepo {
   Future<List<Expense>> getPage(int page, [int limit = 20]);
   Future<List<Expense>> getExpensesForAccount(int accountId, int page, [int limit = 20]);
   Future<List<Expense>> getExpensesForAccountAndDate(int accountId, DateTime date, int page, [int limit = 20]);
+  Future<List<Expense>> getExpensesByPayerId(int personId, int page, [int limit = 20]);
+  Future<List<Expense>> getParticipatedExpensesByPersonId(int personId, int page, [int limit = 20]);
 }
