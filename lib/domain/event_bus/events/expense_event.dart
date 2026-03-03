@@ -1,9 +1,9 @@
 import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 
-class ChangeExpenseDataEvent extends DomainEvent {
+class ExpenseChangedEvent extends DomainEvent {
   final Expense updatedExpense;
-  ChangeExpenseDataEvent(this.updatedExpense);
+  ExpenseChangedEvent(this.updatedExpense);
 }
 
 class ExpenseRemovedEvent extends DomainEvent {
