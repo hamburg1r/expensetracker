@@ -1,11 +1,12 @@
 import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:expensetracker/domain/model/base_entity.dart'; // Add this import
 
 part 'debt.freezed.dart';
 
 @Freezed()
-abstract class Debt with _$Debt {
+abstract class Debt with _$Debt implements BaseEntity { // Corrected order
   const factory Debt({
     @Default(0) int id,
     required Person debtor,

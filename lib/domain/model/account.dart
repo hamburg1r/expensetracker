@@ -2,11 +2,12 @@ import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/model/unaccountedmoney.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:expensetracker/domain/model/base_entity.dart'; // Add this import
 
 part 'account.freezed.dart';
 
 @Freezed()
-abstract class Account with _$Account {
+abstract class Account with _$Account implements BaseEntity { // Corrected order
   factory Account({
     @Default(0) int id,
     required Person owner,

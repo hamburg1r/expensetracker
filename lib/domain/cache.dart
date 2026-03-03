@@ -1,20 +1,22 @@
-class Cache {
-  final Map<Type, Map<int, CacheItem<dynamic>>> _caches = {};
-  final Map<Type, void Function(dynamic, Cache)> _garbageCollectors = {};
+import 'package:expensetracker/domain/model/base_entity.dart';
 
-  void registerGarbageCollector<T>(void Function(T, Cache) collector) {
-    _garbageCollectors[T] = (dynamic item, Cache cache) =>
+class Cache {
+  final Map<Type, Map<int, CacheItem<BaseEntity>>> _caches = {};
+  final Map<Type, void Function(BaseEntity, Cache)> _garbageCollectors = {};
+
+  void registerGarbageCollector<T extends BaseEntity>(void Function(T, Cache) collector) {
+    _garbageCollectors[T] = (BaseEntity item, Cache cache) =>
         collector(item as T, cache);
   }
 
-  Map<int, CacheItem<T>> _getCacheFor<T>() {
-    return _caches.putIfAbsent(T, () => <int, CacheItem<T>>{})
+  Map<int, CacheItem<T>> _getCacheFor<T extends BaseEntity>() {
+    return _caches.putIfAbsent(T, () => <int, CacheItem<BaseEntity>>{})
         as Map<int, CacheItem<T>>;
   }
 
-  void addStrong<T>(T item) {
+  void addStrong<T extends BaseEntity>(T item) {
     final cache = _getCacheFor<T>();
-    final int id = (item as dynamic).id;
+    final int id = item.id;
 
     if (cache.containsKey(id)) {
       cache[id]!.increment();
@@ -23,9 +25,9 @@ class Cache {
     }
   }
 
-  void addWeak<T>(T item) {
+  void addWeak<T extends BaseEntity>(T item) {
     final cache = _getCacheFor<T>();
-    final int id = (item as dynamic).id;
+    final int id = item.id;
 
     if (!cache.containsKey(id)) {
       cache[id] = CacheItem(
@@ -35,22 +37,22 @@ class Cache {
     }
   }
 
-  int references<T>(T item) {
+  int references<T extends BaseEntity>(T item) {
     final cache = _getCacheFor<T>();
-    final int id = (item as dynamic).id;
+    final int id = item.id;
     return cache[id]?.references ?? -1;
   }
 
-  void update<T>(T item) {
+  void update<T extends BaseEntity>(T item) {
     final cache = _getCacheFor<T>();
-    final int id = (item as dynamic).id;
+    final int id = item.id;
 
     if (cache.containsKey(id)) {
       cache[id]!.value = item;
     }
   }
 
-  void remove<T>(int id) {
+  void remove<T extends BaseEntity>(int id) {
     final cache = _getCacheFor<T>();
     if (cache.containsKey(id)) {
       final removedItem = cache.remove(id);
@@ -61,9 +63,9 @@ class Cache {
     }
   }
 
-  void releaseStrong<T>(T item) {
+  void releaseStrong<T extends BaseEntity>(T item) {
     final cache = _getCacheFor<T>();
-    final int id = (item as dynamic).id;
+    final int id = item.id;
 
     if (!cache.containsKey(id)) return;
 
@@ -78,16 +80,16 @@ class Cache {
     }
   }
 
-  T? get<T>(int id) {
+  T? get<T extends BaseEntity>(int id) {
     final cache = _getCacheFor<T>();
     return cache[id]?.value;
   }
 
-  Map<int, T> getAll<T>() {
+  Map<int, T> getAll<T extends BaseEntity>() {
     return _getCacheFor<T>().map((key, value) => MapEntry(key, value.value));
   }
 
-  void clear<T>() {
+  void clear<T extends BaseEntity>() {
     final cache = _getCacheFor<T>();
     cache.clear();
   }
@@ -97,7 +99,7 @@ class Cache {
   }
 }
 
-class CacheItem<T> {
+class CacheItem<T extends BaseEntity> {
   T value;
   int references;
 
