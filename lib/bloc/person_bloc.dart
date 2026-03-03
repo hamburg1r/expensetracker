@@ -27,7 +27,6 @@ part 'person_state.dart';
 
 // TODO: check for improvements for PersonLoading event, i.e. where it can be added etc.
 class PersonBloc extends Bloc<PersonEvent, PersonState> {
-  // Use Cases
   final GetAllPeopleUseCase _getAllPeopleUseCase;
   final CreatePersonUseCase _createPersonUseCase;
   final UpdatePersonUseCase _updatePersonUseCase;
@@ -37,15 +36,16 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   final GetPersonDebtsOwedUseCase _getPersonDebtsOwedUseCase;
   final GetPersonDebtsReceivableUseCase _getPersonDebtsReceivableUseCase;
 
-  // Other dependencies
   final Cache cache;
   final EventBus _eventBus;
+
   late StreamSubscription _personUpdatedSubscription;
   late StreamSubscription _personAddedSubscription;
   late StreamSubscription _updatePersonSubscription;
-  late StreamSubscription _personDeletedSubscription; // New subscription
-  late StreamSubscription _personRemovedSubscription; // New subscription
-  late StreamSubscription _personUnloadedSubscription; // New subscription
+  late StreamSubscription _deletePersonSubscription;
+  late StreamSubscription _removePersonSubscription;
+  late StreamSubscription _personDeletedSubscription;
+  late StreamSubscription _unloadPersonSubscription;
 
   /// Constructs a [PersonBloc] instance.
   ///
@@ -87,10 +87,11 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
 
     on<CreatePersonEvent>(_onCreatePerson);
     on<UpdatePersonEvent>(_onUpdatePerson);
-    on<DeletePersonEvent>(_onDeletePerson); // Changed from RemovePersonEvent
+    on<DeletePersonEvent>(_onDeletePerson);
 
     on<PersonUpdatedEvent>(_onPersonUpdated);
-    on<RemovePersonEvent>(_onRemovePerson); // New handler for cache removal
+    on<RemovePersonEvent>(_onRemovePerson);
+    on<PersonDeletedEvent>(_onPersonDeleted);
 
     on<UnloadPersonEvent>(_onUnloadPerson);
     on<UnloadPeopleEvent>(_onUnloadPeople);
@@ -120,27 +121,28 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
           add(UpdatePersonEvent(event.person));
         });
 
-    // New subscription for domain_events.DeletePersonEvent
-    _personDeletedSubscription = _eventBus
+    _deletePersonSubscription = _eventBus
         .on<domain_events.DeletePersonEvent>()
         .listen((event) {
           add(DeletePersonEvent(event.person));
         });
 
-    // New subscription for domain_events.RemovePersonEvent
-    _personRemovedSubscription = _eventBus
+    _removePersonSubscription = _eventBus
         .on<domain_events.RemovePersonEvent>()
         .listen((event) {
           add(RemovePersonEvent(event.person));
         });
 
-    // New subscription for domain_events.UnloadPersonEvent
-    _personUnloadedSubscription = _eventBus
-        .on<
-          domain_events.UnloadPersonEvent
-        >() // TODO: This might not be needed in practice
+    _personDeletedSubscription = _eventBus
+        .on<domain_events.PersonDeletedEvent>()
         .listen((event) {
-          // TODO: remove check from here
+          add(PersonDeletedEvent(event.personId));
+        });
+
+    // TODO: This might not be needed in practice
+    _unloadPersonSubscription = _eventBus
+        .on<domain_events.UnloadPersonEvent>()
+        .listen((event) {
           final person = cache.get<Person>(event.personId);
           if (person != null) {
             add(UnloadPersonEvent(person));
@@ -162,9 +164,10 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     _personUpdatedSubscription.cancel();
     _personAddedSubscription.cancel();
     _updatePersonSubscription.cancel();
-    _personDeletedSubscription.cancel(); // Cancel new subscription
-    _personRemovedSubscription.cancel(); // Cancel new subscription
-    _personUnloadedSubscription.cancel(); // Cancel new subscription
+    _deletePersonSubscription.cancel(); // Cancel new subscription
+    _removePersonSubscription.cancel(); // Cancel new subscription
+    _personDeletedSubscription.cancel();
+    _unloadPersonSubscription.cancel(); // Cancel new subscription
     return super.close();
   }
 
@@ -194,7 +197,6 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     PersonUpdatedEvent event,
     Emitter<PersonState> emit,
   ) async {
-    // TODO: handle null
     cache.update(event.person);
     _emitLoadedPeople(emit);
   }
@@ -390,6 +392,33 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     Emitter<PersonState> emit,
   ) async {
     cache.remove<Person>(event.person.id);
+    _emitLoadedPeople(emit);
+  }
+
+  /// Handles the `PersonDeletedEvent`.
+  ///
+  /// This method is a notification handler responsible for updating the BLoC's
+  /// internal cache and UI state after a [Person] has been successfully
+  /// deleted from the persistent data store (or is intended to be removed
+  /// from the cache for other reasons).
+  ///
+  /// **Workflow:**
+  /// 1. Calls `cache.remove<Person>(event.personId)` to explicitly remove the
+  ///    specified person from the BLoC's internal cache.
+  /// 2. Calls `_emitLoadedPeople(emit)` to emit a `PersonLoaded` state,
+  ///    reflecting the updated list of persons (without the removed one) to the UI.
+  ///
+  /// **Purpose:** To keep the BLoC's local cache and the UI synchronized with
+  /// the data layer's state regarding person deletions, ensuring that the
+  /// removed person is no longer displayed.
+  ///
+  /// [event]: The `PersonDeletedEvent` containing the [Person] object to be removed from the cache.
+  /// [emit]: The `Emitter<PersonState>` used to emit the `PersonLoaded` state.
+  Future<void> _onPersonDeleted(
+    PersonDeletedEvent event,
+    Emitter<PersonState> emit,
+  ) async {
+    cache.remove<Person>(event.personId);
     _emitLoadedPeople(emit);
   }
 

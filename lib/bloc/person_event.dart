@@ -27,6 +27,15 @@ class DeletePersonEvent extends PersonEvent {
   List<Object> get props => [person];
 }
 
+class PersonDeletedEvent extends PersonEvent {
+  final int personId;
+
+  const PersonDeletedEvent(this.personId);
+
+  @override
+  List<Object> get props => [personId];
+}
+
 class RemovePersonEvent extends PersonEvent {
   final Person person;
 

@@ -34,7 +34,7 @@ class DeletePersonUseCase {
     final deletedPerson = await _personRepo.delete(id);
 
     if (deletedPerson) {
-      _eventBus.fire(UnloadPersonEvent(id));
+      _eventBus.fire(PersonDeletedEvent(id));
       // _eventBus.fire(PersonDataRemovedEvent(personToDelete));
     }
   }

@@ -6,12 +6,12 @@ class PersonAddedEvent extends DomainEvent {
   PersonAddedEvent(this.person);
 }
 
-class UpdatePersonEvent extends DomainEvent { // Command for Event Bus
+class UpdatePersonEvent extends DomainEvent {
   final Person person;
   UpdatePersonEvent(this.person);
 }
 
-class PersonUpdatedEvent extends DomainEvent { // Notification for Event Bus
+class PersonUpdatedEvent extends DomainEvent {
   final Person person;
   PersonUpdatedEvent(this.person);
 }
@@ -21,12 +21,17 @@ class UnloadPersonEvent extends DomainEvent {
   UnloadPersonEvent(this.personId);
 }
 
-class DeletePersonEvent extends DomainEvent { // Command for Event Bus
+class DeletePersonEvent extends DomainEvent {
   final Person person;
   DeletePersonEvent(this.person);
 }
 
-class RemovePersonEvent extends DomainEvent { // Notification for Event Bus
+class PersonDeletedEvent extends DomainEvent {
+  final int personId;
+  PersonDeletedEvent(this.personId);
+}
+
+class RemovePersonEvent extends DomainEvent {
   final Person person;
   RemovePersonEvent(this.person);
 }
