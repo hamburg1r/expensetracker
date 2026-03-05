@@ -1,3 +1,5 @@
+import 'package:expensetracker/domain/model/debt.dart';
+import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 
 abstract class PersonRepo {
@@ -15,6 +17,14 @@ abstract class PersonRepo {
   Future<void> update(Person person);
 
   Future<bool> delete(int id);
+
+  Future<void> addDebtOwedToPerson(int personId, Debt debt);
+
+  Future<void> addDebtReceivableToPerson(int personId, Debt debt);
+
+  Future<void> addTransactionToPerson(int personId, Expense expense);
+
+  Future<void> addParticipationToPerson(int personId, Expense expense);
 
   Future<List<int>> getDebtsOwed(
     int id,
