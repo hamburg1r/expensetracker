@@ -56,7 +56,7 @@ class MockPersonRepo implements PersonRepo {
   }
 
   @override
-  Future<void> addDebtOwedToPerson(int personId, Debt debt) async {
+  Future<void> addDebtOwed(int personId, Debt debt) async {
     final index = _people.indexWhere((p) => p.id == personId);
     if (index != -1) {
       final person = _people[index];
@@ -66,7 +66,7 @@ class MockPersonRepo implements PersonRepo {
   }
 
   @override
-  Future<void> addDebtReceivableToPerson(int personId, Debt debt) async {
+  Future<void> addDebtReceivable(int personId, Debt debt) async {
     final index = _people.indexWhere((p) => p.id == personId);
     if (index != -1) {
       final person = _people[index];
@@ -78,7 +78,7 @@ class MockPersonRepo implements PersonRepo {
   }
 
   @override
-  Future<void> addTransactionToPerson(int personId, Expense expense) async {
+  Future<void> addTransaction(int personId, Expense expense) async {
     final index = _people.indexWhere((p) => p.id == personId);
     if (index != -1) {
       final person = _people[index];
@@ -90,13 +90,68 @@ class MockPersonRepo implements PersonRepo {
   }
 
   @override
-  Future<void> addParticipationToPerson(int personId, Expense expense) async {
+  Future<void> addParticipation(int personId, Expense expense) async {
     final index = _people.indexWhere((p) => p.id == personId);
     if (index != -1) {
       final person = _people[index];
       _people[index] = person.copyWith(
         participations: [...person.participations, expense],
       );
+    }
+    return Future.value();
+  }
+
+  @override
+  Future<void> removeDebtOwed(int personId, int debtId) async {
+    final index = _people.indexWhere((p) => p.id == personId);
+    if (index != -1) {
+      final person = _people[index];
+      final updatedDebtsOwed = person.debtsOwed
+          .where((d) => d.id != debtId)
+          .toList();
+      _people[index] = person.copyWith(debtsOwed: updatedDebtsOwed);
+    }
+    return Future.value();
+  }
+
+  @override
+  Future<void> removeDebtReceivable(int personId, int debtId) async {
+    final index = _people.indexWhere((p) => p.id == personId);
+    if (index != -1) {
+      final person = _people[index];
+      final updatedDebtsReceivable = person.debtsReceivable
+          .where((d) => d.id != debtId)
+          .toList();
+      _people[index] = person.copyWith(debtsReceivable: updatedDebtsReceivable);
+    }
+    return Future.value();
+  }
+
+  @override
+  Future<void> removeTransaction(int personId, int expenseId) async {
+    final index = _people.indexWhere((p) => p.id == personId);
+    if (index != -1) {
+      final person = _people[index];
+      final updatedTransactions = person.transactions
+          .where((e) => e.id != expenseId)
+          .toList();
+      _people[index] = person.copyWith(transactions: updatedTransactions);
+    }
+    return Future.value();
+  }
+
+  @override
+  Future<void> removeParticipation(
+    int personId,
+    int expenseId,
+  ) async {
+    final index = _people.indexWhere((p) => p.id == personId);
+    if (index != -1) {
+      final person = _people[index];
+      final updatedParticipations = person.participations
+          .where((e) => e.id != expenseId)
+          .toList();
+      _people[index] = person.copyWith(participations: updatedParticipations);
     }
     return Future.value();
   }

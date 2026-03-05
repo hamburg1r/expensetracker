@@ -1,3 +1,4 @@
+/*
 import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/person.dart';
@@ -10,17 +11,15 @@ class RemoveParticipationFromPersonUseCase {
 
   RemoveParticipationFromPersonUseCase(this._personRepo, this._eventBus);
 
-  Future<void> call(int personId, int expenseId) async {
-    Person? person = await _personRepo.getById(personId);
-    if (person == null) {
-      throw Exception('Person with ID $personId not found.');
-    }
-
+  Future<void> call(Person person, int expenseId) async {
     final List<Expense> newParticipations = person.participations
         .where((e) => e.id != expenseId)
         .toList();
     final updatedPerson = person.copyWith(participations: newParticipations);
 
+    await _personRepo.update(updatedPerson);
+
     _eventBus.fire(PersonUpdatedEvent(updatedPerson));
   }
 }
+*/

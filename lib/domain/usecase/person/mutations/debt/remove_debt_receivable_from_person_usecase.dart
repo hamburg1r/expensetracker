@@ -1,3 +1,4 @@
+/*
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/person.dart';
@@ -10,17 +11,15 @@ class RemoveDebtReceivableFromPersonUseCase {
 
   RemoveDebtReceivableFromPersonUseCase(this._personRepo, this._eventBus);
 
-  Future<void> call(int personId, int debtId) async {
-    Person? person = await _personRepo.getById(personId);
-    if (person == null) {
-      throw Exception('Person with ID $personId not found.');
-    }
-
+  Future<void> call(Person person, int debtId) async {
     final List<Debt> newDebtsReceivable = person.debtsReceivable
         .where((d) => d.id != debtId)
         .toList();
     final updatedPerson = person.copyWith(debtsReceivable: newDebtsReceivable);
 
+    await _personRepo.update(updatedPerson);
+
     _eventBus.fire(PersonUpdatedEvent(updatedPerson));
   }
 }
+*/

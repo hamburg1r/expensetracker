@@ -11,6 +11,6 @@ class CreatePersonUseCase {
 
   Future<void> call(Person person) async {
     final int id = await _personRepo.create(person);
-    _eventBus.fire(PersonAddedEvent(person.copyWith(id: id)));
+    _eventBus.fire(PersonCreatedEvent(person.copyWith(id: id)));
   }
 }

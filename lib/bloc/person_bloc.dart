@@ -105,7 +105,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
         });
 
     _personAddedSubscription = _eventBus
-        .on<domain_events.PersonAddedEvent>()
+        .on<domain_events.PersonCreatedEvent>()
         .listen((event) {
           // Not adding anything as load is supposed to be called when needed
           // not when new item is added. Maybe it can reload the current page

@@ -1,3 +1,4 @@
+/*
 import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/person.dart';
@@ -10,16 +11,14 @@ class AddTransactionToPersonUseCase {
 
   AddTransactionToPersonUseCase(this._personRepo, this._eventBus);
 
-  Future<void> call(int personId, Expense expense) async {
-    Person? person = await _personRepo.getById(personId);
-    if (person == null) {
-      throw Exception('Person with ID $personId not found.');
-    }
-
+  Future<void> call(Person person, Expense expense) async {
     final List<Expense> newTransactions = List.from(person.transactions)
       ..add(expense);
     final updatedPerson = person.copyWith(transactions: newTransactions);
 
+    await _personRepo.update(updatedPerson);
+
     _eventBus.fire(PersonUpdatedEvent(updatedPerson));
   }
 }
+*/

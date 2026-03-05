@@ -18,13 +18,21 @@ abstract class PersonRepo {
 
   Future<bool> delete(int id);
 
-  Future<void> addDebtOwedToPerson(int personId, Debt debt);
+  Future<void> addDebtOwed(int personId, Debt debt);
 
-  Future<void> addDebtReceivableToPerson(int personId, Debt debt);
+  Future<void> addDebtReceivable(int personId, Debt debt);
 
-  Future<void> addTransactionToPerson(int personId, Expense expense);
+  Future<void> addTransaction(int personId, Expense expense);
 
-  Future<void> addParticipationToPerson(int personId, Expense expense);
+  Future<void> addParticipation(int personId, Expense expense);
+
+  Future<void> removeDebtOwed(int personId, int debtId);
+
+  Future<void> removeDebtReceivable(int personId, int debtId);
+
+  Future<void> removeTransaction(int personId, int expenseId);
+
+  Future<void> removeParticipation(int personId, int expenseId);
 
   Future<List<int>> getDebtsOwed(
     int id,

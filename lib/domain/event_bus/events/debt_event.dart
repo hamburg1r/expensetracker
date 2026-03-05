@@ -1,17 +1,17 @@
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 
-class DebtChangedEvent extends DomainEvent {
-  final Debt updatedDebt;
-  DebtChangedEvent(this.updatedDebt);
-}
-
-class DebtRemovedEvent extends DomainEvent {
-  final Debt removedDebt;
-  DebtRemovedEvent(this.removedDebt);
-}
-
-class RemoveDebtEvent extends DomainEvent {
+class DebtCreatedEvent extends DomainEvent {
   final Debt debt;
-  RemoveDebtEvent(this.debt);
+  DebtCreatedEvent(this.debt);
+}
+
+class DebtUpdatedEvent extends DomainEvent {
+  final Debt debt;
+  DebtUpdatedEvent(this.debt);
+}
+
+class DebtDeletedEvent extends DomainEvent {
+  final int debtId;
+  DebtDeletedEvent(this.debtId);
 }

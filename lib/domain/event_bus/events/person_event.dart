@@ -1,9 +1,9 @@
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 
-class PersonAddedEvent extends DomainEvent {
+class PersonCreatedEvent extends DomainEvent {
   final Person person;
-  PersonAddedEvent(this.person);
+  PersonCreatedEvent(this.person);
 }
 
 class UpdatePersonEvent extends DomainEvent {

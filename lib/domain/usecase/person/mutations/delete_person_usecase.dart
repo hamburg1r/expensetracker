@@ -35,7 +35,6 @@ class DeletePersonUseCase {
 
     if (deletedPerson) {
       _eventBus.fire(PersonDeletedEvent(id));
-      // _eventBus.fire(PersonDataRemovedEvent(personToDelete));
     }
   }
 
@@ -62,7 +61,7 @@ class DeletePersonUseCase {
 
       for (final debt in allDebts) {
         await _debtRepo.delete(debt.id);
-        _eventBus.fire(DebtRemovedEvent(debt));
+        _eventBus.fire(DebtDeletedEvent(debt.id));
       }
       page++;
     }
@@ -81,7 +80,7 @@ class DeletePersonUseCase {
       }
       for (final expense in expenses) {
         await _expenseRepo.delete(expense.id);
-        _eventBus.fire(ExpenseRemovedEvent(expense));
+        _eventBus.fire(ExpenseDeletedEvent(expense.id));
       }
       page++;
     }

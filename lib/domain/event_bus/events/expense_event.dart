@@ -6,9 +6,9 @@ class ExpenseChangedEvent extends DomainEvent {
   ExpenseChangedEvent(this.updatedExpense);
 }
 
-class ExpenseRemovedEvent extends DomainEvent {
-  final Expense removedExpense;
-  ExpenseRemovedEvent(this.removedExpense);
+class ExpenseDeletedEvent extends DomainEvent {
+  final int expenseId;
+  ExpenseDeletedEvent(this.expenseId);
 }
 
 class RemoveExpenseEvent extends DomainEvent {

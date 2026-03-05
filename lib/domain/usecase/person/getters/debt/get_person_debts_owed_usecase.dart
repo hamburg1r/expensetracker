@@ -1,8 +1,6 @@
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/repository/debt.dart';
 import 'package:expensetracker/domain/repository/person.dart';
-// ignore: unused_import
-import 'package:collection/collection.dart'; // For .nonNulls
 
 class GetPersonDebtsOwedUseCase {
   final PersonRepo _personRepo;
