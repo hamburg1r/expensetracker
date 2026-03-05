@@ -3,12 +3,12 @@ import 'package:expensetracker/domain/model/category.dart';
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:expensetracker/domain/model/base_entity.dart'; // Add this import
+import 'package:expensetracker/domain/model/base_entity.dart';
 
 part 'expense.freezed.dart';
 
 @Freezed()
-abstract class Expense with _$Expense implements BaseEntity { // Corrected order
+abstract class Expense with _$Expense implements BaseEntity {
   const factory Expense({
     @Default(0) int id,
     required String name,
@@ -16,10 +16,11 @@ abstract class Expense with _$Expense implements BaseEntity { // Corrected order
     @Default([]) List<String> tags,
     required DateTime date,
     required double amount,
-    Person? payer,
+    required Person payer,
     required List<Person> participation,
     @Default([]) List<Debt> debts,
     Category? category,
     required Account account,
+    @Default(0) int version,
   }) = _Expense;
 }
