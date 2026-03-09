@@ -5,10 +5,10 @@ import 'package:expensetracker/bloc/person_bloc.dart';
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 import 'package:expensetracker/domain/repository/account.dart';
-import 'package:expensetracker/domain/repository/debt.dart';
 import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
 import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
 import 'package:expensetracker/domain/usecase/debt/getters/get_all_debt_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debt_by_id_usecase.dart';
 import 'package:expensetracker/domain/usecase/debt/getters/get_page_debt_usecase.dart';
 import 'package:expensetracker/domain/usecase/debt/mutations/create_debt_usecase.dart';
 import 'package:expensetracker/domain/usecase/debt/mutations/delete_debt_usecase.dart';
@@ -44,7 +44,6 @@ List<SingleChildWidget> blocProviders = [
   ),
   BlocProvider<DebtBloc>(
     create: (context) => DebtBloc(
-      Provider.of<DebtRepo>(context, listen: false),
       Provider.of<EventBus>(context, listen: false),
       Provider.of<Cache>(context, listen: false),
       Provider.of<DeleteDebtUseCase>(context, listen: false),
@@ -54,6 +53,7 @@ List<SingleChildWidget> blocProviders = [
       Provider.of<GetDebtsByCreditorIdUseCase>(context, listen: false),
       Provider.of<GetDebtsByDebtorIdUseCase>(context, listen: false),
       Provider.of<GetAllDebtUseCase>(context, listen: false),
+      Provider.of<GetDebtByIdUseCase>(context, listen: false),
     ),
     lazy: false,
   ),

@@ -4,7 +4,9 @@ class Cache {
   final Map<Type, Map<int, CacheItem<BaseEntity>>> _caches = {};
   final Map<Type, void Function(BaseEntity, Cache)> _garbageCollectors = {};
 
-  void registerGarbageCollector<T extends BaseEntity>(void Function(T, Cache) collector) {
+  void registerGarbageCollector<T extends BaseEntity>(
+    void Function(T, Cache) collector,
+  ) {
     _garbageCollectors[T] = (BaseEntity item, Cache cache) =>
         collector(item as T, cache);
   }

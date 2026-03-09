@@ -64,8 +64,8 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   /// - `_deletePersonUseCase`: For deleting persons.
   /// - `_getPagePeopleUseCase`: For fetching persons by page.
   /// - `_getPersonByIdUseCase`: For fetching a single person by ID.
-  /// - `_getPersonDebtsOwedUseCase`: For fetching debts owed by a person.
-  /// - `_getPersonDebtsReceivableUseCase`: For fetching debts receivable by a person.
+  /// - `_getDebtsByCreditorIdUseCase`: For fetching debts where the person is the creditor.
+  /// - `_getDebtsByDebtorIdUseCase`: For fetching debts where the person is the debtor.
   /// - `cache`: The application's caching mechanism for Person objects.
   /// - `_eventBus`: The domain event bus for cross-BLoC communication.
   PersonBloc(
@@ -499,7 +499,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   /// Handles the `GetPersonDebtsOwedEvent`.
   ///
   /// This method is responsible for fetching a partial list of debts owed by a
-  /// specific [Person] from the underlying data source via `_getPersonDebtsOwedUseCase`.
+  /// specific [Person] from the underlying data source via `_getDebtsByCreditorIdUseCase`.
   ///
   /// **Crucially, this method focuses solely on data retrieval and local cache
   /// manipulation; it does NOT persist any changes to the Person object
@@ -580,7 +580,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   /// Handles the `GetPersonDebtsReceivableEvent`.
   ///
   /// This method is responsible for fetching a partial list of debts receivable by a
-  /// specific [Person] from the underlying data source via `_getPersonDebtsReceivableUseCase`.
+  /// specific [Person] from the underlying data source via `_getDebtsByDebtorIdUseCase`.
   ///
   /// **Crucially, this method focuses solely on data retrieval and local cache
   /// manipulation; it does NOT persist any changes to the Person object
@@ -679,8 +679,10 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   /// is found in the cache, it can optionally add a strong reference if `strong`
   /// is true and no strong references exist.
   /// If the person is not in the cache, it attempts to fetch it from the data
-  /// source using `_getPersonByIdUseCase`. Upon successful retrieval from the
-  /// data source, the person is added to the cache with a strong reference.
+  /// source using `_getPersonByIdUseCase`. Upon successful retrieval, the person
+  /// is added to the cache with a strong reference if `strong` is true,
+  /// otherwise the fetched person is returned without adding a strong reference
+  /// to the cache.
   ///
   /// **Parameters:**
   /// - `id`: The unique identifier of the [Person] to retrieve.
@@ -697,12 +699,12 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     }
 
     try {
-      final repoPerson = await _getPersonByIdUseCase.call(id);
-      if (repoPerson == null) {
+      final fetchedPerson = await _getPersonByIdUseCase.call(id);
+      if (fetchedPerson == null) {
         return null;
       }
-      cache.addStrong(repoPerson);
-      return repoPerson;
+      if (strong) cache.addStrong(fetchedPerson);
+      return fetchedPerson;
     } catch (e) {
       return null;
     }
