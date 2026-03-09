@@ -2,8 +2,8 @@ import 'package:expensetracker/bloc/person_bloc.dart';
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 import 'package:expensetracker/domain/model/person.dart';
-import 'package:expensetracker/domain/usecase/person/getters/debt/get_person_debts_owed_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/getters/debt/get_person_debts_receivable_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
 // Removed unused PersonRepo and DebtRepo imports
 import 'package:expensetracker/domain/usecase/person/mutations/delete_person_usecase.dart'; // Path changed
 
@@ -37,8 +37,8 @@ class PeopleScreen extends StatelessWidget {
             Provider.of<DeletePersonUseCase>(context),
             Provider.of<GetPagePeopleUseCase>(context),
             Provider.of<GetPersonByIdUseCase>(context),
-            Provider.of<GetPersonDebtsOwedUseCase>(context),
-            Provider.of<GetPersonDebtsReceivableUseCase>(context),
+            Provider.of<GetDebtsByCreditorIdUseCase>(context),
+            Provider.of<GetDebtsByDebtorIdUseCase>(context),
             Provider.of<Cache>(context),
             Provider.of<EventBus>(context),
           )..add(

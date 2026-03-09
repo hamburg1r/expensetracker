@@ -19,10 +19,7 @@ class DeleteDebtUseCase {
     await _debtRepo.delete(debtId);
 
     await _personRepo.removeDebtOwed(debtToDelete.debtor.id, debtId);
-    await _personRepo.removeDebtReceivable(
-      debtToDelete.creditor.id,
-      debtId,
-    );
+    await _personRepo.removeDebtReceivable(debtToDelete.creditor.id, debtId);
 
     _eventBus.fire(DebtDeletedEvent(debtId));
   }

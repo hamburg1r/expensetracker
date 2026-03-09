@@ -38,7 +38,6 @@ class DeletePersonUseCase {
     }
   }
 
-  // Helper method to fetch and emit RemoveDebtEvent
   Future<void> _removeDebts(int personId, int limit) async {
     int page = 0;
     while (true) {

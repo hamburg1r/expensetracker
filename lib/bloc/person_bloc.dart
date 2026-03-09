@@ -9,8 +9,8 @@ import 'package:expensetracker/domain/event_bus/events/person_event.dart'
 import 'package:expensetracker/domain/model/debt.dart';
 import 'package:expensetracker/domain/model/person.dart';
 
-import 'package:expensetracker/domain/usecase/person/getters/debt/get_person_debts_owed_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/getters/debt/get_person_debts_receivable_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_all_people_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_page_people_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_person_by_id_usecase.dart';
@@ -33,8 +33,8 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   final DeletePersonUseCase _deletePersonUseCase;
   final GetPagePeopleUseCase _getPagePeopleUseCase;
   final GetPersonByIdUseCase _getPersonByIdUseCase;
-  final GetPersonDebtsOwedUseCase _getPersonDebtsOwedUseCase;
-  final GetPersonDebtsReceivableUseCase _getPersonDebtsReceivableUseCase;
+  final GetDebtsByCreditorIdUseCase _getDebtsByCreditorIdUseCase;
+  final GetDebtsByDebtorIdUseCase _getDebtsByDebtorIdUseCase;
 
   final Cache cache;
   final EventBus _eventBus;
@@ -75,8 +75,8 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     this._deletePersonUseCase,
     this._getPagePeopleUseCase,
     this._getPersonByIdUseCase,
-    this._getPersonDebtsOwedUseCase,
-    this._getPersonDebtsReceivableUseCase,
+    this._getDebtsByCreditorIdUseCase,
+    this._getDebtsByDebtorIdUseCase,
     this.cache,
     this._eventBus,
   ) : super(PersonInitial()) {
@@ -99,9 +99,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     _personUpdatedSubscription = _eventBus
         .on<domain_events.PersonUpdatedEvent>()
         .listen((event) {
-          add(
-            PersonUpdatedEvent(event.person),
-          );
+          add(PersonUpdatedEvent(event.person));
         });
 
     _personAddedSubscription = _eventBus
@@ -543,7 +541,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
         return;
       }
 
-      final List<Debt> fetchedDebts = await _getPersonDebtsOwedUseCase.call(
+      final List<Debt> fetchedDebts = await _getDebtsByCreditorIdUseCase.call(
         event.person.id,
         event.page,
         event.limit,
@@ -615,12 +613,11 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     emit(PersonLoading());
     try {
       // Fetch debts using the use case
-      final List<Debt> fetchedDebts = await _getPersonDebtsReceivableUseCase
-          .call(
-            event.person.id,
-            event.page,
-            event.limit,
-          );
+      final List<Debt> fetchedDebts = await _getDebtsByDebtorIdUseCase.call(
+        event.person.id,
+        event.page,
+        event.limit,
+      );
 
       // Caching and state emission logic (extracted from _handleDebtFetchingLogic)
       Person? person = cache.get<Person>(event.person.id);

@@ -1,3 +1,5 @@
+import 'package:expensetracker/domain/usecase/debt/getters/get_all_debt_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debt_by_id_usecase.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 
 import 'package:expensetracker/domain/repository/account.dart';
@@ -6,23 +8,21 @@ import 'package:expensetracker/domain/repository/expense.dart';
 import 'package:expensetracker/domain/repository/person.dart';
 import 'package:expensetracker/domain/repository/unaccountedmoney.dart';
 
-import 'package:expensetracker/domain/usecase/person/getters/debt/get_person_debts_owed_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/getters/debt/get_person_debts_receivable_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/mutations/create_debt_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/mutations/delete_debt_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/mutations/update_debt_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_page_debt_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
+
 import 'package:expensetracker/domain/usecase/person/getters/get_all_people_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_page_people_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_person_by_id_usecase.dart';
 
 import 'package:expensetracker/domain/usecase/person/mutations/create_person_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/mutations/debt/add_debt_owed_to_person_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/mutations/debt/add_debt_receivable_to_person_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/mutations/debt/remove_debt_owed_from_person_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/mutations/debt/remove_debt_receivable_from_person_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/mutations/delete_person_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/mutations/expense/add_participation_to_person_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/mutations/expense/add_transaction_to_person_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/mutations/expense/remove_participation_from_person_usecase.dart';
-import 'package:expensetracker/domain/usecase/person/mutations/expense/remove_transaction_from_person_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/mutations/update_person_usecase.dart';
+
 
 import 'package:expensetracker/domain/usecase/unaccounted_money/mutations/create_unaccountedmoney_usecase.dart';
 import 'package:expensetracker/domain/usecase/unaccounted_money/mutations/delete_unaccountedmoney_usecase.dart';
@@ -59,67 +59,7 @@ List<SingleChildWidget> useCaseProviders = [
       Provider.of<PersonRepo>(context, listen: false),
     ),
   ),
-  Provider<GetPersonDebtsOwedUseCase>(
-    create: (context) => GetPersonDebtsOwedUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<DebtRepo>(context, listen: false),
-    ),
-  ),
-  Provider<GetPersonDebtsReceivableUseCase>(
-    create: (context) => GetPersonDebtsReceivableUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<DebtRepo>(context, listen: false),
-    ),
-  ),
 
-  Provider<AddDebtOwedToPersonUseCase>(
-    create: (context) => AddDebtOwedToPersonUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<EventBus>(context, listen: false),
-    ),
-  ),
-  Provider<AddDebtReceivableToPersonUseCase>(
-    create: (context) => AddDebtReceivableToPersonUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<EventBus>(context, listen: false),
-    ),
-  ),
-  Provider<RemoveDebtOwedFromPersonUseCase>(
-    create: (context) => RemoveDebtOwedFromPersonUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<EventBus>(context, listen: false),
-    ),
-  ),
-  Provider<RemoveDebtReceivableFromPersonUseCase>(
-    create: (context) => RemoveDebtReceivableFromPersonUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<EventBus>(context, listen: false),
-    ),
-  ),
-  Provider<AddTransactionToPersonUseCase>(
-    create: (context) => AddTransactionToPersonUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<EventBus>(context, listen: false),
-    ),
-  ),
-  Provider<RemoveTransactionFromPersonUseCase>(
-    create: (context) => RemoveTransactionFromPersonUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<EventBus>(context, listen: false),
-    ),
-  ),
-  Provider<AddParticipationToPersonUseCase>(
-    create: (context) => AddParticipationToPersonUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<EventBus>(context, listen: false),
-    ),
-  ),
-  Provider<RemoveParticipationFromPersonUseCase>(
-    create: (context) => RemoveParticipationFromPersonUseCase(
-      Provider.of<PersonRepo>(context, listen: false),
-      Provider.of<EventBus>(context, listen: false),
-    ),
-  ),
   Provider<DeletePersonUseCase>(
     create: (context) => DeletePersonUseCase(
       Provider.of<PersonRepo>(context, listen: false),
@@ -128,6 +68,55 @@ List<SingleChildWidget> useCaseProviders = [
       Provider.of<ExpenseRepo>(context, listen: false),
     ),
   ),
+  // Debt Use Cases
+  Provider<CreateDebtUseCase>(
+    create: (context) => CreateDebtUseCase(
+      Provider.of<DebtRepo>(context, listen: false),
+      Provider.of<PersonRepo>(context, listen: false),
+      Provider.of<EventBus>(context, listen: false),
+    ),
+  ),
+  Provider<DeleteDebtUseCase>(
+    create: (context) => DeleteDebtUseCase(
+      Provider.of<DebtRepo>(context, listen: false),
+      Provider.of<PersonRepo>(context, listen: false),
+      Provider.of<EventBus>(context, listen: false),
+    ),
+  ),
+  Provider<UpdateDebtUseCase>(
+    create: (context) => UpdateDebtUseCase(
+      Provider.of<DebtRepo>(context, listen: false),
+      Provider.of<PersonRepo>(context, listen: false),
+      Provider.of<EventBus>(context, listen: false),
+    ),
+  ),
+  Provider<GetPageDebtUseCase>(
+    create: (context) => GetPageDebtUseCase(
+      Provider.of<DebtRepo>(context, listen: false),
+    ),
+  ),
+  Provider<GetDebtsByCreditorIdUseCase>(
+    create: (context) => GetDebtsByCreditorIdUseCase(
+      Provider.of<DebtRepo>(context, listen: false),
+    ),
+  ),
+  Provider<GetDebtsByDebtorIdUseCase>(
+    create: (context) => GetDebtsByDebtorIdUseCase(
+      Provider.of<DebtRepo>(context, listen: false),
+    ),
+  ),
+  Provider<GetAllDebtUseCase>(
+    create: (context) => GetAllDebtUseCase(
+      Provider.of<DebtRepo>(context, listen: false),
+    ),
+  ),
+  Provider<GetDebtByIdUseCase>(
+    create: (context) => GetDebtByIdUseCase(
+      Provider.of<DebtRepo>(context, listen: false),
+    ),
+  ),
+
+  // Unaccounted Money Use Cases
   Provider<CreateUnaccountedMoneyUseCase>(
     create: (context) => CreateUnaccountedMoneyUseCase(
       Provider.of<UnaccountedMoneyRepo>(context, listen: false),
@@ -135,7 +124,6 @@ List<SingleChildWidget> useCaseProviders = [
       Provider.of<AccountRepo>(context, listen: false),
     ),
   ),
-
   Provider<UpdateUnaccountedMoneyUseCase>(
     create: (context) => UpdateUnaccountedMoneyUseCase(
       Provider.of<UnaccountedMoneyRepo>(context, listen: false),
