@@ -1,13 +1,13 @@
 import 'package:expensetracker/domain/model/unaccountedmoney.dart';
 import 'package:expensetracker/domain/repository/unaccountedmoney.dart';
-import 'package:expensetracker/domain/repository/account.dart'; // Import AccountRepo
+import 'package:expensetracker/domain/repository/account.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 import 'package:expensetracker/domain/event_bus/events/account_event.dart';
 
 class UpdateUnaccountedMoneyUseCase {
   final UnaccountedMoneyRepo _unaccountedMoneyRepo;
   final EventBus _eventBus;
-  final AccountRepo _accountRepo; // Add AccountRepo
+  final AccountRepo _accountRepo;
 
   UpdateUnaccountedMoneyUseCase(
     this._unaccountedMoneyRepo,
@@ -53,6 +53,6 @@ class UpdateUnaccountedMoneyUseCase {
       totalUnaccountedMoney: newTotalUnaccountedMoney,
     );
     await _accountRepo.update(updatedAccount);
-    _eventBus.fire(AccountDataChangedEvent(updatedAccount));
+    _eventBus.fire(AccountUpdatedEvent(updatedAccount));
   }
 }

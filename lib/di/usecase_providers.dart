@@ -15,6 +15,13 @@ import 'package:expensetracker/domain/usecase/debt/getters/get_page_debt_usecase
 import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
 import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
 
+import 'package:expensetracker/domain/usecase/account/getters/get_all_accounts_usecase.dart';
+import 'package:expensetracker/domain/usecase/account/getters/get_account_by_id_usecase.dart';
+import 'package:expensetracker/domain/usecase/account/getters/get_page_accounts_usecase.dart';
+import 'package:expensetracker/domain/usecase/account/mutations/create_account_usecase.dart';
+import 'package:expensetracker/domain/usecase/account/mutations/update_account_usecase.dart';
+import 'package:expensetracker/domain/usecase/account/mutations/delete_account_usecase.dart';
+
 import 'package:expensetracker/domain/usecase/person/getters/get_all_people_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_page_people_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_person_by_id_usecase.dart';
@@ -22,7 +29,6 @@ import 'package:expensetracker/domain/usecase/person/getters/get_person_by_id_us
 import 'package:expensetracker/domain/usecase/person/mutations/create_person_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/mutations/delete_person_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/mutations/update_person_usecase.dart';
-
 
 import 'package:expensetracker/domain/usecase/unaccounted_money/mutations/create_unaccountedmoney_usecase.dart';
 import 'package:expensetracker/domain/usecase/unaccounted_money/mutations/delete_unaccountedmoney_usecase.dart';
@@ -113,6 +119,41 @@ List<SingleChildWidget> useCaseProviders = [
   Provider<GetDebtByIdUseCase>(
     create: (context) => GetDebtByIdUseCase(
       Provider.of<DebtRepo>(context, listen: false),
+    ),
+  ),
+
+  // Account Use Cases
+  Provider<GetAllAccountsUseCase>(
+    create: (context) => GetAllAccountsUseCase(
+      Provider.of<AccountRepo>(context, listen: false),
+    ),
+  ),
+  Provider<GetAccountByIdUseCase>(
+    create: (context) => GetAccountByIdUseCase(
+      Provider.of<AccountRepo>(context, listen: false),
+    ),
+  ),
+  Provider<GetPageAccountsUseCase>(
+    create: (context) => GetPageAccountsUseCase(
+      Provider.of<AccountRepo>(context, listen: false),
+    ),
+  ),
+  Provider<CreateAccountUseCase>(
+    create: (context) => CreateAccountUseCase(
+      Provider.of<AccountRepo>(context, listen: false),
+      Provider.of<EventBus>(context, listen: false),
+    ),
+  ),
+  Provider<UpdateAccountUseCase>(
+    create: (context) => UpdateAccountUseCase(
+      Provider.of<AccountRepo>(context, listen: false),
+      Provider.of<EventBus>(context, listen: false),
+    ),
+  ),
+  Provider<DeleteAccountUseCase>(
+    create: (context) => DeleteAccountUseCase(
+      Provider.of<AccountRepo>(context, listen: false),
+      Provider.of<EventBus>(context, listen: false),
     ),
   ),
 

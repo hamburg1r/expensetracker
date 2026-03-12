@@ -1,13 +1,13 @@
 import 'package:expensetracker/domain/repository/unaccountedmoney.dart';
-import 'package:expensetracker/domain/repository/account.dart'; // Import AccountRepo
-import 'package:expensetracker/domain/model/unaccountedmoney.dart'; // Import UnaccountedMoney model
+import 'package:expensetracker/domain/repository/account.dart';
+import 'package:expensetracker/domain/model/unaccountedmoney.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 import 'package:expensetracker/domain/event_bus/events/account_event.dart';
 
 class DeleteUnaccountedMoneyUseCase {
   final UnaccountedMoneyRepo _unaccountedMoneyRepo;
   final EventBus _eventBus;
-  final AccountRepo _accountRepo; // Add AccountRepo
+  final AccountRepo _accountRepo;
 
   DeleteUnaccountedMoneyUseCase(
     this._unaccountedMoneyRepo,
@@ -25,25 +25,30 @@ class DeleteUnaccountedMoneyUseCase {
 
     final deleted = await _unaccountedMoneyRepo.delete(id);
     if (deleted) {
-    final account = await _accountRepo.getById(unaccountedMoneyEntry.account.id);
-    if (account == null) {
-      throw Exception('Account with ID ${unaccountedMoneyEntry.account.id} not found for UnaccountedMoney entry deletion.');
-    }
+      final account = await _accountRepo.getById(
+        unaccountedMoneyEntry.account.id,
+      );
+      if (account == null) {
+        throw Exception(
+          'Account with ID ${unaccountedMoneyEntry.account.id} not found for UnaccountedMoney entry deletion.',
+        );
+      }
 
-    final updatedUnaccountedMoneyList =
-        List<UnaccountedMoney>.from(account.unaccountedMoney)
-          ..removeWhere((um) => um.id == id);
+      final updatedUnaccountedMoneyList = List<UnaccountedMoney>.from(
+        account.unaccountedMoney,
+      )..removeWhere((um) => um.id == id);
 
-    final newTotalUnaccountedMoney = account.totalUnaccountedMoney - unaccountedMoneyEntry.amount;
-    final newTotalMoney = account.totalMoney - unaccountedMoneyEntry.amount;
+      final newTotalUnaccountedMoney =
+          account.totalUnaccountedMoney - unaccountedMoneyEntry.amount;
+      final newTotalMoney = account.totalMoney - unaccountedMoneyEntry.amount;
 
-    final updatedAccount = account.copyWith(
-      unaccountedMoney: updatedUnaccountedMoneyList,
-      totalMoney: newTotalMoney,
-      totalUnaccountedMoney: newTotalUnaccountedMoney,
-    );
-    await _accountRepo.update(updatedAccount);
-    _eventBus.fire(AccountDataChangedEvent(updatedAccount));
+      final updatedAccount = account.copyWith(
+        unaccountedMoney: updatedUnaccountedMoneyList,
+        totalMoney: newTotalMoney,
+        totalUnaccountedMoney: newTotalUnaccountedMoney,
+      );
+      await _accountRepo.update(updatedAccount);
+      _eventBus.fire(AccountUpdatedEvent(updatedAccount));
     }
     return deleted;
   }

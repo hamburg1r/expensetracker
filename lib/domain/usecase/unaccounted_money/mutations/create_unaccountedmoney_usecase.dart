@@ -4,7 +4,6 @@ import 'package:expensetracker/domain/repository/account.dart';
 import 'package:expensetracker/domain/model/unaccountedmoney.dart';
 import 'package:expensetracker/domain/repository/unaccountedmoney.dart';
 
-
 class CreateUnaccountedMoneyUseCase {
   final UnaccountedMoneyRepo _unaccountedMoneyRepo;
   final EventBus _eventBus;
@@ -37,7 +36,7 @@ class CreateUnaccountedMoneyUseCase {
       totalUnaccountedMoney: account.totalUnaccountedMoney + entry.amount,
     );
     await _accountRepo.update(updatedAccount);
-    _eventBus.fire(AccountDataChangedEvent(updatedAccount));
+    _eventBus.fire(AccountUpdatedEvent(updatedAccount));
 
     return id;
   }
