@@ -31,16 +31,16 @@ class PeopleScreen extends StatelessWidget {
     return BlocProvider<PersonBloc>(
       create: (ctx) =>
           PersonBloc(
-            Provider.of<GetAllPeopleUseCase>(context),
-            Provider.of<CreatePersonUseCase>(context),
-            Provider.of<UpdatePersonUseCase>(context),
-            Provider.of<DeletePersonUseCase>(context),
-            Provider.of<GetPagePeopleUseCase>(context),
-            Provider.of<GetPersonByIdUseCase>(context),
-            Provider.of<GetDebtsByCreditorIdUseCase>(context),
-            Provider.of<GetDebtsByDebtorIdUseCase>(context),
-            Provider.of<Cache>(context),
-            Provider.of<EventBus>(context),
+            Provider.of<GetAllPeopleUseCase>(context, listen: false),
+            Provider.of<GetPagePeopleUseCase>(context, listen: false),
+            Provider.of<GetPersonByIdUseCase>(context, listen: false),
+            Provider.of<CreatePersonUseCase>(context, listen: false),
+            Provider.of<UpdatePersonUseCase>(context, listen: false),
+            Provider.of<DeletePersonUseCase>(context, listen: false),
+            Provider.of<GetDebtsByCreditorIdUseCase>(context, listen: false),
+            Provider.of<GetDebtsByDebtorIdUseCase>(context, listen: false),
+            Provider.of<Cache>(context, listen: false),
+            Provider.of<EventBus>(context, listen: false),
           )..add(
             LoadAllPeopleEvent(),
           ), // Dispatch LoadAllPeopleEvent when bloc is created

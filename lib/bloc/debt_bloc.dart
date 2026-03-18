@@ -1,20 +1,25 @@
 import 'dart:async';
-import 'package:expensetracker/domain/model/person.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:expensetracker/domain/model/debt.dart';
+import 'package:expensetracker/domain/model/person.dart';
+
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 import 'package:expensetracker/domain/event_bus/events/debt_event.dart'
     as domain_events;
-import 'package:expensetracker/domain/usecase/debt/mutations/delete_debt_usecase.dart';
-import 'package:expensetracker/domain/usecase/debt/mutations/create_debt_usecase.dart';
-import 'package:expensetracker/domain/usecase/debt/mutations/update_debt_usecase.dart';
-import 'package:expensetracker/domain/usecase/debt/getters/get_page_debt_usecase.dart';
-import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
-import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
+
 import 'package:expensetracker/domain/usecase/debt/getters/get_all_debt_usecase.dart';
 import 'package:expensetracker/domain/usecase/debt/getters/get_debt_by_id_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_page_debt_usecase.dart';
+
+import 'package:expensetracker/domain/usecase/debt/mutations/create_debt_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/mutations/delete_debt_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/mutations/update_debt_usecase.dart';
 
 part 'debt_state.dart';
 part 'debt_event.dart';
@@ -30,16 +35,18 @@ part 'debt_event.dart';
 /// It exposes methods for event handling (`_onLoadAllDebts`, `_onCreateDebt`, etc.)
 /// and utility methods for accessing cached data (`getAllLoaded`, `getById`).
 class DebtBloc extends Bloc<DebtEvent, DebtState> {
-  final EventBus _eventBus;
-  final Cache _cache;
-  final DeleteDebtUseCase _deleteDebtUseCase;
-  final CreateDebtUseCase _createDebtUseCase;
-  final UpdateDebtUseCase _updateDebtUseCase;
+  final GetAllDebtUseCase _getAllDebtUseCase;
+  final GetDebtByIdUseCase _getDebtByIdUseCase;
   final GetPageDebtUseCase _getPageDebtUseCase;
   final GetDebtsByCreditorIdUseCase _getDebtsByCreditorIdUseCase;
   final GetDebtsByDebtorIdUseCase _getDebtsByDebtorIdUseCase;
-  final GetAllDebtUseCase _getAllDebtUseCase;
-  final GetDebtByIdUseCase _getDebtByIdUseCase;
+
+  final CreateDebtUseCase _createDebtUseCase;
+  final UpdateDebtUseCase _updateDebtUseCase;
+  final DeleteDebtUseCase _deleteDebtUseCase;
+
+  final EventBus _eventBus;
+  final Cache _cache;
 
   late StreamSubscription _debtCreatedSubscription;
   late StreamSubscription _debtDeletedSubscription;
@@ -67,34 +74,37 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
   /// - `_getAllDebtUseCase`: For fetching all debts.
   /// - `_getDebtByIdUseCase`: For fetching a debt by ID.
   DebtBloc(
-    this._eventBus,
-    this._cache,
-    this._deleteDebtUseCase,
-    this._createDebtUseCase,
-    this._updateDebtUseCase,
+    this._getAllDebtUseCase,
+    this._getDebtByIdUseCase,
     this._getPageDebtUseCase,
     this._getDebtsByCreditorIdUseCase,
     this._getDebtsByDebtorIdUseCase,
-    this._getAllDebtUseCase,
-    this._getDebtByIdUseCase,
+    this._createDebtUseCase,
+    this._updateDebtUseCase,
+    this._deleteDebtUseCase,
+    this._eventBus,
+    this._cache,
   ) : super(DebtInitial()) {
     on<LoadAllDebtsEvent>(_onLoadAllDebts);
-    on<CreateDebtEvent>(_onCreateDebt);
-    on<DeleteDebtEvent>(_onDeleteDebt);
-    on<DebtDeletedEvent>(_onDebtDeleted);
-    on<UpdateDebtEvent>(_onUpdateDebt);
     on<GetPageDebtEvent>(_onGetPageDebt);
     on<GetDebtsByCreditorIdEvent>(_onGetDebtsByCreditorId);
     on<GetDebtsByDebtorIdEvent>(_onGetDebtsByDebtorId);
     on<UnloadDebtEvent>(_onUnloadDebt);
     on<UnloadDebtsEvent>(_onUnloadDebts);
+
+    on<CreateDebtEvent>(_onCreateDebt);
+    on<UpdateDebtEvent>(_onUpdateDebt);
+    on<DeleteDebtEvent>(_onDeleteDebt);
+
+    on<DebtCreatedEvent>(_onDebtCreated);
     on<DebtUpdatedEvent>(_onDebtUpdated);
+    on<DebtDeletedEvent>(_onDebtDeleted);
+    on<GetDebtByIdEvent>(_onGetDebtById); // Add this line
 
     _debtCreatedSubscription = _eventBus
         .on<domain_events.DebtCreatedEvent>()
         .listen((event) {
-          // _cache.addStrong(event.debt);
-          // No emit or add event here, similar to PersonBloc's PersonCreatedEvent handling.
+          add(DebtCreatedEvent(event.debt));
         });
 
     _debtDeletedSubscription = _eventBus
@@ -107,8 +117,6 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
         .on<domain_events.DebtUpdatedEvent>()
         .listen((event) {
           add(DebtUpdatedEvent(event.debt));
-          // _cache.addStrong(event.debt);
-          // No emit or add event here, similar to PersonBloc's PersonUpdatedEvent handling.
         });
   }
 
@@ -473,6 +481,11 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     _emitLoadedDebts(emit);
   }
 
+  Future<void> _onDebtCreated(
+    DebtCreatedEvent event,
+    Emitter<DebtState> emit,
+  ) async {}
+
   /// Retrieves all [Debt] objects that are currently loaded and managed
   /// by the BLoC's internal cache.
   ///
@@ -515,49 +528,51 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     return debtWithCachedPeople;
   }
 
-  /// Retrieves a single [Debt] object by its `id` from the BLoC's internal
-  /// cache, falling back to the persistent data source if not found in cache.
+  /// Handles the `GetDebtByIdEvent`.
   ///
-  /// This method first checks the local cache for the debt. If the debt
-  /// is found in the cache, it can optionally add a strong reference if `strong`
-  /// is true and no strong references exist.
+  /// This method retrieves a single [Debt] object by its `id`.
+  /// It first checks the local cache. If the debt is found in the cache,
+  /// it is processed by `_processAndCacheDebt` to ensure its embedded
+  /// [Person] objects are canonical instances and to maintain a strong
+  /// reference in the cache.
   /// If the debt is not in the cache, it attempts to fetch it from the data
-  /// source using `_getDebtByIdUseCase`. Upon successful retrieval:
-  ///   - If `strong` is `true`, the `fetchedDebt` is processed by
-  ///     `_processAndCacheDebt` (which canonicalizes embedded [Person] objects
-  ///     and adds the processed debt to the cache with a strong reference).
-  ///   - If `strong` is `false`, the `fetchedDebt` is returned directly without
-  ///     being processed by `_processAndCacheDebt` or added to the cache with
-  ///     a strong reference. This means embedded [Person] objects might not
-  ///     be canonicalized and the Debt object itself might not be managed
-  ///     by the cache.
+  /// source using `_getDebtByIdUseCase`. Upon successful retrieval, the
+  /// `fetchedDebt` is processed by `_processAndCacheDebt` (which canonicalizes
+  /// embedded [Person] objects and adds the processed debt to the cache
+  /// with a strong reference).
   ///
-  /// **Parameters:**
-  /// - `id`: The unique identifier of the [Debt] to retrieve.
-  /// - `strong`: Optional. If `true`, ensures a strong reference to the debt
-  ///   in the cache if it's already there but only has weak references, and also
-  ///   ensures a strong reference for newly fetched debts after canonicalization.
-  ///   If `false`, a strong reference is not explicitly ensured for either cached
-  ///   or newly fetched debts. Defaults to `true`.
+  /// After successfully retrieving and caching the debt (or if it was already
+  /// in the cache), `_emitLoadedDebts` is called to update the state.
+  /// If the debt is not found or an error occurs, an `DebtError` state is emitted.
   ///
-  /// Returns a `Future<Debt?>`, which resolves to the [Debt] object if found,
-  /// or `null` if not found or an error occurs during retrieval.
-  Future<Debt?> getById(int id, [bool strong = true]) async {
-    final debt = _cache.get<Debt>(id);
-    if (debt != null) {
-      if (strong && _cache.references(debt) <= 0) _cache.addStrong(debt);
-      return debt;
-    }
-
+  /// [event]: The `GetDebtByIdEvent` containing the ID of the [Debt] to retrieve.
+  /// [emit]: The `Emitter<DebtState>` used to emit `DebtLoading`, `DebtLoaded`,
+  ///         or `DebtError` states.
+  Future<void> _onGetDebtById(
+    GetDebtByIdEvent event,
+    Emitter<DebtState> emit,
+  ) async {
+    emit(DebtLoading());
     try {
-      final fetchedDebt = await _getDebtByIdUseCase.call(id);
-      if (fetchedDebt == null) {
-        return null;
+      final debt = _cache.get<Debt>(event.id);
+      Debt? fetchedDebt;
+
+      if (debt != null) {
+        fetchedDebt = _processAndCacheDebt(debt);
+      } else {
+        fetchedDebt = await _getDebtByIdUseCase.call(event.id);
+        if (fetchedDebt != null) {
+          fetchedDebt = _processAndCacheDebt(fetchedDebt);
+        }
       }
-      if (strong) return _processAndCacheDebt(fetchedDebt);
-      return fetchedDebt;
+
+      if (fetchedDebt != null) {
+        _emitLoadedDebts(emit);
+      } else {
+        emit(DebtError("Debt with ID ${event.id} not found."));
+      }
     } catch (e) {
-      return null;
+      emit(DebtError("$e\nFailed to get debt by ID: ${event.id}"));
     }
   }
 }

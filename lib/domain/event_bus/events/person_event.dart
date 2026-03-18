@@ -30,8 +30,3 @@ class PersonDeletedEvent extends DomainEvent {
   final int personId;
   PersonDeletedEvent(this.personId);
 }
-
-class RemovePersonEvent extends DomainEvent {
-  final Person person;
-  RemovePersonEvent(this.person);
-}

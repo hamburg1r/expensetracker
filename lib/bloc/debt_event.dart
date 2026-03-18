@@ -113,3 +113,22 @@ class DebtUpdatedEvent extends DebtEvent {
   @override
   List<Object> get props => [debt];
 }
+
+class DebtCreatedEvent extends DebtEvent {
+  final Debt debt;
+
+  const DebtCreatedEvent(this.debt);
+
+  @override
+  List<Object> get props => [debt];
+}
+
+class GetDebtByIdEvent extends DebtEvent {
+  final int id;
+
+  const GetDebtByIdEvent(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+

@@ -1,16 +1,18 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:expensetracker/domain/model/debt.dart';
+import 'package:expensetracker/domain/model/person.dart';
 
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
 import 'package:expensetracker/domain/event_bus/events/person_event.dart'
     as domain_events;
-import 'package:expensetracker/domain/model/debt.dart';
-import 'package:expensetracker/domain/model/person.dart';
 
-import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
-import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
+import 'package:expensetracker/utils/list_utils.dart';
+
 import 'package:expensetracker/domain/usecase/person/getters/get_all_people_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_page_people_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/getters/get_person_by_id_usecase.dart';
@@ -19,8 +21,8 @@ import 'package:expensetracker/domain/usecase/person/mutations/create_person_use
 import 'package:expensetracker/domain/usecase/person/mutations/delete_person_usecase.dart';
 import 'package:expensetracker/domain/usecase/person/mutations/update_person_usecase.dart';
 
-import 'package:expensetracker/utils/list_utils.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_creditor_id_usecase.dart';
+import 'package:expensetracker/domain/usecase/debt/getters/get_debts_by_debtor_id_usecase.dart';
 
 part 'person_event.dart';
 part 'person_state.dart';
@@ -28,11 +30,13 @@ part 'person_state.dart';
 // TODO: check for improvements for PersonLoading event, i.e. where it can be added etc.
 class PersonBloc extends Bloc<PersonEvent, PersonState> {
   final GetAllPeopleUseCase _getAllPeopleUseCase;
+  final GetPagePeopleUseCase _getPagePeopleUseCase;
+  final GetPersonByIdUseCase _getPersonByIdUseCase;
+
   final CreatePersonUseCase _createPersonUseCase;
   final UpdatePersonUseCase _updatePersonUseCase;
   final DeletePersonUseCase _deletePersonUseCase;
-  final GetPagePeopleUseCase _getPagePeopleUseCase;
-  final GetPersonByIdUseCase _getPersonByIdUseCase;
+
   final GetDebtsByCreditorIdUseCase _getDebtsByCreditorIdUseCase;
   final GetDebtsByDebtorIdUseCase _getDebtsByDebtorIdUseCase;
 
@@ -43,7 +47,6 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   late StreamSubscription _personAddedSubscription;
   late StreamSubscription _updatePersonSubscription;
   late StreamSubscription _deletePersonSubscription;
-  late StreamSubscription _removePersonSubscription;
   late StreamSubscription _personDeletedSubscription;
   late StreamSubscription _unloadPersonSubscription;
 
@@ -70,11 +73,11 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   /// - `_eventBus`: The domain event bus for cross-BLoC communication.
   PersonBloc(
     this._getAllPeopleUseCase,
+    this._getPagePeopleUseCase,
+    this._getPersonByIdUseCase,
     this._createPersonUseCase,
     this._updatePersonUseCase,
     this._deletePersonUseCase,
-    this._getPagePeopleUseCase,
-    this._getPersonByIdUseCase,
     this._getDebtsByCreditorIdUseCase,
     this._getDebtsByDebtorIdUseCase,
     this.cache,
@@ -84,17 +87,17 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     on<GetPagePeopleEvent>(_onGetPagePeople);
     on<GetPersonDebtsOwedEvent>(_onGetDebtsOwed);
     on<GetPersonDebtsReceivableEvent>(_onGetDebtsReceivable);
+    on<UnloadPersonEvent>(_onUnloadPerson);
+    on<UnloadPeopleEvent>(_onUnloadPeople);
 
     on<CreatePersonEvent>(_onCreatePerson);
     on<UpdatePersonEvent>(_onUpdatePerson);
     on<DeletePersonEvent>(_onDeletePerson);
 
+    on<PersonCreatedEvent>(_onPersonCreated);
     on<PersonUpdatedEvent>(_onPersonUpdated);
-    on<RemovePersonEvent>(_onRemovePerson);
     on<PersonDeletedEvent>(_onPersonDeleted);
-
-    on<UnloadPersonEvent>(_onUnloadPerson);
-    on<UnloadPeopleEvent>(_onUnloadPeople);
+    on<GetPersonByIdEvent>(_onGetPersonById);
 
     _personUpdatedSubscription = _eventBus
         .on<domain_events.PersonUpdatedEvent>()
@@ -105,12 +108,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     _personAddedSubscription = _eventBus
         .on<domain_events.PersonCreatedEvent>()
         .listen((event) {
-          // Not adding anything as load is supposed to be called when needed
-          // not when new item is added. Maybe it can reload the current page
-          // instead of adding the person to cache pool.
-
-          // cache.addStrong(event.person);
-          // add(LoadAllPeopleEvent());
+          add(PersonCreatedEvent(event.person));
         });
 
     _updatePersonSubscription = _eventBus
@@ -125,19 +123,12 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
           add(DeletePersonEvent(event.person));
         });
 
-    _removePersonSubscription = _eventBus
-        .on<domain_events.RemovePersonEvent>()
-        .listen((event) {
-          add(RemovePersonEvent(event.person));
-        });
-
     _personDeletedSubscription = _eventBus
         .on<domain_events.PersonDeletedEvent>()
         .listen((event) {
           add(PersonDeletedEvent(event.personId));
         });
 
-    // TODO: This might not be needed in practice
     _unloadPersonSubscription = _eventBus
         .on<domain_events.UnloadPersonEvent>()
         .listen((event) {
@@ -162,10 +153,9 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     _personUpdatedSubscription.cancel();
     _personAddedSubscription.cancel();
     _updatePersonSubscription.cancel();
-    _deletePersonSubscription.cancel(); // Cancel new subscription
-    _removePersonSubscription.cancel(); // Cancel new subscription
+    _deletePersonSubscription.cancel();
     _personDeletedSubscription.cancel();
-    _unloadPersonSubscription.cancel(); // Cancel new subscription
+    _unloadPersonSubscription.cancel();
     return super.close();
   }
 
@@ -366,33 +356,6 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     }
   }
 
-  /// Handles the `RemovePersonEvent`.
-  ///
-  /// This method is a notification handler responsible for updating the BLoC's
-  /// internal cache and UI state after a [Person] has been successfully
-  /// removed from the persistent data store (or is intended to be removed
-  /// from the cache for other reasons).
-  ///
-  /// **Workflow:**
-  /// 1. Calls `cache.remove<Person>(event.person.id)` to explicitly remove the
-  ///    specified person from the BLoC's internal cache.
-  /// 2. Calls `_emitLoadedPeople(emit)` to emit a `PersonLoaded` state,
-  ///    reflecting the updated list of persons (without the removed one) to the UI.
-  ///
-  /// **Purpose:** To keep the BLoC's local cache and the UI synchronized with
-  /// the data layer's state regarding person deletions, ensuring that the
-  /// removed person is no longer displayed.
-  ///
-  /// [event]: The `RemovePersonEvent` containing the [Person] object to be removed from the cache.
-  /// [emit]: The `Emitter<PersonState>` used to emit the `PersonLoaded` state.
-  Future<void> _onRemovePerson(
-    RemovePersonEvent event,
-    Emitter<PersonState> emit,
-  ) async {
-    cache.remove<Person>(event.person.id);
-    _emitLoadedPeople(emit);
-  }
-
   /// Handles the `PersonDeletedEvent`.
   ///
   /// This method is a notification handler responsible for updating the BLoC's
@@ -419,6 +382,11 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     cache.remove<Person>(event.personId);
     _emitLoadedPeople(emit);
   }
+
+  Future<void> _onPersonCreated(
+    PersonCreatedEvent event,
+    Emitter<PersonState> emit,
+  ) async {}
 
   /// Handles the `UpdatePersonEvent`.
   ///
@@ -672,41 +640,49 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     return cache.getAll<Person>().values.toList(growable: false);
   }
 
-  /// Retrieves a single [Person] object by its `id` from the BLoC's internal
-  /// cache, falling back to the persistent data source if not found in cache.
+  /// Handles the `GetPersonByIdEvent`.
   ///
-  /// This method first checks the local cache for the person. If the person
-  /// is found in the cache, it can optionally add a strong reference if `strong`
-  /// is true and no strong references exist.
+  /// This method retrieves a single [Person] object by its `id`.
+  /// It first checks the local cache. If the person is found in the cache,
+  /// `cache.addStrong(person)` is called to ensure a strong reference to it.
   /// If the person is not in the cache, it attempts to fetch it from the data
-  /// source using `_getPersonByIdUseCase`. Upon successful retrieval, the person
-  /// is added to the cache with a strong reference if `strong` is true,
-  /// otherwise the fetched person is returned without adding a strong reference
-  /// to the cache.
+  /// source using `_getPersonByIdUseCase`. Upon successful retrieval, the
+  /// `fetchedPerson` is added to the cache with a strong reference using
+  /// `cache.addStrong(fetchedPerson)`.
   ///
-  /// **Parameters:**
-  /// - `id`: The unique identifier of the [Person] to retrieve.
-  /// - `strong`: Optional. If `true`, ensures a strong reference to the person
-  ///   in the cache if it's already there but only has weak references. Defaults to `true`.
+  /// After successfully retrieving and caching the person (or if it was already
+  /// in the cache), `_emitLoadedPeople` is called to update the state.
+  /// If the person is not found or an error occurs, a `PersonError` state is emitted.
   ///
-  /// Returns a `Future<Person?>`, which resolves to the [Person] object if found,
-  /// or `null` if not found or an error occurs during retrieval.
-  Future<Person?> getById(int id, [bool strong = true]) async {
-    final person = cache.get<Person>(id);
-    if (person != null) {
-      if (strong && cache.references(person) <= 0) cache.addStrong(person);
-      return person;
-    }
-
+  /// [event]: The `GetPersonByIdEvent` containing the ID of the [Person] to retrieve.
+  /// [emit]: The `Emitter<PersonState>` used to emit `PersonLoading`, `PersonLoaded`,
+  ///         or `PersonError` states.
+  Future<void> _onGetPersonById(
+    GetPersonByIdEvent event,
+    Emitter<PersonState> emit,
+  ) async {
+    emit(PersonLoading());
     try {
-      final fetchedPerson = await _getPersonByIdUseCase.call(id);
-      if (fetchedPerson == null) {
-        return null;
+      final person = cache.get<Person>(event.id);
+      Person? fetchedPerson;
+
+      if (person != null) {
+        cache.addStrong(person);
+        fetchedPerson = person;
+      } else {
+        fetchedPerson = await _getPersonByIdUseCase.call(event.id);
+        if (fetchedPerson != null) {
+          cache.addStrong(fetchedPerson);
+        }
       }
-      if (strong) cache.addStrong(fetchedPerson);
-      return fetchedPerson;
+
+      if (fetchedPerson != null) {
+        _emitLoadedPeople(emit);
+      } else {
+        emit(PersonError("Person with ID ${event.id} not found."));
+      }
     } catch (e) {
-      return null;
+      emit(PersonError("$e\nFailed to get person by ID: ${event.id}"));
     }
   }
 }
