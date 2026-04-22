@@ -15,3 +15,8 @@ class AccountDeletedEvent extends DomainEvent {
   final int accountId;
   AccountDeletedEvent(this.accountId);
 }
+
+class UnloadAccountEvent extends DomainEvent {
+  final int accountId;
+  UnloadAccountEvent(this.accountId);
+}

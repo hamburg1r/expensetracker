@@ -15,3 +15,8 @@ class DebtDeletedEvent extends DomainEvent {
   final int debtId;
   DebtDeletedEvent(this.debtId);
 }
+
+class UnloadDebtEvent extends DomainEvent {
+  final int debtId;
+  UnloadDebtEvent(this.debtId);
+}
