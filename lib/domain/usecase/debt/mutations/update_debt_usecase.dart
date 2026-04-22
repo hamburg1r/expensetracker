@@ -13,20 +13,20 @@ class UpdateDebtUseCase {
 
   Future<void> call(Debt updatedDebt) async {
     await _personRepo.removeDebtOwed(
-      updatedDebt.debtor.id,
+      updatedDebt.debtorId,
       updatedDebt.id,
     );
     await _personRepo.addDebtOwed(
-      updatedDebt.debtor.id,
+      updatedDebt.debtorId,
       updatedDebt,
     );
 
     await _personRepo.removeDebtReceivable(
-      updatedDebt.creditor.id,
+      updatedDebt.creditorId,
       updatedDebt.id,
     );
     await _personRepo.addDebtReceivable(
-      updatedDebt.creditor.id,
+      updatedDebt.creditorId,
       updatedDebt,
     );
 

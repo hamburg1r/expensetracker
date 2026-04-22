@@ -1,7 +1,3 @@
-import 'package:expensetracker/domain/model/account.dart';
-import 'package:expensetracker/domain/model/category.dart';
-import 'package:expensetracker/domain/model/debt.dart';
-import 'package:expensetracker/domain/model/person.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:expensetracker/domain/model/base_entity.dart';
 
@@ -16,11 +12,11 @@ abstract class Expense with _$Expense implements BaseEntity {
     @Default([]) List<String> tags,
     required DateTime date,
     required double amount,
-    required Person payer,
-    required List<Person> participation,
-    @Default([]) List<Debt> debts,
-    Category? category,
-    required Account account,
+    required int payerId,
+    @Default([]) List<int> participationIds,
+    @Default([]) List<int> debtIds,
+    int? categoryId,
+    required int accountId,
     @Default(0) int version,
   }) = _Expense;
 }

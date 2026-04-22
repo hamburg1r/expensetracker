@@ -15,8 +15,8 @@ class CreateDebtUseCase {
     final int newDebtId = await _debtRepo.create(debt);
     final Debt newDebt = debt.copyWith(id: newDebtId);
 
-    await _personRepo.addDebtOwed(newDebt.debtor.id, newDebt);
-    await _personRepo.addDebtReceivable(newDebt.creditor.id, newDebt);
+    await _personRepo.addDebtOwed(newDebt.debtorId, newDebt);
+    await _personRepo.addDebtReceivable(newDebt.creditorId, newDebt);
 
     _eventBus.fire(DebtCreatedEvent(newDebt));
     return newDebtId;

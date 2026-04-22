@@ -26,24 +26,23 @@ class DeleteUnaccountedMoneyUseCase {
     final deleted = await _unaccountedMoneyRepo.delete(id);
     if (deleted) {
       final account = await _accountRepo.getById(
-        unaccountedMoneyEntry.account.id,
+        unaccountedMoneyEntry.accountId,
       );
       if (account == null) {
         throw Exception(
-          'Account with ID ${unaccountedMoneyEntry.account.id} not found for UnaccountedMoney entry deletion.',
+          'Account with ID ${unaccountedMoneyEntry.accountId} not found for UnaccountedMoney entry deletion.',
         );
       }
 
-      final updatedUnaccountedMoneyList = List<UnaccountedMoney>.from(
-        account.unaccountedMoney,
-      )..removeWhere((um) => um.id == id);
+      final updatedUnaccountedMoneyIds = account.unaccountedMoneyIds
+        ..removeWhere((uId) => uId == id);
 
       final newTotalUnaccountedMoney =
           account.totalUnaccountedMoney - unaccountedMoneyEntry.amount;
       final newTotalMoney = account.totalMoney - unaccountedMoneyEntry.amount;
 
       final updatedAccount = account.copyWith(
-        unaccountedMoney: updatedUnaccountedMoneyList,
+        unaccountedMoneyIds: updatedUnaccountedMoneyIds,
         totalMoney: newTotalMoney,
         totalUnaccountedMoney: newTotalUnaccountedMoney,
       );

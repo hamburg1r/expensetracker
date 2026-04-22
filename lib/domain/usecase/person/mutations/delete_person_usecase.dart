@@ -97,16 +97,16 @@ class DeletePersonUseCase {
         break;
       }
       for (final expense in expenses) {
-        final updatedParticipation = expense.participation
-            .where((p) => p.id != personId)
+        final updatedParticipation = expense.participationIds
+            .where((pId) => pId != personId)
             .toList(growable: false);
 
         final modifiedExpense = expense.copyWith(
-          participation: updatedParticipation,
+          participationIds: updatedParticipation,
         );
 
         await _expenseRepo.update(modifiedExpense);
-        _eventBus.fire(ExpenseChangedEvent(modifiedExpense));
+        _eventBus.fire(ExpenseUpdatedEvent(modifiedExpense));
       }
       page++;
     }

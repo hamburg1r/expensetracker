@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:expensetracker/domain/model/debt.dart';
-import 'package:expensetracker/domain/model/person.dart';
 
 import 'package:expensetracker/domain/cache.dart';
 import 'package:expensetracker/domain/event_bus/event.dart';
@@ -24,16 +23,6 @@ import 'package:expensetracker/domain/usecase/debt/mutations/update_debt_usecase
 part 'debt_state.dart';
 part 'debt_event.dart';
 
-/// Manages the state and business logic related to [Debt] entities within the application.
-///
-/// This BLoC handles various debt-related operations such as loading all debts,
-/// creating, updating, deleting debts, and fetching debts based on specific criteria
-/// (e.g., by creditor ID, by debtor ID, or paginated lists). It interacts with
-/// [DebtRepo] for data persistence, [Cache] for efficient data retrieval,
-/// and [EventBus] for cross-BLoC communication and reacting to domain events.
-///
-/// It exposes methods for event handling (`_onLoadAllDebts`, `_onCreateDebt`, etc.)
-/// and utility methods for accessing cached data (`getAllLoaded`, `getById`).
 class DebtBloc extends Bloc<DebtEvent, DebtState> {
   final GetAllDebtUseCase _getAllDebtUseCase;
   final GetDebtByIdUseCase _getDebtByIdUseCase;
@@ -51,28 +40,8 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
   late StreamSubscription _debtCreatedSubscription;
   late StreamSubscription _debtDeletedSubscription;
   late StreamSubscription _debtUpdatedSubscription;
+  late StreamSubscription _unloadDebtSubscription;
 
-  /// Constructs a [DebtBloc] instance.
-  ///
-  /// This constructor initializes the BLoC with various use cases, a cache,
-  /// and an event bus. It sets the initial state to `DebtInitial` and
-  /// configures event handlers for all defined `DebtEvent`s.
-  ///
-  /// It also sets up subscriptions to `domain_events` from the `EventBus`
-  /// to react to external changes in debt data (e.g., updates, additions,
-  /// deletions originating from other parts of the application or data layer).
-  ///
-  /// **Dependencies:**
-  /// - `_eventBus`: The domain event bus for cross-BLoC communication.
-  /// - `_cache`: The application's caching mechanism for Debt objects.
-  /// - `_deleteDebtUseCase`: For deleting debts.
-  /// - `_createDebtUseCase`: For creating new debts.
-  /// - `_updateDebtUseCase`: For updating existing debts.
-  /// - `_getPageDebtUseCase`: For fetching debts by page.
-  /// - `_getDebtsByCreditorIdUseCase`: For fetching debts by creditor ID.
-  /// - `_getDebtsByDebtorIdUseCase`: For fetching debts by debtor ID.
-  /// - `_getAllDebtUseCase`: For fetching all debts.
-  /// - `_getDebtByIdUseCase`: For fetching a debt by ID.
   DebtBloc(
     this._getAllDebtUseCase,
     this._getDebtByIdUseCase,
@@ -118,68 +87,30 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
         .listen((event) {
           add(DebtUpdatedEvent(event.debt));
         });
+
+    _unloadDebtSubscription = _eventBus
+        .on<domain_events.UnloadDebtEvent>()
+        .listen((event) {
+          final debt = _cache.get<Debt>(event.debtId);
+          if (debt != null) {
+            add(UnloadDebtEvent(debt));
+          }
+        });
   }
 
-  /// Closes the [DebtBloc] and cancels all active `StreamSubscription`s
-  /// to prevent memory leaks and ensure proper resource management.
-  ///
-  /// This method should be called when the BLoC is no longer needed, typically
-  /// in the `dispose()` method of the associated UI widget or when the BLoC's
-  /// lifecycle ends.
-  ///
-  /// It ensures that all listeners to domain events are detached, preventing
-  /// the BLoC from reacting to events after it has been disposed.
   @override
   Future<void> close() {
     _debtCreatedSubscription.cancel();
     _debtDeletedSubscription.cancel();
     _debtUpdatedSubscription.cancel();
+    _unloadDebtSubscription.cancel();
     return super.close();
   }
 
-  /// Emits a `DebtLoaded` state containing all [Debt] objects currently
-  /// present in the BLoC's internal cache.
-  ///
-  /// This helper method is typically called after any operation that modifies
-  /// the collection of debts in the cache (e.g., loading new data, updating
-  /// an existing debt, or removing a debt). It ensures that the UI always
-  /// receives the most up-to-date representation of the debt list.
-  ///
-  /// [emit]: The `Emitter<DebtState>` to emit the `DebtLoaded` state.
   void _emitLoadedDebts(Emitter<DebtState> emit) {
     emit(DebtLoaded(_cache.getAll<Debt>()));
   }
 
-  /// Handles the `LoadAllDebtsEvent`.
-  ///
-  /// This method is responsible for initiating the loading of all [Debt]
-  /// objects from the persistent data source. It uses the `_getAllDebtUseCase`
-  /// to perform this retrieval.
-  ///
-  /// **Workflow:**
-  /// 1. Emits `DebtLoading()` to signal that data fetching is in progress,
-  ///    allowing the UI to display a loading indicator.
-  /// 2. Executes the `_getAllDebtUseCase.call()` to retrieve all debts.
-  /// 3. For each fetched [Debt] object, it performs a deep caching process:
-  ///    a. It first ensures that the `debtor` and `creditor` [Person] objects
-  ///       embedded within the debt are canonical instances managed by the
-  ///       BLoC's internal `_cache`. This is achieved by:
-  ///       - Adding or updating the `Person` objects from the debt into the `_cache`
-  ///         using `_cache.addStrong`.
-  ///       - Retrieving the canonical `Person` instances from the `_cache`.
-  ///    b. A new [Debt] object is then created using `debt.copyWith()` with its
-  ///       `creditor` and `debtor` fields referencing these canonical `Person` instances.
-  ///    c. This newly constructed [Debt] object (which now holds references to
-  ///       the canonical `Person` objects) is added to the BLoC's internal `_cache`
-  ///       using `_cache.addStrong`, establishing a strong reference.
-  /// 4. Calls `_emitLoadedDebts(emit)` to emit a `DebtLoaded` state,
-  ///    providing the complete list of debts (from cache) to the UI.
-  /// 5. Catches any exceptions during the loading process and emits `DebtError()`
-  ///    with a descriptive message.
-  ///
-  /// [event]: The `LoadAllDebtsEvent` that triggers this data loading operation.
-  /// [emit]: The `Emitter<DebtState>` used to emit `DebtLoading`, `DebtLoaded`,
-  ///         or `DebtError` states.
   Future<void> _onLoadAllDebts(
     LoadAllDebtsEvent event,
     Emitter<DebtState> emit,
@@ -188,30 +119,13 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     try {
       final allDebts = await _getAllDebtUseCase.call();
 
-      for (var debt in allDebts) {
-        _processAndCacheDebt(debt);
-      }
+      allDebts.forEach(_cache.addStrong);
       _emitLoadedDebts(emit);
     } catch (e) {
       emit(DebtError("$e\nFailed to load all debts"));
     }
   }
 
-  /// Handles the `CreateDebtEvent`.
-  ///
-  /// This method is responsible for creating a new [Debt] entity in the
-  /// persistent data store. It uses the `_createDebtUseCase` to perform
-  /// the creation.
-  ///
-  /// **Workflow:**
-  /// 1. Emits `DebtLoading()` to indicate that a creation operation is in progress.
-  /// 2. Calls `_createDebtUseCase.call(event.debt)` to save the new debt
-  ///    to the data source.
-  /// 3. Catches any exceptions during the creation process and emits `DebtError()`
-  ///    with a descriptive message.
-  ///
-  /// [event]: The `CreateDebtEvent` containing the [Debt] object to be created.
-  /// [emit]: The `Emitter<DebtState>` used to emit `DebtLoading` or `DebtError` states.
   Future<void> _onCreateDebt(
     CreateDebtEvent event,
     Emitter<DebtState> emit,
@@ -224,21 +138,6 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     }
   }
 
-  /// Handles the `DeleteDebtEvent`.
-  ///
-  /// This method is responsible for initiating the deletion of a [Debt]
-  /// entity from the persistent data store. It uses the `_deleteDebtUseCase`
-  /// to perform this operation.
-  ///
-  /// **Workflow:**
-  /// 1. Emits `DebtLoading()` to indicate that a deletion operation is in progress.
-  /// 2. Calls `_deleteDebtUseCase.call(event.debt.id)` to remove the debt
-  ///    from the data source.
-  /// 3. Catches any exceptions during the deletion process and emits `DebtError()`
-  ///    with a descriptive message.
-  ///
-  /// [event]: The `DeleteDebtEvent` containing the [Debt] object to be deleted.
-  /// [emit]: The `Emitter<DebtState>` used to emit `DebtLoading` or `DebtError` states.
   Future<void> _onDeleteDebt(
     DeleteDebtEvent event,
     Emitter<DebtState> emit,
@@ -251,21 +150,6 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     }
   }
 
-  /// Handles the `DebtDeletedEvent`.
-  ///
-  /// This method is a notification handler responsible for updating the BLoC's
-  /// internal cache and UI state after a [Debt] has been successfully
-  /// deleted from the persistent data store (or is intended to be removed
-  /// from the cache for other reasons).
-  ///
-  /// **Workflow:**
-  /// 1. Calls `_cache.remove<Debt>(event.debtId)` to explicitly remove the
-  ///    specified debt from the BLoC's internal cache.
-  /// 2. Calls `_emitLoadedDebts(emit)` to emit a `DebtLoaded` state,
-  ///    reflecting the updated list of debts (without the removed one) to the UI.
-  ///
-  /// [event]: The `DebtDeletedEvent` containing the ID of the [Debt] to be removed from the cache.
-  /// [emit]: The `Emitter<DebtState>` used to emit the `DebtLoaded` state.
   Future<void> _onDebtDeleted(
     DebtDeletedEvent event,
     Emitter<DebtState> emit,
@@ -274,21 +158,6 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     _emitLoadedDebts(emit);
   }
 
-  /// Handles the `UpdateDebtEvent`.
-  ///
-  /// This method is responsible for initiating the update of an existing
-  /// [Debt] entity in the persistent data store. It uses the `_updateDebtUseCase`
-  /// to perform this operation.
-  ///
-  /// **Workflow:**
-  /// 1. Emits `DebtLoading()` to indicate that an update operation is in progress.
-  /// 2. Calls `_updateDebtUseCase.execute(event.debt)` to save the updated debt
-  ///    to the data source.
-  /// 3. Catches any exceptions during the update process and emits `DebtError()`
-  ///    with a descriptive message.
-  ///
-  /// [event]: The `UpdateDebtEvent` containing the updated [Debt] object.
-  /// [emit]: The `Emitter<DebtState>` used to emit `DebtLoading` or `DebtError` states.
   Future<void> _onUpdateDebt(
     UpdateDebtEvent event,
     Emitter<DebtState> emit,
@@ -301,27 +170,6 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     }
   }
 
-  /// Handles the `GetPageDebtEvent`.
-  ///
-  /// This method is responsible for fetching a specific page of [Debt]
-  /// objects from the persistent data source, typically used for pagination
-  /// or lazy loading. It uses the `_getPageDebtUseCase` to retrieve the data.
-  ///
-  /// **Workflow:**
-  /// 1. Emits `DebtLoading()` to signal that data fetching for the page is in progress.
-  /// 2. Calls `_getPageDebtUseCase.call(event.page, event.limit)` to retrieve
-  ///    the specified page of debts.
-  /// 3. For each fetched [Debt] object, it processes and caches it using
-  ///    `_processAndCacheDebt`, ensuring that embedded [Person] objects are
-  ///    canonical instances from the BLoC's internal `_cache`.
-  /// 4. Calls `_emitLoadedDebts(emit)` to emit a `DebtLoaded` state,
-  ///    providing the updated list of debts (from cache) to the UI.
-  /// 5. Catches any exceptions during the page fetching process and emits `DebtError()`
-  ///    with a descriptive message.
-  ///
-  /// [event]: The `GetPageDebtEvent` containing the page number and limit for fetching.
-  /// [emit]: The `Emitter<DebtState>` used to emit `DebtLoading`, `DebtLoaded`,
-  ///         or `DebtError` states.
   Future<void> _onGetPageDebt(
     GetPageDebtEvent event,
     Emitter<DebtState> emit,
@@ -329,33 +177,13 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     emit(DebtLoading());
     try {
       final debts = await _getPageDebtUseCase.call(event.page, event.limit);
-      for (var debt in debts) {
-        _processAndCacheDebt(debt);
-      }
+      debts.forEach(_cache.addStrong);
       _emitLoadedDebts(emit);
     } catch (e) {
       emit(DebtError("$e\nFailed to get page of debts"));
     }
   }
 
-  /// Handles the `GetDebtsByCreditorIdEvent`.
-  ///
-  /// This method is responsible for fetching a list of [Debt] objects
-  /// where a specific person is the creditor. It uses the `_getDebtsByCreditorIdUseCase`
-  /// to perform this retrieval.
-  ///
-  /// **Workflow:**
-  /// 1. Emits `DebtLoading()` to signal that data fetching is in progress.
-  /// 2. Calls `_getDebtsByCreditorIdUseCase.call(event.creditorId, event.page, event.limit)`
-  ///    to retrieve the debts.
-  /// 3. For each fetched [Debt] object, it processes and caches it using
-  ///    `_processAndCacheDebt`, ensuring that embedded [Person] objects are
-  ///    canonical instances from the BLoC's internal `_cache`.
-  /// 4. Calls `_emitLoadedDebts(emit)` to emit a `DebtLoaded` state.
-  /// 5. Catches any exceptions and emits `DebtError()`.
-  ///
-  /// [event]: The `GetDebtsByCreditorIdEvent` containing the creditor's ID, page, and limit.
-  /// [emit]: The `Emitter<DebtState>` used to emit states.
   Future<void> _onGetDebtsByCreditorId(
     GetDebtsByCreditorIdEvent event,
     Emitter<DebtState> emit,
@@ -367,33 +195,13 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
         event.page,
         event.limit,
       );
-      for (var debt in debts) {
-        _processAndCacheDebt(debt);
-      }
+      debts.forEach(_cache.addStrong);
       _emitLoadedDebts(emit);
     } catch (e) {
       emit(DebtError("$e\nFailed to get debts by creditor ID"));
     }
   }
 
-  /// Handles the `GetDebtsByDebtorIdEvent`.
-  ///
-  /// This method is responsible for fetching a list of [Debt] objects
-  /// where a specific person is the debtor. It uses the `_getDebtsByDebtorIdUseCase`
-  /// to perform this retrieval.
-  ///
-  /// **Workflow:**
-  /// 1. Emits `DebtLoading()` to signal that data fetching is in progress.
-  /// 2. Calls `_getDebtsByDebtorIdUseCase.call(event.debtorId, event.page, event.limit)`
-  ///    to retrieve the debts.
-  /// 3. For each fetched [Debt] object, it processes and caches it using
-  ///    `_processAndCacheDebt`, ensuring that embedded [Person] objects are
-  ///    canonical instances from the BLoC's internal `_cache`.
-  /// 4. Calls `_emitLoadedDebts(emit)` to emit a `DebtLoaded` state.
-  /// 5. Catches any exceptions and emits `DebtError()`.
-  ///
-  /// [event]: The `GetDebtsByDebtorIdEvent` containing the debtor's ID, page, and limit.
-  /// [emit]: The `Emitter<DebtState>` used to emit states.
   Future<void> _onGetDebtsByDebtorId(
     GetDebtsByDebtorIdEvent event,
     Emitter<DebtState> emit,
@@ -405,29 +213,13 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
         event.page,
         event.limit,
       );
-      for (var debt in debts) {
-        _processAndCacheDebt(debt);
-      }
+      debts.forEach(_cache.addStrong);
       _emitLoadedDebts(emit);
     } catch (e) {
       emit(DebtError("$e\nFailed to get debts by debtor ID"));
     }
   }
 
-  /// Handles the `UnloadDebtEvent`.
-  ///
-  /// This method is responsible for releasing a strong reference to a single
-  /// [Debt] object in the BLoC's internal cache.
-  ///
-  /// **Workflow:**
-  /// 1. Calls `_cache.releaseStrong(event.debt)` to decrement the strong
-  ///    reference count for the specified debt in the cache.
-  /// 2. Calls `_emitLoadedDebts(emit)` to emit a `DebtLoaded` state,
-  ///    reflecting the potentially changed reference counts or removal if
-  ///    references dropped to zero.
-  ///
-  /// [event]: The `UnloadDebtEvent` containing the [Debt] to be unloaded.
-  /// [emit]: The `Emitter<DebtState>` used to emit the `DebtLoaded` state.
   Future<void> _onUnloadDebt(
     UnloadDebtEvent event,
     Emitter<DebtState> emit,
@@ -436,21 +228,6 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     _emitLoadedDebts(emit);
   }
 
-  /// Handles the `UnloadDebtsEvent`.
-  ///
-  /// This method is responsible for releasing strong references to a list of
-  /// [Debt] objects in the BLoC's internal cache.
-  ///
-  /// **Workflow:**
-  /// 1. Iterates through each `debt` in `event.debts`.
-  /// 2. For each `debt`, it calls `_cache.releaseStrong(debt)` to decrement
-  ///    its strong reference count in the cache.
-  /// 3. After processing all debts, it calls `_emitLoadedDebts(emit)` to emit
-  ///    a `DebtLoaded` state, updating the UI with the cache's current contents.
-  ///
-  /// [event]: The `UnloadDebtsEvent` containing the list of [Debt] objects
-  ///          to be unloaded.
-  /// [emit]: The `Emitter<DebtState>` used to emit the `DebtLoaded` state.
   Future<void> _onUnloadDebts(
     UnloadDebtsEvent event,
     Emitter<DebtState> emit,
@@ -459,20 +236,6 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     _emitLoadedDebts(emit);
   }
 
-  /// Handles the `DebtUpdatedEvent`.
-  ///
-  /// This method is a notification handler responsible for updating the BLoC's
-  /// internal cache and UI state after a [Debt] has been successfully
-  /// updated in the persistent data store.
-  ///
-  /// **Workflow:**
-  /// 1. Calls `_cache.addStrong(event.debt)` to add or update the
-  ///    specified debt in the BLoC's internal cache.
-  /// 2. Calls `_emitLoadedDebts(emit)` to emit a `DebtLoaded` state,
-  ///    reflecting the updated list of debts to the UI.
-  ///
-  /// [event]: The `DebtUpdatedEvent` containing the updated [Debt] object.
-  /// [emit]: The `Emitter<DebtState>` used to emit the `DebtLoaded` state.
   Future<void> _onDebtUpdated(
     DebtUpdatedEvent event,
     Emitter<DebtState> emit,
@@ -486,68 +249,10 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     Emitter<DebtState> emit,
   ) async {}
 
-  /// Retrieves all [Debt] objects that are currently loaded and managed
-  /// by the BLoC's internal cache.
-  ///
-  /// This method provides direct access to the BLoC's local state without
-  /// triggering any events or state changes. It is useful for components that
-  /// need to quickly access the current set of loaded debts.
-  ///
-  /// Returns a `Future<List<Debt>>` containing all debts from the cache.
   Future<List<Debt>> getAllLoaded() async {
     return _cache.getAll<Debt>().values.toList(growable: false);
   }
 
-  /// Processes a single [Debt] object, ensuring its embedded [Person]
-  /// objects (debtor and creditor) are canonical instances from the cache,
-  /// and then adds the processed [Debt] to the cache.
-  ///
-  /// This method first ensures that the `debtor` and `creditor` [Person] objects
-  /// embedded within the provided `debt` are canonical instances managed by the
-  /// BLoC's internal `_cache`. This is achieved by:
-  ///   - Adding or updating the `Person` objects from the debt into the `_cache`
-  ///     using `_cache.addStrong`.
-  ///   - Retrieving the canonical `Person` instances from the `_cache`.
-  /// A new [Debt] object is then created using `debt.copyWith()`, with its
-  /// `creditor` and `debtor` fields referencing these canonical `Person` instances.
-  /// This newly constructed [Debt] object is then added to the BLoC's internal `_cache`.
-  ///
-  /// Returns the processed [Debt] object with canonical [Person] references.
-  Debt _processAndCacheDebt(Debt debt) {
-    _cache.addStrong(debt.creditor);
-    final cachedCreditor = _cache.get<Person>(debt.creditor.id)!;
-
-    _cache.addStrong(debt.debtor);
-    final cachedDebtor = _cache.get<Person>(debt.debtor.id)!;
-
-    final debtWithCachedPeople = debt.copyWith(
-      creditor: cachedCreditor,
-      debtor: cachedDebtor,
-    );
-    _cache.addStrong(debtWithCachedPeople); // Cache the processed debt itself
-    return debtWithCachedPeople;
-  }
-
-  /// Handles the `GetDebtByIdEvent`.
-  ///
-  /// This method retrieves a single [Debt] object by its `id`.
-  /// It first checks the local cache. If the debt is found in the cache,
-  /// it is processed by `_processAndCacheDebt` to ensure its embedded
-  /// [Person] objects are canonical instances and to maintain a strong
-  /// reference in the cache.
-  /// If the debt is not in the cache, it attempts to fetch it from the data
-  /// source using `_getDebtByIdUseCase`. Upon successful retrieval, the
-  /// `fetchedDebt` is processed by `_processAndCacheDebt` (which canonicalizes
-  /// embedded [Person] objects and adds the processed debt to the cache
-  /// with a strong reference).
-  ///
-  /// After successfully retrieving and caching the debt (or if it was already
-  /// in the cache), `_emitLoadedDebts` is called to update the state.
-  /// If the debt is not found or an error occurs, an `DebtError` state is emitted.
-  ///
-  /// [event]: The `GetDebtByIdEvent` containing the ID of the [Debt] to retrieve.
-  /// [emit]: The `Emitter<DebtState>` used to emit `DebtLoading`, `DebtLoaded`,
-  ///         or `DebtError` states.
   Future<void> _onGetDebtById(
     GetDebtByIdEvent event,
     Emitter<DebtState> emit,
@@ -558,11 +263,12 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
       Debt? fetchedDebt;
 
       if (debt != null) {
-        fetchedDebt = _processAndCacheDebt(debt);
+        _cache.addStrong(debt);
+        fetchedDebt = debt;
       } else {
         fetchedDebt = await _getDebtByIdUseCase.call(event.id);
         if (fetchedDebt != null) {
-          fetchedDebt = _processAndCacheDebt(fetchedDebt);
+          _cache.addStrong(fetchedDebt);
         }
       }
 

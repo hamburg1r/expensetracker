@@ -20,17 +20,17 @@ class CreateUnaccountedMoneyUseCase {
     // Optionally publish a domain event, e.g., UnaccountedMoneyCreatedEvent
     // _eventBus.fire(UnaccountedMoneyCreatedEvent(id, entry));
 
-    final account = await _accountRepo.getById(entry.account.id);
+    final account = await _accountRepo.getById(entry.accountId);
     if (account == null) {
       throw Exception(
-        'Account with ID ${entry.account.id} not found for UnaccountedMoney entry creation.',
+        'Account with ID ${entry.accountId} not found for UnaccountedMoney entry creation.',
       );
     }
 
     final updatedAccount = account.copyWith(
-      unaccountedMoney: [
-        ...account.unaccountedMoney,
-        entry.copyWith(id: id),
+      unaccountedMoneyIds: [
+        ...account.unaccountedMoneyIds,
+        id,
       ],
       totalMoney: account.totalMoney + entry.amount,
       totalUnaccountedMoney: account.totalUnaccountedMoney + entry.amount,

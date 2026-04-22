@@ -18,37 +18,27 @@ class UpdateUnaccountedMoneyUseCase {
   Future<void> call(UnaccountedMoney entry) async {
     await _unaccountedMoneyRepo.update(entry);
 
-    final account = await _accountRepo.getById(entry.account.id);
+    final account = await _accountRepo.getById(entry.accountId);
     if (account == null) {
       throw Exception(
-        'Account with ID ${entry.account.id} not found for UnaccountedMoney entry update.',
+        'Account with ID ${entry.accountId} not found for UnaccountedMoney entry update.',
       );
     }
 
-    final oldEntryIndex = account.unaccountedMoney.indexWhere(
-      (e) => e.id == entry.id,
-    );
-
-    if (oldEntryIndex == -1) {
+    final oldEntry = await _unaccountedMoneyRepo.getById(entry.id);
+    if (oldEntry == null) {
       throw Exception(
-        'UnaccountedMoney entry with ID ${entry.id} not found in account ${account.id}. Cannot update a non-existent entry.',
+        'Old UnaccountedMoney entry with ID ${entry.id} not found. Cannot update.',
       );
     }
 
-    final oldEntry = account.unaccountedMoney[oldEntryIndex];
     final amountChange = entry.amount - oldEntry.amount;
-
-    final updatedUnaccountedMoneyList = List<UnaccountedMoney>.from(
-      account.unaccountedMoney,
-    );
-    updatedUnaccountedMoneyList[oldEntryIndex] = entry;
 
     final newTotalMoney = account.totalMoney + amountChange;
     final newTotalUnaccountedMoney =
         account.totalUnaccountedMoney + amountChange;
 
     final updatedAccount = account.copyWith(
-      unaccountedMoney: updatedUnaccountedMoneyList,
       totalMoney: newTotalMoney,
       totalUnaccountedMoney: newTotalUnaccountedMoney,
     );

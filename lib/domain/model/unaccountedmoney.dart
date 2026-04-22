@@ -1,4 +1,3 @@
-import 'package:expensetracker/domain/model/account.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:expensetracker/domain/model/base_entity.dart';
 
@@ -11,7 +10,7 @@ abstract class UnaccountedMoney with _$UnaccountedMoney implements BaseEntity {
     required double amount,
     required String description,
     required DateTime date,
-    required Account account,
+    required int accountId,
     @Default(0) int version,
   }) = _UnaccountedMoney;
 }

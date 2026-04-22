@@ -165,6 +165,30 @@ class Cache {
     }
   }
 
+  /// Decrements the strong reference count for a given [id].
+  ///
+  /// If the reference count drops to zero after decrementing, the item is
+  /// removed from the cache, and any registered garbage collector for its type
+  /// [T] is invoked.
+  ///
+  /// - Parameters:
+  ///   - [id]: The ID of the [BaseEntity] item for which to release a strong reference.
+  void releaseStrongById<T extends BaseEntity>(int id) {
+    final cache = _getCacheFor<T>();
+
+    if (!cache.containsKey(id)) return;
+
+    cache[id]!.decrement();
+
+    if (cache[id]!.references == 0) {
+      final removedItem = cache.remove(id);
+      final collector = _garbageCollectors[T];
+      if (collector != null && removedItem != null) {
+        collector(removedItem.value, this);
+      }
+    }
+  }
+
   /// Retrieves an item of type [T] from the cache by its ID.
   ///
   /// - Parameters:
