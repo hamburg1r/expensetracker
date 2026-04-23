@@ -98,10 +98,6 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     return super.close();
   }
 
-  void _emitLoadedAccounts(Emitter<AccountState> emit) {
-    emit(AccountLoaded(_cache.getAll<Account>()));
-  }
-
   Future<void> _onLoadAllAccounts(
     LoadAllAccountsEvent event,
     Emitter<AccountState> emit,
@@ -110,7 +106,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     try {
       final allAccounts = await _getAllAccountsUseCase.call();
       allAccounts.forEach(_cache.addStrong);
-      _emitLoadedAccounts(emit);
+      emit(AccountLoaded(_cache.getAll<Account>()));
     } catch (e) {
       emit(AccountError("$e\nFailed to load all accounts"));
     }
@@ -127,7 +123,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         event.limit,
       );
       pageData.forEach(_cache.addStrong);
-      _emitLoadedAccounts(emit);
+      emit(AccountLoaded(_cache.getAll<Account>()));
     } catch (e) {
       emit(AccountError("$e\nFailed to get page of accounts"));
     }
@@ -174,7 +170,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     Emitter<AccountState> emit,
   ) async {
     _cache.releaseStrong<Account>(event.account);
-    _emitLoadedAccounts(emit);
+    emit(AccountLoaded(_cache.getAll<Account>()));
   }
 
   Future<void> _onUnloadAccounts(
@@ -182,7 +178,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     Emitter<AccountState> emit,
   ) async {
     event.accounts.forEach(_cache.releaseStrong<Account>);
-    _emitLoadedAccounts(emit);
+    emit(AccountLoaded(_cache.getAll<Account>()));
   }
 
   Future<void> _onAccountCreated(
@@ -195,7 +191,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     Emitter<AccountState> emit,
   ) async {
     _cache.update(event.account);
-    _emitLoadedAccounts(emit);
+    emit(AccountUpdated(event.account));
   }
 
   Future<void> _onAccountDeleted(
@@ -203,7 +199,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     Emitter<AccountState> emit,
   ) async {
     _cache.remove<Account>(event.accountId);
-    _emitLoadedAccounts(emit);
+    emit(AccountDeleted(event.accountId));
   }
 
   Future<void> _onGetAccountById(
@@ -212,24 +208,17 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   ) async {
     emit(AccountLoading());
     try {
-      final account = _cache.get<Account>(event.id);
-      Account? fetchedAccount;
+      final account =
+          _cache.get<Account>(event.id) ??
+          await _getAccountByIdUseCase.call(event.id);
 
-      if (account != null) {
-        _cache.addStrong(account);
-        fetchedAccount = account;
-      } else {
-        fetchedAccount = await _getAccountByIdUseCase.call(event.id);
-        if (fetchedAccount != null) {
-          _cache.addStrong(fetchedAccount);
-        }
-      }
-
-      if (fetchedAccount != null) {
-        _emitLoadedAccounts(emit);
-      } else {
+      if (account == null) {
         emit(AccountError("Account with ID ${event.id} not found."));
+        return;
       }
+      _cache.addStrong(account);
+
+      emit(AccountLoaded(_cache.getAll<Account>()));
     } catch (e) {
       emit(AccountError("$e\nFailed to get account by ID: ${event.id}"));
     }

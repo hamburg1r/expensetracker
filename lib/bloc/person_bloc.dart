@@ -161,11 +161,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     try {
       final List<Person> all = await _getAllPeopleUseCase.call();
       all.forEach(cache.addStrong);
-      emit(
-        PersonLoaded(
-          cache.getAll<Person>(),
-        ),
-      );
+      emit(PersonLoaded(cache.getAll<Person>()));
     } catch (e) {
       emit(PersonError("$e\nFailed to load"));
     }
@@ -176,11 +172,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     Emitter<PersonState> emit,
   ) async {
     cache.releaseStrong<Person>(event.person);
-    emit(
-      PersonLoaded(
-        cache.getAll<Person>(),
-      ),
-    );
+    emit(PersonLoaded(cache.getAll<Person>()));
   }
 
   Future<void> _onUnloadPeople(
@@ -191,11 +183,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
     // for (var person in event.people) {
     //   cache.releaseStrong<Person>(person);
     // }
-    emit(
-      PersonLoaded(
-        cache.getAll<Person>(),
-      ),
-    );
+    emit(PersonLoaded(cache.getAll<Person>()));
   }
 
   Future<void> _onCreatePerson(
@@ -259,11 +247,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
       );
       // TODO: maybe move move this logic to some kind of event handled single item loading mechanism
       pageData.forEach(cache.addStrong);
-      emit(
-        PersonLoaded(
-          cache.getAll<Person>(),
-        ),
-      );
+      emit(PersonLoaded(cache.getAll<Person>()));
     } catch (e) {
       emit(PersonError("$e\nFailed to fetch Person for page: ${event.page}"));
     }
@@ -298,12 +282,7 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
       );
 
       cache.update(person.copyWith(debtsOwedIds: updatedDebtsOwedIds));
-      emit(
-        DebtsOwedLoaded(
-          person,
-          fetchedDebts,
-        ),
-      );
+      emit(DebtsOwedLoaded(person, fetchedDebts));
     } catch (e) {
       emit(PersonError("$e\nFailed to fetch debts owed for Person"));
     }
@@ -339,13 +318,10 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
         person.debtsReceivableIds,
       );
 
-      cache.update(person.copyWith(debtsReceivableIds: updatedDebtsReceivableIds));
-      emit(
-        DebtsReceivableLoaded(
-          person,
-          fetchedDebts,
-        ),
+      cache.update(
+        person.copyWith(debtsReceivableIds: updatedDebtsReceivableIds),
       );
+      emit(DebtsReceivableLoaded(person, fetchedDebts));
     } catch (e) {
       emit(PersonError("$e\nFailed to fetch debts receivable for Person"));
     }
@@ -379,28 +355,17 @@ class PersonBloc extends Bloc<PersonEvent, PersonState> {
   ) async {
     emit(PersonLoading());
     try {
-      final person = cache.get<Person>(event.id);
-      Person? fetchedPerson;
+      final person =
+          cache.get<Person>(event.id) ??
+          await _getPersonByIdUseCase.call(event.id);
 
-      if (person != null) {
-        cache.addStrong(person);
-        fetchedPerson = person;
-      } else {
-        fetchedPerson = await _getPersonByIdUseCase.call(event.id);
-        if (fetchedPerson != null) {
-          cache.addStrong(fetchedPerson);
-        }
-      }
-
-      if (fetchedPerson != null) {
-        emit(
-          PersonLoaded(
-            cache.getAll<Person>(),
-          ),
-        );
-      } else {
+      if (person == null) {
         emit(PersonError("Person with ID ${event.id} not found."));
+        return;
       }
+      cache.addStrong(person);
+
+      emit(PersonLoaded(cache.getAll<Person>()));
     } catch (e) {
       emit(PersonError("$e\nFailed to get person by ID: ${event.id}"));
     }

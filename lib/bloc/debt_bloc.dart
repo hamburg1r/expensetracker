@@ -68,7 +68,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     on<DebtCreatedEvent>(_onDebtCreated);
     on<DebtUpdatedEvent>(_onDebtUpdated);
     on<DebtDeletedEvent>(_onDebtDeleted);
-    on<GetDebtByIdEvent>(_onGetDebtById); // Add this line
+    on<GetDebtByIdEvent>(_onGetDebtById);
 
     _debtCreatedSubscription = _eventBus
         .on<domain_events.DebtCreatedEvent>()
@@ -107,10 +107,6 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     return super.close();
   }
 
-  void _emitLoadedDebts(Emitter<DebtState> emit) {
-    emit(DebtLoaded(_cache.getAll<Debt>()));
-  }
-
   Future<void> _onLoadAllDebts(
     LoadAllDebtsEvent event,
     Emitter<DebtState> emit,
@@ -120,7 +116,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
       final allDebts = await _getAllDebtUseCase.call();
 
       allDebts.forEach(_cache.addStrong);
-      _emitLoadedDebts(emit);
+      emit(DebtLoaded(_cache.getAll<Debt>()));
     } catch (e) {
       emit(DebtError("$e\nFailed to load all debts"));
     }
@@ -155,7 +151,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     Emitter<DebtState> emit,
   ) async {
     _cache.remove<Debt>(event.debtId);
-    _emitLoadedDebts(emit);
+    emit(DebtDeleted(event.debtId));
   }
 
   Future<void> _onUpdateDebt(
@@ -178,7 +174,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     try {
       final debts = await _getPageDebtUseCase.call(event.page, event.limit);
       debts.forEach(_cache.addStrong);
-      _emitLoadedDebts(emit);
+      emit(DebtLoaded(_cache.getAll<Debt>()));
     } catch (e) {
       emit(DebtError("$e\nFailed to get page of debts"));
     }
@@ -196,7 +192,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
         event.limit,
       );
       debts.forEach(_cache.addStrong);
-      _emitLoadedDebts(emit);
+      emit(DebtLoaded(_cache.getAll<Debt>()));
     } catch (e) {
       emit(DebtError("$e\nFailed to get debts by creditor ID"));
     }
@@ -214,7 +210,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
         event.limit,
       );
       debts.forEach(_cache.addStrong);
-      _emitLoadedDebts(emit);
+      emit(DebtLoaded(_cache.getAll<Debt>()));
     } catch (e) {
       emit(DebtError("$e\nFailed to get debts by debtor ID"));
     }
@@ -225,7 +221,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     Emitter<DebtState> emit,
   ) async {
     _cache.releaseStrong<Debt>(event.debt);
-    _emitLoadedDebts(emit);
+    emit(DebtLoaded(_cache.getAll<Debt>()));
   }
 
   Future<void> _onUnloadDebts(
@@ -233,7 +229,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     Emitter<DebtState> emit,
   ) async {
     event.debts.forEach(_cache.releaseStrong<Debt>);
-    _emitLoadedDebts(emit);
+    emit(DebtLoaded(_cache.getAll<Debt>()));
   }
 
   Future<void> _onDebtUpdated(
@@ -241,7 +237,7 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
     Emitter<DebtState> emit,
   ) async {
     _cache.update(event.debt);
-    _emitLoadedDebts(emit);
+    emit(DebtUpdated(event.debt));
   }
 
   Future<void> _onDebtCreated(
@@ -259,24 +255,17 @@ class DebtBloc extends Bloc<DebtEvent, DebtState> {
   ) async {
     emit(DebtLoading());
     try {
-      final debt = _cache.get<Debt>(event.id);
-      Debt? fetchedDebt;
+      final debt =
+          _cache.get<Debt>(event.id) ??
+          await _getDebtByIdUseCase.call(event.id);
 
-      if (debt != null) {
-        _cache.addStrong(debt);
-        fetchedDebt = debt;
-      } else {
-        fetchedDebt = await _getDebtByIdUseCase.call(event.id);
-        if (fetchedDebt != null) {
-          _cache.addStrong(fetchedDebt);
-        }
-      }
-
-      if (fetchedDebt != null) {
-        _emitLoadedDebts(emit);
-      } else {
+      if (debt == null) {
         emit(DebtError("Debt with ID ${event.id} not found."));
+        return;
       }
+      _cache.addStrong(debt);
+
+      emit(DebtLoaded(_cache.getAll<Debt>()));
     } catch (e) {
       emit(DebtError("$e\nFailed to get debt by ID: ${event.id}"));
     }

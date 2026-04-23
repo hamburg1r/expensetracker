@@ -20,6 +20,24 @@ class AccountLoaded extends AccountState {
   List<Object> get props => [accounts];
 }
 
+class AccountUpdated extends AccountState {
+  final Account account;
+
+  const AccountUpdated(this.account);
+
+  @override
+  List<Object> get props => [account];
+}
+
+class AccountDeleted extends AccountState {
+  final int id;
+
+  const AccountDeleted(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+
 class AccountError extends AccountState {
   final String message;
 

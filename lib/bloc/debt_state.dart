@@ -20,6 +20,24 @@ class DebtLoaded extends DebtState {
   List<Object> get props => [debts];
 }
 
+class DebtUpdated extends DebtState {
+  final Debt debt;
+
+  const DebtUpdated(this.debt);
+
+  @override
+  List<Object> get props => [debt];
+}
+
+class DebtDeleted extends DebtState {
+  final int id;
+
+  const DebtDeleted(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+
 class DebtError extends DebtState {
   final String message;
 
