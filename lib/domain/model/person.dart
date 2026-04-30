@@ -15,6 +15,5 @@ abstract class Person with _$Person implements BaseEntity {
     @Default([]) List<int> debtsReceivableIds,
     @Default([]) List<int> transactionIds,
     @Default([]) List<int> participationIds,
-    @Default(0) int version,
   }) = _Person;
 }

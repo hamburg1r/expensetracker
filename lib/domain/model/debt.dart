@@ -15,6 +15,5 @@ abstract class Debt with _$Debt implements BaseEntity {
     @Default([]) List<String> tags,
     @Default(0) double paidAmount,
     int? expenseId,
-    @Default(0) int version,
   }) = _Debt;
 }

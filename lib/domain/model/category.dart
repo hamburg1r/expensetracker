@@ -10,6 +10,5 @@ abstract class Category with _$Category implements BaseEntity {
     required String name,
     @Default([]) List<int> expenseIds,
     int? budget,
-    @Default(0) int version,
   }) = _Category;
 }

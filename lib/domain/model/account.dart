@@ -14,6 +14,5 @@ abstract class Account with _$Account implements BaseEntity {
     @Default([]) List<int> unaccountedMoneyIds,
     @Default(0) double totalMoney,
     @Default(0) double totalUnaccountedMoney,
-    @Default(0) int version,
   }) = _Account;
 }

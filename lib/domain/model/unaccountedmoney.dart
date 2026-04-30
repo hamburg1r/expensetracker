@@ -11,6 +11,5 @@ abstract class UnaccountedMoney with _$UnaccountedMoney implements BaseEntity {
     required String description,
     required DateTime date,
     required int accountId,
-    @Default(0) int version,
   }) = _UnaccountedMoney;
 }

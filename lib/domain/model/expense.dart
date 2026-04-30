@@ -17,6 +17,5 @@ abstract class Expense with _$Expense implements BaseEntity {
     @Default([]) List<int> debtIds,
     int? categoryId,
     required int accountId,
-    @Default(0) int version,
   }) = _Expense;
 }
