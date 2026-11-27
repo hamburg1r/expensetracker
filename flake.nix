@@ -100,6 +100,11 @@
 					pkgs.unzip          # Needed to extract cmdline-tools
 					pkgs.curl           # Needed to download cmdline-tools
 					pkgs.nmap          # Add nmap since it's used in connectadb
+					pkgs.python3
+					pkgs.python3Packages.markdown
+					pkgs.nodejs
+					pkgs.yarn
+					pkgs.mermaid-cli
 					connectadb
 					installdeps         # Our script is now a proper binary
 				];

@@ -25,7 +25,10 @@ linter:
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
 formatter:
-  trailing_commas: preserve
+  trailing_commas: automate
+analyzer:
+  errors:
+    avoid_print: ignore
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
