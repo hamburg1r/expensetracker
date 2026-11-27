@@ -1,6 +1,6 @@
 import 'package:expensetracker/domain/repository/unaccountedmoney.dart';
 import 'package:expensetracker/domain/repository/account.dart';
-import 'package:expensetracker/domain/model/unaccountedmoney.dart';
+
 import 'package:expensetracker/domain/event_bus/event.dart';
 import 'package:expensetracker/domain/event_bus/events/account_event.dart';
 

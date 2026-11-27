@@ -25,11 +25,11 @@ class DeletePersonUseCase {
       throw Exception('Person with ID $id not found.');
     }
 
-    await _removeDebts(id, limit);
-
     await _removeExpenses(id, limit);
 
     await _removeParticipations(id, limit);
+
+    await _removeDebts(id, limit);
 
     final deletedPerson = await _personRepo.delete(id);
 

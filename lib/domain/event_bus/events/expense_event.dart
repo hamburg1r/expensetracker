@@ -21,7 +21,7 @@ class ExpenseDeletedEvent extends DomainEvent {
   ExpenseDeletedEvent(this.expenseId);
 }
 
-class RemoveExpenseEvent extends DomainEvent {
+class DeleteExpenseEvent extends DomainEvent {
   final Expense expense;
-  RemoveExpenseEvent(this.expense);
+  DeleteExpenseEvent(this.expense);
 }

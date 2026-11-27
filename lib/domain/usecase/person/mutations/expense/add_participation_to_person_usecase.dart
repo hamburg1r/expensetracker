@@ -1,4 +1,3 @@
-/*
 import 'package:expensetracker/domain/model/expense.dart';
 import 'package:expensetracker/domain/model/person.dart';
 import 'package:expensetracker/domain/repository/person.dart';
@@ -12,13 +11,16 @@ class AddParticipationToPersonUseCase {
   AddParticipationToPersonUseCase(this._personRepo, this._eventBus);
 
   Future<void> call(Person person, Expense expense) async {
-    final List<Expense> newParticipations = List.from(person.participations)
-      ..add(expense);
-    final updatedPerson = person.copyWith(participations: newParticipations);
+    if (person.participationIds.contains(expense.id)) {
+      return; // Already participating
+    }
+
+    final List<int> newParticipationIds =
+        List.from(person.participationIds)..add(expense.id);
+    final updatedPerson = person.copyWith(participationIds: newParticipationIds);
 
     await _personRepo.update(updatedPerson);
 
     _eventBus.fire(PersonUpdatedEvent(updatedPerson));
   }
 }
-*/

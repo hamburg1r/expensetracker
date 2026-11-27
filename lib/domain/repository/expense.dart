@@ -12,13 +12,6 @@ abstract class ExpenseRepo {
 
   Future<void> updateExpensePayer(int expenseId, Person newPayer);
 
-  Future<void> addParticipantToExpense(int expenseId, Person newParticipant);
-
-  Future<void> removeParticipantFromExpense(
-    int expenseId,
-    Person oldParticipant,
-  );
-
   Future<Expense?> getById(int id);
   Future<List<Expense>> getPage(int page, [int limit = 20]);
   Future<List<Expense>> getExpensesForAccount(

@@ -7,17 +7,20 @@ import 'package:expensetracker/domain/repository/expense.dart';
 import 'package:expensetracker/domain/repository/account.dart';
 
 // --- Mock Implementations ---
-import 'package:expensetracker/domain/repository/mock/person.dart';
-import 'package:expensetracker/domain/repository/mock/debt.dart';
-import 'package:expensetracker/domain/repository/mock/expense.dart';
-import 'package:expensetracker/domain/repository/mock/account.dart';
+import 'package:expensetracker/data/repository/mock/person_mock.dart';
+import 'package:expensetracker/data/repository/mock/debt_mock.dart';
+import 'package:expensetracker/data/repository/mock/expense_mock.dart';
+import 'package:expensetracker/data/repository/mock/account_mock.dart';
 import 'package:expensetracker/domain/repository/unaccountedmoney.dart';
-import 'package:expensetracker/domain/repository/mock/unaccounted_entry.dart';
+import 'package:expensetracker/data/repository/mock/unaccountedmoney_mock.dart'; // Corrected path and name
 
 List<SingleChildWidget> repoProviders = [
-  Provider<PersonRepo>(create: (_) => MockPersonRepo()),
-  Provider<DebtRepo>(create: (_) => MockDebtRepo()),
-  Provider<ExpenseRepo>(create: (_) => MockExpenseRepo()),
-  Provider<AccountRepo>(create: (_) => MockAccountRepo()),
-  Provider<UnaccountedMoneyRepo>(create: (_) => MockUnaccountedMoneyRepo()),
+  Provider<PersonRepo>(create: (_) => MockPersonRepository()),
+  Provider<AccountRepo>(
+      create: (context) => MockAccountRepository()),
+  Provider<ExpenseRepo>(
+      create: (context) => MockExpenseRepository()),
+  Provider<DebtRepo>(
+      create: (context) => MockDebtRepository()),
+  Provider<UnaccountedMoneyRepo>(create: (_) => MockUnaccountedMoneyRepository()),
 ];
